@@ -261,7 +261,7 @@ let allListings = [];
 let currentTrader = null;
 
 async function loadListings() {
-  const { data, error } = await db.from("listings").select("*").eq("verified", true).order("created_at", { ascending: false });
+  const { data, error } = await db.from("Listing").select("*").eq("verified", true).order("created_at", { ascending: false });
   if (error) { console.error(error); return; }
   allListings = data || [];
   renderPriceBoard(allListings);
@@ -330,7 +330,7 @@ function traderLogout() {
 }
 
 async function loadMyListings() {
-  const { data } = await db.from("listings").select("*").eq("trader", currentTrader.full_name).order("created_at", { ascending: false });
+  const { data } = await db.from("Listing").select("*").eq("trader", currentTrader.full_name).order("created_at", { ascending: false });
   const el = document.getElementById("my-listings");
   el.innerHTML = data.map(item => `
     <div class="price-item">
@@ -351,7 +351,7 @@ async function submitListing() {
     const pct = Math.abs((price-avg)/avg*100);
     if (pct>60) { showToast("🚨 AI flagged: price looks unusual. Admin will review."); return; }
   }
-  const { error } = await db.from("listings").insert([{ name, price, unit, category, location, trader:currentTrader.full_name, verified:true, change:"stable" }]);
+  const { error } = await db.from("Listing").insert([{ name, price, unit, category, location, trader:currentTrader.full_name, verified:true, change:"stable" }]);
   if (error) { showToast("❌ Error: "+error.message); return; }
   document.getElementById("update-name").value="";
   document.getElementById("update-price").value="";
@@ -423,7 +423,7 @@ function adminLogout() {
 }
 
 async function loadAdminData() {
-  const { data:listings } = await db.from("listings").select("*");
+  const { data:listings } = await db.from("Listing").select("*");
   const { data:traders } = await db.from("traders").select("*");
   const pending = (traders||[]).filter(t=>t.status==="pending");
   const approved = (traders||[]).filter(t=>t.status==="approved");
@@ -463,7 +463,7 @@ async function rejectTrader(id) {
 }
 
 async function removeListing(id) {
-  await db.from("listings").delete().eq("id", id);
+  await db.from("Listing").delete().eq("id", id);
   showToast("🗑 Listing removed");
   loadAdminData();
   loadListings();
