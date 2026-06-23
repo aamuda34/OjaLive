@@ -252,6 +252,7 @@ textarea{resize:vertical;min-height:80px;}
 </div>
 
 <script>
+window.addEventListener("load", function() {
 const SUPABASE_URL = "https://ivxtmhojrwxfsfblqtcv.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2eHRtaG9qcnd4ZnNmYmxxdGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMDA4NjksImV4cCI6MjA5Nzc3Njg2OX0.hnYsiqkLwnFlo4ZZD9iGbotphOh1lvlr_31sBkds2eM";
 const { createClient } = window.supabase;
@@ -489,6 +490,7 @@ if (navigator.geolocation) {
 }
 
 loadListings();
+});
 </script>
 </body>
 </html>
