@@ -1,29 +1,482 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OjaLive Test</title>
+<title>OjaLive - Live Market Prices</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--earth:#C4612A;--earth-lt:#F0A06A;--dark:#1A1208;--card:#FEFCF8;--muted:#7A6A55;--border:#E8DFD0;--green:#2D7A4F;--red:#C0392B;--amber:#D4A017;--bg:#F7F2EA;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:sans-serif;background:var(--bg);color:var(--dark);font-size:15px;}
+.topbar{background:var(--dark);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-size:20px;font-weight:800;}.logo span{color:var(--earth-lt);}
+.loc{background:var(--earth);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.tabs{display:flex;background:var(--dark);padding:0 16px 14px;gap:8px;}
+.tab{flex:1;padding:9px 0;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:#2E2415;color:#A08060;}
+.tab.active{background:var(--earth);color:#fff;}
+.screen{display:none;padding:16px;}.screen.active{display:block;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
+.card-title{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.price-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.price-item:last-child{border-bottom:none;}
+.mname{font-weight:600;font-size:14px;}.munit{font-size:11px;color:var(--muted);margin-top:1px;}
+.pright{text-align:right;}.pval{font-size:17px;font-weight:700;color:var(--earth);}
+.pbadge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-top:3px;display:inline-block;}
+.up{background:#FDECEA;color:var(--red);}.down{background:#E8F5EE;color:var(--green);}.stable{background:#FDF6E3;color:var(--amber);}
+.vdot{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:4px;}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;margin-top:12px;}
+label:first-child{margin-top:0;}
+input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:#fff;color:var(--dark);outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--earth);}
+textarea{resize:vertical;min-height:80px;}
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;margin-top:14px;}
+.btn-p{background:var(--earth);color:#fff;}.btn-d{background:var(--dark);color:#fff;}.btn-o{background:transparent;border:1.5px solid var(--earth);color:var(--earth);}
+.hero{background:linear-gradient(135deg,var(--dark),#3D2810);border-radius:14px;padding:18px;color:#fff;margin-bottom:14px;}
+.hlabel{font-size:11px;color:var(--earth-lt);font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+.hval{font-size:28px;font-weight:800;margin:4px 0;}.hsub{font-size:12px;color:#C0A880;}
+.ai-box{background:linear-gradient(135deg,#1A2E1A,#0D1F0D);border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2D4A2D;}
+.ai-label{font-size:11px;color:#6FCF97;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.ai-res{background:#0D1F0D;border-radius:10px;padding:12px;margin-top:10px;color:#C8E6C8;font-size:13px;line-height:1.6;border:1px solid #2D4A2D;display:none;}
+.ai-res.show{display:block;}
+.ai-row{display:flex;gap:8px;margin-top:10px;}
+.ai-row input{flex:1;background:#0D1F0D;border-color:#2D4A2D;color:#fff;font-size:13px;}
+.ai-send{padding:10px 14px;background:#2D7A4F;color:#fff;border:none;border-radius:8px;font-size:18px;cursor:pointer;}
+.pt{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.pt:last-child{border-bottom:none;}
+.pt .name{font-weight:600;font-size:14px;}.pt .meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.abts{display:flex;gap:6px;}
+.bsm{padding:5px 12px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;}
+.bapp{background:var(--green);color:#fff;}.brej{background:#FDECEA;color:var(--red);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dark);color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;z-index:999;transition:transform .3s;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.eline{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.eline:last-child{border-bottom:none;font-weight:700;font-size:14px;}
+.empty{text-align:center;padding:24px;color:var(--muted);font-size:13px;}
+.hidden{display:none;}
+.spill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#E8F5EE;color:var(--green);}
+</style>
 </head>
 <body>
-<h1>OjaLive</h1>
-<button onclick="alert('Button works!')">Test Button</button>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<div class="topbar">
+  <div class="logo">Oja<span>Live</span></div>
+  <div class="loc">OjaLive Market</div>
+</div>
+<div class="tabs">
+  <button class="tab active" id="tab-buyer">Buy</button>
+  <button class="tab" id="tab-supplier">Sell</button>
+  <button class="tab" id="tab-ai">AI</button>
+  <button class="tab" id="tab-admin">Admin</button>
+</div>
+<div class="toast" id="toast"></div>
+<div class="screen active" id="screen-buyer">
+  <div class="hero">
+    <div class="hlabel">Live Market Prices</div>
+    <div class="hval" id="listing-count">Loading...</div>
+    <div class="hsub" id="live-time">Fetching from database...</div>
+  </div>
+  <div class="card" style="padding:10px 14px;">
+    <input type="text" placeholder="Search materials, food, fabric..." id="search-input">
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-size:16px;font-weight:700;">Live Prices</div>
+      <div style="font-size:10px;color:var(--muted);">real-time</div>
+    </div>
+    <div id="price-board"><div class="empty">Loading prices...</div></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-supplier">
+  <div id="supplier-login-wall">
+    <div style="max-width:360px;margin:0 auto;padding-top:20px;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-size:32px;font-weight:800;">Oja<span style="color:var(--earth);">Live</span></div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">Seller Portal</div>
+      </div>
+      <div class="card">
+        <div class="card-title">New Here? Register</div>
+        <label>Full Name / Shop Name</label>
+        <input type="text" id="reg-name" placeholder="e.g. Alhaji Musa Stores">
+        <label>Phone Number</label>
+        <input type="tel" id="reg-phone" placeholder="080xxxxxxxx">
+        <label>Market / Shop Location</label>
+        <input type="text" id="reg-location" placeholder="e.g. Shop 12, Oja Oba, Iwo">
+        <label>What do you sell?</label>
+        <select id="reg-trade">
+          <option>Building Materials</option>
+          <option>Foodstuff</option>
+          <option>Hardware</option>
+          <option>Roofing Supplies</option>
+          <option>Timber & Plywood</option>
+          <option>Fabric & Clothing</option>
+          <option>Electronics</option>
+          <option>Other</option>
+        </select>
+        <label>Create Password</label>
+        <input type="password" id="reg-password" placeholder="Create a password">
+        <button class="btn btn-p" id="btn-register">Request Verification</button>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:12px;margin:10px 0;">already registered?</div>
+      <div class="card">
+        <label>Phone Number</label>
+        <input type="tel" id="login-phone" placeholder="080xxxxxxxx">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Your password">
+        <button class="btn btn-d" id="btn-login">Login</button>
+      </div>
+    </div>
+  </div>
+  <div id="supplier-dashboard" class="hidden">
+    <div class="hero">
+      <div class="hlabel">Welcome back</div>
+      <div class="hval" id="supplier-greeting">Loading...</div>
+      <div class="hsub"><span class="spill">Verified Trader</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Post a Price</div>
+      <label>Item Name</label>
+      <input type="text" id="update-name" placeholder="e.g. Dangote Cement, Rice 50kg">
+      <label>Category</label>
+      <select id="update-category">
+        <option>Building Materials</option>
+        <option>Foodstuff</option>
+        <option>Hardware</option>
+        <option>Roofing</option>
+        <option>Timber & Plywood</option>
+        <option>Fabric</option>
+        <option>Electronics</option>
+        <option>Other</option>
+      </select>
+      <label>Price (N)</label>
+      <input type="number" id="update-price" placeholder="e.g. 5200">
+      <label>Unit</label>
+      <input type="text" id="update-unit" placeholder="e.g. per bag, per kg, per yard">
+      <label>Your Location</label>
+      <input type="text" id="update-location" placeholder="e.g. Oja Oba, Iwo">
+      <button class="btn btn-p" id="btn-post">Broadcast Price</button>
+    </div>
+    <div class="card">
+      <div class="card-title">My Listings</div>
+      <div id="my-listings"><div class="empty">No listings yet</div></div>
+    </div>
+    <button class="btn btn-o" id="btn-logout" style="margin-bottom:20px;">Logout</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-ai">
+  <div class="card">
+    <div class="card-title">AI Material Estimator</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Describe your project. AI calculates materials and cost using live prices.</p>
+    <textarea id="project-desc" placeholder="e.g. I want to build a 3-bedroom bungalow..."></textarea>
+    <button class="btn btn-p" id="btn-estimate">Calculate My Costs</button>
+    <div id="estimate-loading" class="hidden" style="text-align:center;padding:16px;color:var(--muted);font-size:13px;">AI is calculating...</div>
+    <div id="estimate-result" class="hidden">
+      <div style="margin-top:14px;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;">Estimated Materials</div>
+      <div id="estimate-lines" style="margin-top:8px;"></div>
+    </div>
+  </div>
+  <div class="ai-box">
+    <div class="ai-label">OjaLive AI Assistant</div>
+    <p style="font-size:12px;color:#8BA3A8;line-height:1.5;">Ask anything about market prices or your project.</p>
+    <div class="ai-row">
+      <input type="text" id="ai-chat-input" placeholder="e.g. Is cement price rising?">
+      <button class="ai-send" id="btn-ai-send">→</button>
+    </div>
+    <div class="ai-res" id="ai-response-box"></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-admin">
+  <div id="admin-login-wall">
+    <div style="max-width:360px;margin:0 auto;padding-top:20px;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-size:32px;font-weight:800;">Admin</div>
+        <div style="font-size:13px;color:var(--muted);">OjaLive Control Panel</div>
+      </div>
+      <div class="card">
+        <label>Admin Password</label>
+        <input type="password" id="admin-pass" placeholder="Enter admin password">
+        <button class="btn btn-d" id="btn-admin-login">Access Dashboard</button>
+      </div>
+    </div>
+  </div>
+  <div id="admin-dashboard" class="hidden">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div class="card" style="text-align:center;padding:14px 8px;">
+        <div id="stat-listings" style="font-size:24px;font-weight:800;color:var(--earth);">0</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Live Listings</div>
+      </div>
+      <div class="card" style="text-align:center;padding:14px 8px;">
+        <div id="stat-pending" style="font-size:24px;font-weight:800;color:var(--amber);">0</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Pending Traders</div>
+      </div>
+      <div class="card" style="text-align:center;padding:14px 8px;">
+        <div id="stat-traders" style="font-size:24px;font-weight:800;color:var(--green);">0</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Verified Traders</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Pending Traders</div>
+      <div id="pending-traders"><div class="empty">No pending registrations</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">All Listings</div>
+      <div id="admin-listings"><div class="empty">No listings yet</div></div>
+    </div>
+    <button class="btn btn-o" id="btn-admin-logout" style="margin-bottom:20px;">Logout</button>
+  </div>
+</div>
 <script>
+const SUPABASE_URL = "https://ivxtmhojrwxfsfblqtcv.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2eHRtaG9qcnd4ZnNmYmxxdGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMDA4NjksImV4cCI6MjA5Nzc3Njg2OX0.hnYsiqkLwnFlo4ZZD9iGbotphOh1lvlr_31sBkds2eM";
+let db, allListings = [], currentTrader = null;
+
 window.addEventListener('load', function() {
   const { createClient } = window.supabase;
-  const db = createClient(
-    'https://ivxtmhojrwxfsfblqtcv.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2eHRtaG9qcnd4ZnNmYmxxdGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMDA4NjksImV4cCI6MjA5Nzc3Njg2OX0.hnYsiqkLwnFlo4ZZD9iGbotphOh1lvlr_31sBkds2eM'
-  );
-  db.from('Listing').select('*').then(function(result) {
-    if (result.error) {
-      document.body.innerHTML += '<p>DB Error: ' + result.error.message + '</p>';
-    } else {
-      document.body.innerHTML += '<p>DB Works! ' + result.data.length + ' listings found</p>';
-    }
+  db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // TABS
+  document.getElementById('tab-buyer').addEventListener('click', function() { switchTab('buyer'); });
+  document.getElementById('tab-supplier').addEventListener('click', function() { switchTab('supplier'); });
+  document.getElementById('tab-ai').addEventListener('click', function() { switchTab('ai'); });
+  document.getElementById('tab-admin').addEventListener('click', function() { switchTab('admin'); });
+
+  // BUYER
+  document.getElementById('search-input').addEventListener('input', function() { filterListings(this.value); });
+
+  // SUPPLIER
+  document.getElementById('btn-register').addEventListener('click', registerTrader);
+  document.getElementById('btn-login').addEventListener('click', traderLogin);
+  document.getElementById('btn-post').addEventListener('click', submitListing);
+  document.getElementById('btn-logout').addEventListener('click', traderLogout);
+
+  // AI
+  document.getElementById('btn-estimate').addEventListener('click', runEstimator);
+  document.getElementById('btn-ai-send').addEventListener('click', sendAIChat);
+  document.getElementById('ai-chat-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') sendAIChat();
   });
+
+  // ADMIN
+  document.getElementById('btn-admin-login').addEventListener('click', adminLogin);
+  document.getElementById('btn-admin-logout').addEventListener('click', adminLogout);
+
+  loadListings();
 });
+
+function switchTab(tab) {
+  ['buyer','supplier','ai','admin'].forEach(function(t) {
+    document.getElementById('tab-'+t).classList.toggle('active', t === tab);
+    document.getElementById('screen-'+t).classList.toggle('active', t === tab);
+  });
+}
+
+async function loadListings() {
+  var result = await db.from('Listing').select('*').eq('verified', true).order('created_at', { ascending: false });
+  if (result.error) { console.error(result.error); return; }
+  allListings = result.data || [];
+  renderPriceBoard(allListings);
+  document.getElementById('listing-count').textContent = allListings.length + ' Live Listings';
+  document.getElementById('live-time').textContent = 'Updated ' + new Date().toLocaleTimeString('en-NG', {hour:'2-digit',minute:'2-digit'});
+}
+
+function renderPriceBoard(data) {
+  var el = document.getElementById('price-board');
+  if (!data.length) { el.innerHTML = '<div class="empty">No listings yet. Be the first to post!</div>'; return; }
+  el.innerHTML = data.map(function(item) {
+    return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+' · <span class="vdot"></span>'+item.trader+' · '+( item.location||'')+' </div></div><div class="pright"><div class="pval">N'+Number(item.price).toLocaleString()+'</div><span class="pbadge '+(item.change||'stable')+'">'+( item.change==='up'?'Rising':item.change==='down'?'Falling':'Stable')+'</span></div></div>';
+  }).join('');
+}
+
+function filterListings(q) {
+  var filtered = allListings.filter(function(i) {
+    return i.name.toLowerCase().includes(q.toLowerCase()) || (i.category||'').toLowerCase().includes(q.toLowerCase());
+  });
+  renderPriceBoard(filtered);
+}
+
+async function registerTrader() {
+  var name = document.getElementById('reg-name').value.trim();
+  var phone = document.getElementById('reg-phone').value.trim();
+  var location = document.getElementById('reg-location').value.trim();
+  var trade = document.getElementById('reg-trade').value;
+  var password = document.getElementById('reg-password').value.trim();
+  if (!name||!phone||!location||!password) { showToast('Fill all fields'); return; }
+  var result = await db.from('traders').insert([{full_name:name,phone:phone,location:location,trade:trade,password:password,status:'pending'}]);
+  if (result.error) { showToast('Error: '+result.error.message); return; }
+  showToast('Registration sent! Admin will verify you soon.');
+  document.getElementById('reg-name').value='';
+  document.getElementById('reg-phone').value='';
+  document.getElementById('reg-location').value='';
+  document.getElementById('reg-password').value='';
+}
+
+async function traderLogin() {
+  var phone = document.getElementById('login-phone').value.trim();
+  var password = document.getElementById('login-password').value.trim();
+  if (!phone||!password) { showToast('Enter phone and password'); return; }
+  var result = await db.from('traders').select('*').eq('phone',phone).eq('password',password).single();
+  if (result.error||!result.data) { showToast('Wrong phone or password'); return; }
+  if (result.data.status !== 'approved') { showToast('Account pending admin approval'); return; }
+  currentTrader = result.data;
+  document.getElementById('supplier-login-wall').classList.add('hidden');
+  document.getElementById('supplier-dashboard').classList.remove('hidden');
+  document.getElementById('supplier-greeting').textContent = result.data.full_name;
+  loadMyListings();
+  showToast('Welcome back, '+result.data.full_name);
+}
+
+function traderLogout() {
+  currentTrader = null;
+  document.getElementById('supplier-login-wall').classList.remove('hidden');
+  document.getElementById('supplier-dashboard').classList.add('hidden');
+}
+
+async function loadMyListings() {
+  var result = await db.from('Listing').select('*').eq('trader', currentTrader.full_name).order('created_at',{ascending:false});
+  var el = document.getElementById('my-listings');
+  if (!result.data||!result.data.length) { el.innerHTML='<div class="empty">No listings yet</div>'; return; }
+  el.innerHTML = result.data.map(function(item) {
+    return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+'</div></div><div class="pright"><div class="pval">N'+Number(item.price).toLocaleString()+'</div></div></div>';
+  }).join('');
+}
+
+async function submitListing() {
+  if (!currentTrader) { showToast('Please login first'); return; }
+  var name = document.getElementById('update-name').value.trim();
+  var price = parseFloat(document.getElementById('update-price').value);
+  var unit = document.getElementById('update-unit').value.trim();
+  var category = document.getElementById('update-category').value;
+  var location = document.getElementById('update-location').value.trim();
+  if (!name||!price||!unit||!location) { showToast('Fill all fields'); return; }
+  var existing = allListings.filter(function(l) { return l.name.toLowerCase()===name.toLowerCase(); });
+  if (existing.length) {
+    var avg = existing.reduce(function(s,l){return s+Number(l.price);},0)/existing.length;
+    if (Math.abs((price-avg)/avg*100)>60) { showToast('AI flagged: price looks unusual. Admin will review.'); return; }
+  }
+  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentTrader.full_name,verified:true,change:'stable'}]);
+  if (result.error) { showToast('Error: '+result.error.message); return; }
+  showToast('Price broadcast to all buyers!');
+  document.getElementById('update-name').value='';
+  document.getElementById('update-price').value='';
+  document.getElementById('update-unit').value='';
+  document.getElementById('update-location').value='';
+  loadListings();
+  loadMyListings();
+}
+
+async function runEstimator() {
+  var desc = document.getElementById('project-desc').value.trim();
+  if (!desc) { showToast('Describe your project first'); return; }
+  document.getElementById('estimate-result').classList.add('hidden');
+  document.getElementById('estimate-loading').classList.remove('hidden');
+  var priceContext = allListings.map(function(p){return p.name+': N'+p.price+' '+p.unit;}).join('\n');
+  var prompt = 'You are OjaLive AI, a building materials estimator for Nigerian markets.\nCurrent live prices:\n'+priceContext+'\nProject: "'+desc+'"\nReturn ONLY valid JSON: {"items":[{"name":"string","qty":"string","total":number}],"grand_total":number,"note":"string"}';
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    var data = await res.json();
+    var text = data.content.map(function(b){return b.text||'';}).join('').replace(/```json|```/g,'').trim();
+    var result = JSON.parse(text);
+    var html = result.items.map(function(i){return '<div class="eline"><span>'+i.name+' x '+i.qty+'</span><span style="color:var(--earth);font-weight:600;">N'+i.total.toLocaleString()+'</span></div>';}).join('');
+    html += '<div class="eline"><span>TOTAL</span><span style="color:var(--earth);font-weight:700;">N'+result.grand_total.toLocaleString()+'</span></div>';
+    if (result.note) html += '<p style="font-size:11px;color:var(--muted);margin-top:8px;">'+result.note+'</p>';
+    document.getElementById('estimate-lines').innerHTML = html;
+    document.getElementById('estimate-result').classList.remove('hidden');
+  } catch(e) {
+    document.getElementById('estimate-lines').innerHTML = '<p style="color:var(--red);font-size:13px;">AI unavailable. Try again.</p>';
+    document.getElementById('estimate-result').classList.remove('hidden');
+  }
+  document.getElementById('estimate-loading').classList.add('hidden');
+}
+
+async function sendAIChat() {
+  var input = document.getElementById('ai-chat-input');
+  var q = input.value.trim();
+  if (!q) return;
+  input.value='';
+  var box = document.getElementById('ai-response-box');
+  box.classList.add('show');
+  box.innerHTML = 'Thinking...';
+  var priceContext = allListings.map(function(p){return p.name+': N'+p.price+' '+p.unit+' ('+p.location+')';}).join('\n');
+  var prompt = 'You are OjaLive AI, a helpful market assistant for Nigerian markets.\nLive prices:\n'+priceContext+'\nQuestion: '+q+'\nAnswer in 2-4 sentences. Be practical. Use Naira.';
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    var data = await res.json();
+    box.innerHTML = data.content.map(function(b){return b.text||'';}).join('');
+  } catch(e) { box.innerHTML = 'Could not reach AI.'; }
+}
+
+function adminLogin() {
+  if (document.getElementById('admin-pass').value === 'ojalive2024') {
+    document.getElementById('admin-login-wall').classList.add('hidden');
+    document.getElementById('admin-dashboard').classList.remove('hidden');
+    loadAdminData();
+    showToast('Admin access granted');
+  } else { showToast('Wrong password'); }
+}
+
+function adminLogout() {
+  document.getElementById('admin-login-wall').classList.remove('hidden');
+  document.getElementById('admin-dashboard').classList.add('hidden');
+  document.getElementById('admin-pass').value='';
+}
+
+async function loadAdminData() {
+  var l = await db.from('Listing').select('*');
+  var t = await db.from('traders').select('*');
+  var listings = l.data||[];
+  var traders = t.data||[];
+  var pending = traders.filter(function(t){return t.status==='pending';});
+  var approved = traders.filter(function(t){return t.status==='approved';});
+  document.getElementById('stat-listings').textContent = listings.length;
+  document.getElementById('stat-pending').textContent = pending.length;
+  document.getElementById('stat-traders').textContent = approved.length;
+  document.getElementById('pending-traders').innerHTML = pending.length ? pending.map(function(t){
+    return '<div class="pt"><div><div class="name">'+t.full_name+'</div><div class="meta">'+t.location+' · '+t.phone+'</div></div><div class="abts"><button class="bsm bapp" data-id="'+t.id+'" data-name="'+t.full_name+'">Approve</button><button class="bsm brej" data-id="'+t.id+'">Reject</button></div></div>';
+  }).join('') : '<div class="empty">No pending registrations</div>';
+  document.getElementById('admin-listings').innerHTML = listings.length ? listings.map(function(l){
+    return '<div class="price-item"><div><div class="mname">'+l.name+'</div><div class="munit">'+l.trader+' · '+(l.location||'')+'</div></div><div class="pright"><div class="pval">N'+Number(l.price).toLocaleString()+'</div><button class="bsm brej" data-lid="'+l.id+'" style="margin-top:4px;">Remove</button></div></div>';
+  }).join('') : '<div class="empty">No listings yet</div>';
+
+  document.querySelectorAll('.bapp').forEach(function(btn) {
+    btn.addEventListener('click', function() { approveTrader(this.dataset.id, this.dataset.name); });
+  });
+  document.querySelectorAll('.brej').forEach(function(btn) {
+    if (btn.dataset.id) btn.addEventListener('click', function() { rejectTrader(this.dataset.id); });
+  });
+  document.querySelectorAll('[data-lid]').forEach(function(btn) {
+    btn.addEventListener('click', function() { removeListing(this.dataset.lid); });
+  });
+}
+
+async function approveTrader(id, name) {
+  await db.from('traders').update({status:'approved'}).eq('id',id);
+  showToast(name+' approved!');
+  loadAdminData();
+}
+
+async function rejectTrader(id) {
+  await db.from('traders').delete().eq('id',id);
+  showToast('Trader rejected');
+  loadAdminData();
+}
+
+async function removeListing(id) {
+  await db.from('Listing').delete().eq('id',id);
+  showToast('Listing removed');
+  loadAdminData();
+  loadListings();
+}
+
+var toastTimer;
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){t.classList.remove('show');}, 3000);
+}
 </script>
 </body>
 </html>
