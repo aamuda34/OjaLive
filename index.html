@@ -274,6 +274,7 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 let db, allListings = [], currentTrader = null;
 
 window.addEventListener('load', function() {
+  try {
   const { createClient } = window.supabase;
   db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -292,7 +293,10 @@ window.addEventListener('load', function() {
   document.getElementById('btn-admin-login').addEventListener('click', adminLogin);
   document.getElementById('btn-admin-logout').addEventListener('click', adminLogout);
 
-  loadListings();
+    loadListings();
+  } catch(e) {
+    document.body.innerHTML += '<div style="background:red;color:white;padding:20px;position:fixed;top:0;left:0;right:0;z-index:9999;">ERROR: '+e.message+'</div>';
+  }
 });
 
 function switchTab(tab) {
