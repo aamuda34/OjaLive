@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OjaLive - Live Market Prices</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--earth:#C4612A;--earth-lt:#F0A06A;--dark:#1A1208;--card:#FEFCF8;--muted:#7A6A55;--border:#E8DFD0;--green:#2D7A4F;--red:#C0392B;--amber:#D4A017;--bg:#F7F2EA;}
@@ -268,12 +268,13 @@ textarea{resize:vertical;min-height:90px;}
     <button class="btn btn-o" id="btn-admin-logout" style="margin-bottom:20px;">Logout</button>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://ivxtmhojrwxfsfblqtcv.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2eHRtaG9qcnd4ZnNmYmxxdGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMDA4NjksImV4cCI6MjA5Nzc3Njg2OX0.hnYsiqkLwnFlo4ZZD9iGbotphOh1lvlr_31sBkds2eM";
 let db, allListings = [], currentTrader = null;
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
   try {
   const { createClient } = window.supabase;
   db = createClient(SUPABASE_URL, SUPABASE_KEY);
