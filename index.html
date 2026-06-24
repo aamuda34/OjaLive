@@ -275,6 +275,7 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 let db, allListings = [], currentTrader = null;
 
 function initApp() {
+  console.log('initApp called', 'supabase available:', !!window.supabase);
   if (!window.supabase) { setTimeout(initApp, 100); return; }
   const { createClient } = window.supabase;
   db = createClient(SUPABASE_URL, SUPABASE_KEY);
