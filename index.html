@@ -41,10 +41,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);fon
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('buyer')">Buy</button>
-  <button class="tab" onclick="switchTab('supplier')">Sell</button>
-  <button class="tab" onclick="switchTab('ai')">AI</button>
-  <button class="tab" onclick="switchTab('admin')">Admin</button>
+  <button class="tab active" id="tab-buyer">Buy</button>
+  <button class="tab" id="tab-supplier">Sell</button>
+  <button class="tab" id="tab-ai">AI</button>
+  <button class="tab" id="tab-admin">Admin</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -87,6 +87,11 @@ function showToast(msg) {
 }
 
 function initDB() {
+  document.getElementById('tab-buyer').addEventListener('click', function() { switchTab('buyer'); });
+  document.getElementById('tab-supplier').addEventListener('click', function() { switchTab('supplier'); });
+  document.getElementById('tab-ai').addEventListener('click', function() { switchTab('ai'); });
+  document.getElementById('tab-admin').addEventListener('click', function() { switchTab('admin'); });
+  
   const { createClient } = window.supabase;
   db = createClient(SUPABASE_URL, SUPABASE_KEY);
   loadListings();
