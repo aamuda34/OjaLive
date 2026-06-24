@@ -306,9 +306,11 @@ function switchTab(tab) {
 }
 
 async function loadListings() {
+  console.log('loadListings called');
   var result = await db.from('Listing').select('*').eq('verified', true).order('created_at', {ascending:false});
   if (result.error) { console.error(result.error); return; }
   allListings = result.data || [];
+  console.log('Loaded', allListings.length, 'listings');
   renderPriceBoard(allListings);
   document.getElementById('listing-count').textContent = allListings.length + ' Live Listings';
   document.getElementById('live-time').textContent = 'Updated ' + new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
