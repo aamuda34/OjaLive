@@ -268,12 +268,14 @@ textarea{resize:vertical;min-height:90px;}
     <button class="btn btn-o" id="btn-admin-logout" style="margin-bottom:20px;">Logout</button>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://ivxtmhojrwxfsfblqtcv.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2eHRtaG9qcnd4ZnNmYmxxdGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMDA4NjksImV4cCI6MjA5Nzc3Njg2OX0.hnYsiqkLwnFlo4ZZD9iGbotphOh1lvlr_31sBkds2eM";
 let db, allListings = [], currentTrader = null;
 
 function initApp() {
+  if (!window.supabase) { setTimeout(initApp, 100); return; }
   const { createClient } = window.supabase;
   db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -511,7 +513,8 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(function(){t.classList.remove('show');},3000);
 }
+
+initApp();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="initApp()"></script>
 </body>
 </html>
