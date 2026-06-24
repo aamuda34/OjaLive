@@ -67,7 +67,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);fon
 <div class="screen" id="screen-ai"><div style="text-align:center;padding:40px;color:var(--muted);">AI Tools - Coming Soon</div></div>
 <div class="screen" id="screen-admin"><div style="text-align:center;padding:40px;color:var(--muted);">Admin Panel - Coming Soon</div></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="initDB()"></script>
 <script>
 const SUPABASE_URL = "https://ivxtmhojrwxfsfblqtcv.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2eHRtaG9qcnd4ZnNmYmxxdGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMDA4NjksImV4cCI6MjA5Nzc3Njg2OX0.hnYsiqkLwnFlo4ZZD9iGbotphOh1lvlr_31sBkds2eM";
@@ -86,11 +86,11 @@ function showToast(msg) {
   setTimeout(function() { document.getElementById('toast').classList.remove('show'); }, 3000);
 }
 
-window.addEventListener('load', function() {
+function initDB() {
   const { createClient } = window.supabase;
   db = createClient(SUPABASE_URL, SUPABASE_KEY);
   loadListings();
-});
+}
 
 async function loadListings() {
   try {
