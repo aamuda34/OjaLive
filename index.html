@@ -31,24 +31,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);fon
 .empty{text-align:center;padding:28px;color:var(--muted);font-size:13px;}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--dark);color:#fff;padding:11px 22px;border-radius:25px;font-size:13px;z-index:999;transition:transform .3s;}
 .toast.show{transform:translateX(-50%) translateY(0);}
+.hidden{display:none!important;}
+.btn{display:block;width:100%;padding:13px 16px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:2px solid transparent;margin-bottom:10px;text-align:center;font-family:'DM Sans',sans-serif;}
+.btn-p{background:var(--earth);color:#fff;border-color:var(--earth);}
+.btn-p:active{background:#a84e22;}
+.btn-d{background:var(--dark);color:#fff;border-color:var(--dark);}
+.btn-d:active{background:#333;}
+.btn-o{background:transparent;color:var(--dark);border-color:var(--border);}
+.btn-o:active{background:var(--border);}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px;}
+input,select{display:block;width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--dark);outline:none;}
+input:focus,select:focus{border-color:var(--earth);}
+.spill{background:#E8F5EE;color:var(--green);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.bsm{padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:none;}
+.bapp{background:var(--earth);color:#fff;}
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <div class="logo">Oja<span>Live</span></div>
   <div style="background:var(--earth);color:#fff;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;">OjaLive v2.0</div>
 </div>
-
 <div class="tabs">
   <button class="tab active" id="tab-buyer">Buy</button>
   <button class="tab" id="tab-supplier">Sell</button>
   <button class="tab" id="tab-ai">AI</button>
   <button class="tab" id="tab-admin">Admin</button>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <div class="screen active" id="screen-buyer">
   <div class="hero">
     <div class="hlabel">Live Market Prices</div>
@@ -62,174 +72,270 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);fon
     <div id="board"><div class="empty">Loading prices...</div></div>
   </div>
 </div>
-
 <div class="screen" id="screen-supplier">
   <div id="seller-login-wall">
-    <div style="max-width:380px;margin:0 auto;padding-top:24px;">
-      <div style="text-align:center;margin-bottom:28px;">
-        <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;">Oja<span style="color:var(--earth);">Live</span></div>
-        <div style="font-size:13px;color:var(--muted);margin-top:4px;">Seller Portal</div>
+    <div style="max-width:400px;margin:0 auto;padding:40px 20px;">
+      <div style="text-align:center;margin-bottom:32px;">
+        <div style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;">Oja<span style="color:var(--earth);">Live</span></div>
+        <div style="font-size:14px;color:var(--muted);margin-top:6px;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Seller Portal</div>
       </div>
-      <div class="card">
-        <div class="card-title">New Seller? Register</div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title" style="margin-bottom:18px;">New Seller</div>
         <label>Shop Name</label>
-        <input type="text" id="reg-name" placeholder="e.g. Alhaji Musa Stores">
+        <input type="text" id="reg-name" placeholder="Your shop or business name">
         <label>Phone Number</label>
         <input type="tel" id="reg-phone" placeholder="080xxxxxxxx">
         <label>Market Location</label>
         <input type="text" id="reg-location" placeholder="e.g. Shop 12, Oja Oba, Iwo">
-        <label>What do you sell?</label>
+        <label>Business Type</label>
         <select id="reg-trade">
           <option>Building Materials</option>
           <option>Foodstuff</option>
           <option>Hardware</option>
           <option>Roofing Supplies</option>
-          <option>Timber</option>
-          <option>Fabric</option>
+          <option>Timber & Plywood</option>
+          <option>Fabric & Clothing</option>
           <option>Electronics</option>
           <option>Other</option>
         </select>
-        <label>Create Password</label>
+        <label>Password</label>
         <input type="password" id="reg-password" placeholder="Min 6 characters">
-        <button class="btn btn-p" id="btn-register-trader">Create Account</button>
+        <button class="btn btn-p" id="btn-register-seller" style="margin-top:16px;">Create Account</button>
       </div>
-      <div style="text-align:center;color:var(--muted);font-size:12px;margin:14px 0;">or login below</div>
+      <div style="text-align:center;color:var(--muted);font-size:12px;margin:20px 0;letter-spacing:1px;text-transform:uppercase;font-weight:600;">or login</div>
       <div class="card">
-        <div class="card-title">Login</div>
+        <div class="card-title" style="margin-bottom:18px;">Existing Seller</div>
         <label>Phone Number</label>
         <input type="tel" id="login-phone" placeholder="080xxxxxxxx">
         <label>Password</label>
         <input type="password" id="login-password" placeholder="Your password">
-        <button class="btn btn-d" id="btn-login-trader">Login</button>
+        <button class="btn btn-d" id="btn-login-seller" style="margin-top:16px;">Login</button>
       </div>
     </div>
   </div>
-
   <div id="seller-dashboard" class="hidden">
     <div class="hero">
       <div class="hlabel">Welcome back</div>
-      <div class="hval" id="trader-name">Loading...</div>
-      <div class="hsub"><span class="spill">✔ Verified Seller</span></div>
+      <div class="hval" id="seller-shop-name">Loading...</div>
+      <div class="hsub"><span class="spill">✔ Active Seller</span></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
       <div class="card" style="text-align:center;padding:14px 8px;">
-        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--earth);" id="stat-listings">0</div>
-        <div style="font-size:11px;color:var(--muted);font-weight:600;">Active Listings</div>
+        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--earth);" id="dashboard-listings-count">0</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Active Items</div>
       </div>
       <div class="card" style="text-align:center;padding:14px 8px;">
-        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--green);" id="stat-value">₦0</div>
+        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--green);" id="dashboard-total-value">₦0</div>
         <div style="font-size:11px;color:var(--muted);font-weight:600;">Total Value</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-      <button class="btn btn-p" id="btn-add-listing" style="margin:0;padding:12px;">Add Item</button>
-      <button class="btn btn-o" id="btn-seller-profile" style="margin:0;padding:12px;color:var(--muted);border-color:var(--border);">Profile</button>
+      <button class="btn btn-p" id="btn-add-new-listing" style="margin:0;">Add Item</button>
+      <button class="btn btn-o" id="btn-seller-stats" style="margin:0;color:var(--muted);border-color:var(--border);">Stats</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+      <button class="btn btn-o" id="btn-seller-profile-nav" style="margin:0;color:var(--muted);border-color:var(--border);">Profile</button>
+      <button class="btn btn-o" id="btn-seller-settings" style="margin:0;color:var(--muted);border-color:var(--border);">Settings</button>
     </div>
     <div class="card">
-      <div class="card-title">Your Listings</div>
-      <div id="seller-listings"><div class="empty">No listings yet</div></div>
+      <div class="card-title">My Items</div>
+      <div id="seller-items-list"><div class="empty">No items yet. Add your first item!</div></div>
     </div>
     <button class="btn btn-o" id="btn-seller-logout" style="margin-bottom:20px;">Logout</button>
   </div>
-
   <div id="seller-add-listing" class="hidden">
-    <div style="margin-bottom:14px;">
-      <button class="btn btn-o" id="btn-back-listings" style="background:transparent;color:var(--muted);border-color:var(--border);margin:0;">← Back</button>
-    </div>
+    <button class="btn btn-o" id="btn-back-from-add" style="background:transparent;color:var(--muted);border-color:var(--border);margin-bottom:14px;">← Back to Dashboard</button>
     <div class="card">
-      <div class="card-title">Add Item</div>
-      <label>Item Name</label>
-      <input type="text" id="item-name" placeholder="e.g. Dangote Cement">
-      <label>Category</label>
-      <select id="item-category">
+      <div class="card-title">Post New Item</div>
+      <label>Item Name *</label>
+      <input type="text" id="add-item-name" placeholder="e.g. Dangote Cement 50kg">
+      <label>Category *</label>
+      <select id="add-item-category">
         <option>Building Materials</option>
         <option>Foodstuff</option>
         <option>Hardware</option>
-        <option>Roofing</option>
-        <option>Timber</option>
-        <option>Fabric</option>
+        <option>Roofing Supplies</option>
+        <option>Timber & Plywood</option>
+        <option>Fabric & Clothing</option>
+        <option>Electronics</option>
+        <option>Other</option>
+      </select>
+      <label>Price (₦) *</label>
+      <input type="number" id="add-item-price" placeholder="e.g. 4400">
+      <label>Unit *</label>
+      <input type="text" id="add-item-unit" placeholder="e.g. per bag, per kg, per piece">
+      <label>Your Location *</label>
+      <input type="text" id="add-item-location" placeholder="e.g. Shop 12, Oja Oba, Iwo">
+      <button class="btn btn-p" id="btn-save-new-listing" style="margin-top:16px;">Post Item</button>
+    </div>
+  </div>
+  <div id="seller-edit-listing" class="hidden">
+    <button class="btn btn-o" id="btn-back-from-edit" style="background:transparent;color:var(--muted);border-color:var(--border);margin-bottom:14px;">← Back to Items</button>
+    <div class="card">
+      <div class="card-title">Edit Item</div>
+      <label>Item Name</label>
+      <input type="text" id="edit-item-name" placeholder="Item name">
+      <label>Category</label>
+      <select id="edit-item-category">
+        <option>Building Materials</option>
+        <option>Foodstuff</option>
+        <option>Hardware</option>
+        <option>Roofing Supplies</option>
+        <option>Timber & Plywood</option>
+        <option>Fabric & Clothing</option>
         <option>Electronics</option>
         <option>Other</option>
       </select>
       <label>Price (₦)</label>
-      <input type="number" id="item-price" placeholder="e.g. 4400">
+      <input type="number" id="edit-item-price" placeholder="Price">
       <label>Unit</label>
-      <input type="text" id="item-unit" placeholder="e.g. per bag, per kg">
-      <label>Your Location</label>
-      <input type="text" id="item-location" placeholder="e.g. Oja Oba, Iwo">
-      <button class="btn btn-p" id="btn-save-listing">Post Item</button>
+      <input type="text" id="edit-item-unit" placeholder="Unit">
+      <label>Location</label>
+      <input type="text" id="edit-item-location" placeholder="Location">
+      <button class="btn btn-p" id="btn-save-edit-listing" style="margin-top:16px;">Save Changes</button>
+      <button class="btn btn-o" id="btn-delete-listing" style="margin-top:10px;border-color:var(--red);color:var(--red);">Delete Item</button>
     </div>
   </div>
-
-  <div id="seller-profile" class="hidden">
-    <div style="margin-bottom:14px;">
-      <button class="btn btn-o" id="btn-back-dashboard" style="background:transparent;color:var(--muted);border-color:var(--border);margin:0;">← Back</button>
-    </div>
+  <div id="seller-price-history" class="hidden">
+    <button class="btn btn-o" id="btn-back-from-history" style="background:transparent;color:var(--muted);border-color:var(--border);margin-bottom:14px;">← Back to Dashboard</button>
     <div class="card">
-      <div class="card-title">Your Profile</div>
-      <div style="padding:12px 0;border-bottom:1px solid var(--border);">
-        <div style="font-size:11px;color:var(--muted);font-weight:600;">Shop Name</div>
-        <div style="font-size:14px;font-weight:600;margin-top:4px;" id="profile-name">-</div>
+      <div class="card-title">Price History</div>
+      <div id="seller-history-list"><div class="empty">No price changes yet</div></div>
+    </div>
+  </div>
+  <div id="seller-profile" class="hidden">
+    <button class="btn btn-o" id="btn-back-from-profile" style="background:transparent;color:var(--muted);border-color:var(--border);margin-bottom:14px;">← Back to Dashboard</button>
+    <div class="card">
+      <div class="card-title">Business Profile</div>
+      <div style="padding:16px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Shop Name</div>
+        <div style="font-size:15px;font-weight:600;margin-top:6px;" id="profile-shop-name">-</div>
       </div>
-      <div style="padding:12px 0;border-bottom:1px solid var(--border);">
-        <div style="font-size:11px;color:var(--muted);font-weight:600;">Phone</div>
-        <div style="font-size:14px;font-weight:600;margin-top:4px;" id="profile-phone">-</div>
+      <div style="padding:16px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Phone</div>
+        <div style="font-size:15px;font-weight:600;margin-top:6px;" id="profile-phone">-</div>
       </div>
-      <div style="padding:12px 0;border-bottom:1px solid var(--border);">
-        <div style="font-size:11px;color:var(--muted);font-weight:600;">Location</div>
-        <div style="font-size:14px;font-weight:600;margin-top:4px;" id="profile-location">-</div>
+      <div style="padding:16px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Location</div>
+        <div style="font-size:15px;font-weight:600;margin-top:6px;" id="profile-location">-</div>
       </div>
-      <div style="padding:12px 0;border-bottom:1px solid var(--border);">
-        <div style="font-size:11px;color:var(--muted);font-weight:600;">Business Type</div>
-        <div style="font-size:14px;font-weight:600;margin-top:4px;" id="profile-trade">-</div>
+      <div style="padding:16px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Business Type</div>
+        <div style="font-size:15px;font-weight:600;margin-top:6px;" id="profile-trade">-</div>
+      </div>
+      <div style="padding:16px 0;">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Status</div>
+        <div style="margin-top:6px;"><span class="spill">✔ Verified Seller</span></div>
       </div>
       <button class="btn btn-o" id="btn-edit-profile" style="margin-top:0;">Edit Profile</button>
+    </div>
+  </div>
+  <div id="seller-edit-profile" class="hidden">
+    <button class="btn btn-o" id="btn-back-from-edit-profile" style="background:transparent;color:var(--muted);border-color:var(--border);margin-bottom:14px;">← Back to Profile</button>
+    <div class="card">
+      <div class="card-title">Update Profile</div>
+      <label>Shop Name</label>
+      <input type="text" id="edit-profile-name" placeholder="Shop name">
+      <label>Phone Number</label>
+      <input type="tel" id="edit-profile-phone" placeholder="Phone">
+      <label>Location</label>
+      <input type="text" id="edit-profile-location" placeholder="Location">
+      <label>Business Type</label>
+      <select id="edit-profile-trade">
+        <option>Building Materials</option>
+        <option>Foodstuff</option>
+        <option>Hardware</option>
+        <option>Roofing Supplies</option>
+        <option>Timber & Plywood</option>
+        <option>Fabric & Clothing</option>
+        <option>Electronics</option>
+        <option>Other</option>
+      </select>
+      <button class="btn btn-p" id="btn-save-edit-profile" style="margin-top:16px;">Save Changes</button>
+    </div>
+  </div>
+  <div id="seller-statistics" class="hidden">
+    <button class="btn btn-o" id="btn-back-from-stats" style="background:transparent;color:var(--muted);border-color:var(--border);margin-bottom:14px;">← Back to Dashboard</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div class="card" style="text-align:center;padding:14px 8px;">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--earth);" id="stats-active-items">0</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Active Items</div>
+      </div>
+      <div class="card" style="text-align:center;padding:14px 8px;">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);" id="stats-total-value">₦0</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Total Value</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Item Performance</div>
+      <div id="stats-items-list"><div class="empty">No items to analyze</div></div>
+    </div>
+  </div>
+  <div id="seller-settings" class="hidden">
+    <button class="btn btn-o" id="btn-back-from-settings" style="background:transparent;color:var(--muted);border-color:var(--border);margin-bottom:14px;">← Back to Dashboard</button>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">Account Settings</div>
+      <label>Current Password</label>
+      <input type="password" id="settings-current-password" placeholder="Current password">
+      <label>New Password</label>
+      <input type="password" id="settings-new-password" placeholder="New password (min 6 chars)">
+      <button class="btn btn-d" id="btn-change-password" style="margin-top:14px;">Update Password</button>
+    </div>
+    <div class="card" style="background:#FDF6E3;border-color:var(--amber);">
+      <div class="card-title">Danger Zone</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Delete your account permanently. This cannot be undone.</p>
+      <button class="btn btn-o" id="btn-delete-account" style="border-color:var(--red);color:var(--red);">Delete Account</button>
     </div>
   </div>
 </div>
 <div class="screen" id="screen-ai"><div style="text-align:center;padding:40px;color:var(--muted);">AI Tools - Coming Soon</div></div>
 <div class="screen" id="screen-admin"><div style="text-align:center;padding:40px;color:var(--muted);">Admin Panel - Coming Soon</div></div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://ivxtmhojrwxfsfblqtcv.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2eHRtaG9qcnd4ZnNmYmxxdGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMDA4NjksImV4cCI6MjA5Nzc3Njg2OX0.hnYsiqkLwnFlo4ZZD9iGbotphOh1lvlr_31sBkds2eM";
 let db;
-
 function switchTab(tab) {
   ['buyer','supplier','ai','admin'].forEach(function(t) {
     document.getElementById('tab-'+t).classList.toggle('active', t===tab);
     document.getElementById('screen-'+t).classList.toggle('active', t===tab);
   });
 }
-
 function showToast(msg) {
   document.getElementById('toast').textContent = msg;
   document.getElementById('toast').classList.add('show');
   setTimeout(function() { document.getElementById('toast').classList.remove('show'); }, 3000);
 }
-
 function initDB() {
   document.getElementById('tab-buyer').addEventListener('click', function() { switchTab('buyer'); });
   document.getElementById('tab-supplier').addEventListener('click', function() { switchTab('supplier'); });
   document.getElementById('tab-ai').addEventListener('click', function() { switchTab('ai'); });
   document.getElementById('tab-admin').addEventListener('click', function() { switchTab('admin'); });
-  
-  document.getElementById('btn-register-trader').addEventListener('click', registerTrader);
-  document.getElementById('btn-login-trader').addEventListener('click', loginTrader);
-  document.getElementById('btn-seller-logout').addEventListener('click', logoutTrader);
-  document.getElementById('btn-add-listing').addEventListener('click', showAddListing);
-  document.getElementById('btn-save-listing').addEventListener('click', addListing);
-  document.getElementById('btn-seller-profile').addEventListener('click', showSellerProfile);
-  document.getElementById('btn-edit-profile').addEventListener('click', function() { showToast('Edit profile coming soon'); });
-  document.getElementById('btn-back-listings').addEventListener('click', backToDashboard);
-  document.getElementById('btn-back-dashboard').addEventListener('click', backToDashboard);
-  
+  document.getElementById('btn-register-seller').addEventListener('click', sellerRegister);
+  document.getElementById('btn-login-seller').addEventListener('click', sellerLogin);
+  document.getElementById('btn-seller-logout').addEventListener('click', sellerLogout);
+  document.getElementById('btn-add-new-listing').addEventListener('click', sellerAddListingScreen);
+  document.getElementById('btn-seller-stats').addEventListener('click', sellerStatisticsScreen);
+  document.getElementById('btn-seller-profile-nav').addEventListener('click', sellerProfileScreen);
+  document.getElementById('btn-seller-settings').addEventListener('click', function() { sellerShowScreen('seller-settings'); });
+  document.getElementById('btn-save-new-listing').addEventListener('click', sellerSaveNewListing);
+  document.getElementById('btn-back-from-add').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+  document.getElementById('btn-save-edit-listing').addEventListener('click', sellerSaveEditListing);
+  document.getElementById('btn-delete-listing').addEventListener('click', sellerDeleteListing);
+  document.getElementById('btn-back-from-edit').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+  document.getElementById('btn-back-from-history').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+  document.getElementById('btn-edit-profile').addEventListener('click', sellerEditProfileScreen);
+  document.getElementById('btn-back-from-profile').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+  document.getElementById('btn-save-edit-profile').addEventListener('click', sellerSaveEditProfile);
+  document.getElementById('btn-back-from-edit-profile').addEventListener('click', sellerProfileScreen);
+  document.getElementById('btn-back-from-stats').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+  document.getElementById('btn-change-password').addEventListener('click', sellerChangePassword);
+  document.getElementById('btn-delete-account').addEventListener('click', sellerDeleteAccount);
+  document.getElementById('btn-back-from-settings').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
   const { createClient } = window.supabase;
   db = createClient(SUPABASE_URL, SUPABASE_KEY);
   loadListings();
 }
-
 async function loadListings() {
   try {
     var result = await db.from('Listing').select('*').eq('verified', true);
@@ -245,11 +351,16 @@ async function loadListings() {
   }
 }
 </script>
-
 <script>
-let currentTrader = null;
-
-async function registerTrader() {
+let currentSeller = null;
+let currentEditingListingId = null;
+function sellerShowScreen(screenName) {
+  ['seller-login-wall','seller-dashboard','seller-add-listing','seller-edit-listing','seller-price-history','seller-profile','seller-edit-profile','seller-statistics','seller-settings'].forEach(function(s) {
+    document.getElementById(s).classList.add('hidden');
+  });
+  document.getElementById(screenName).classList.remove('hidden');
+}
+async function sellerRegister() {
   var name = document.getElementById('reg-name').value.trim();
   var phone = document.getElementById('reg-phone').value.trim();
   var location = document.getElementById('reg-location').value.trim();
@@ -265,98 +376,160 @@ async function registerTrader() {
   document.getElementById('reg-location').value='';
   document.getElementById('reg-password').value='';
 }
-
-async function loginTrader() {
+async function sellerLogin() {
   var phone = document.getElementById('login-phone').value.trim();
   var password = document.getElementById('login-password').value.trim();
   if (!phone||!password) { showToast('Enter phone and password'); return; }
   var result = await db.from('traders').select('*').eq('phone',phone).eq('password',password).single();
   if (result.error||!result.data) { showToast('Wrong phone or password'); return; }
-  currentTrader = result.data;
-  document.getElementById('seller-login-wall').classList.add('hidden');
-  document.getElementById('seller-dashboard').classList.remove('hidden');
-  document.getElementById('trader-name').textContent = result.data.full_name;
-  loadSellerListings();
+  currentSeller = result.data;
+  document.getElementById('seller-shop-name').textContent = result.data.full_name;
+  sellerShowScreen('seller-dashboard');
+  loadSellerDashboard();
   showToast('Welcome '+result.data.full_name);
 }
-
-function logoutTrader() {
-  currentTrader = null;
-  document.getElementById('seller-login-wall').classList.remove('hidden');
-  document.getElementById('seller-dashboard').classList.add('hidden');
-  document.getElementById('seller-add-listing').classList.add('hidden');
-  document.getElementById('seller-profile').classList.add('hidden');
+function sellerLogout() {
+  currentSeller = null;
+  sellerShowScreen('seller-login-wall');
   document.getElementById('login-phone').value='';
   document.getElementById('login-password').value='';
 }
-
-async function loadSellerListings() {
-  var result = await db.from('Listing').select('*').eq('trader',currentTrader.full_name);
+async function loadSellerDashboard() {
+  var result = await db.from('Listing').select('*').eq('trader',currentSeller.full_name);
   var listings = result.data || [];
-  document.getElementById('stat-listings').textContent = listings.length;
+  document.getElementById('dashboard-listings-count').textContent = listings.length;
   var total = listings.reduce(function(s,l){return s+Number(l.price);},0);
-  document.getElementById('stat-value').textContent = '₦'+total.toLocaleString();
-  var el = document.getElementById('seller-listings');
-  if (!listings.length) { el.innerHTML = '<div class="empty">No listings yet</div>'; return; }
-  el.innerHTML = listings.map(function(item) {
-    return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+' · '+item.location+'</div></div><div class="pright"><div class="pval">₦'+Number(item.price).toLocaleString()+'</div><div style="display:flex;gap:4px;margin-top:6px;"><button class="bsm bapp" onclick="editListing('+item.id+')">Edit</button><button class="bsm brej" onclick="deleteListing('+item.id+')">Delete</button></div></div></div>';
+  document.getElementById('dashboard-total-value').textContent = '₦'+total.toLocaleString();
+  var html = listings.map(function(item) {
+    return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+' · '+item.location+'</div></div><div class="pright"><div class="pval">₦'+Number(item.price).toLocaleString()+'</div><button class="bsm bapp" onclick="sellerEditListingScreen('+item.id+')">Edit</button></div></div>';
   }).join('');
+  if (!listings.length) html = '<div class="empty">No items yet. Add your first item!</div>';
+  document.getElementById('seller-items-list').innerHTML = html;
 }
-
-async function addListing() {
-  var name = document.getElementById('item-name').value.trim();
-  var price = parseFloat(document.getElementById('item-price').value);
-  var unit = document.getElementById('item-unit').value.trim();
-  var category = document.getElementById('item-category').value;
-  var location = document.getElementById('item-location').value.trim();
+function sellerAddListingScreen() {
+  document.getElementById('add-item-name').value='';
+  document.getElementById('add-item-price').value='';
+  document.getElementById('add-item-unit').value='';
+  document.getElementById('add-item-location').value=currentSeller.location;
+  sellerShowScreen('seller-add-listing');
+}
+async function sellerSaveNewListing() {
+  var name = document.getElementById('add-item-name').value.trim();
+  var price = parseFloat(document.getElementById('add-item-price').value);
+  var unit = document.getElementById('add-item-unit').value.trim();
+  var category = document.getElementById('add-item-category').value;
+  var location = document.getElementById('add-item-location').value.trim();
   if (!name||!price||!unit||!location) { showToast('Fill all fields'); return; }
-  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentTrader.full_name,verified:true,change:'stable'}]);
+  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable'}]);
   if (result.error) { showToast('Error: '+result.error.message); return; }
   showToast('Item posted!');
-  document.getElementById('item-name').value='';
-  document.getElementById('item-price').value='';
-  document.getElementById('item-unit').value='';
-  document.getElementById('item-location').value='';
-  document.getElementById('seller-add-listing').classList.add('hidden');
-  document.getElementById('seller-dashboard').classList.remove('hidden');
-  loadSellerListings();
+  loadSellerDashboard();
   loadListings();
+  sellerShowScreen('seller-dashboard');
 }
-
-async function deleteListing(id) {
-  if (!confirm('Delete this listing?')) return;
-  await db.from('Listing').delete().eq('id',id);
-  showToast('Listing deleted');
-  loadSellerListings();
+async function sellerEditListingScreen(id) {
+  var result = await db.from('Listing').select('*').eq('id',id).single();
+  if (result.error||!result.data) { showToast('Item not found'); return; }
+  var item = result.data;
+  currentEditingListingId = item.id;
+  document.getElementById('edit-item-name').value = item.name;
+  document.getElementById('edit-item-price').value = item.price;
+  document.getElementById('edit-item-unit').value = item.unit;
+  document.getElementById('edit-item-location').value = item.location;
+  document.getElementById('edit-item-category').value = item.category;
+  sellerShowScreen('seller-edit-listing');
+}
+async function sellerSaveEditListing() {
+  if (!currentEditingListingId) { showToast('No item selected'); return; }
+  var name = document.getElementById('edit-item-name').value.trim();
+  var price = parseFloat(document.getElementById('edit-item-price').value);
+  var unit = document.getElementById('edit-item-unit').value.trim();
+  var category = document.getElementById('edit-item-category').value;
+  var location = document.getElementById('edit-item-location').value.trim();
+  if (!name||!price||!unit||!location) { showToast('Fill all fields'); return; }
+  var result = await db.from('Listing').update({name:name,price:price,unit:unit,category:category,location:location}).eq('id',currentEditingListingId);
+  if (result.error) { showToast('Error: '+result.error.message); return; }
+  showToast('Item updated!');
+  loadSellerDashboard();
   loadListings();
+  sellerShowScreen('seller-dashboard');
 }
-
-function editListing(id) {
-  showToast('Edit feature coming soon');
+async function sellerDeleteListing() {
+  if (!currentEditingListingId) { showToast('No item selected'); return; }
+  if (!confirm('Delete this item permanently?')) return;
+  var result = await db.from('Listing').delete().eq('id',currentEditingListingId);
+  if (result.error) { showToast('Error: '+result.error.message); return; }
+  showToast('Item deleted');
+  currentEditingListingId = null;
+  loadSellerDashboard();
+  loadListings();
+  sellerShowScreen('seller-dashboard');
 }
-
-function showSellerProfile() {
-  document.getElementById('seller-dashboard').classList.add('hidden');
-  document.getElementById('seller-profile').classList.remove('hidden');
-  document.getElementById('profile-name').textContent = currentTrader.full_name;
-  document.getElementById('profile-phone').textContent = currentTrader.phone;
-  document.getElementById('profile-location').textContent = currentTrader.location;
-  document.getElementById('profile-trade').textContent = currentTrader.trade;
+function sellerProfileScreen() {
+  document.getElementById('profile-shop-name').textContent = currentSeller.full_name;
+  document.getElementById('profile-phone').textContent = currentSeller.phone;
+  document.getElementById('profile-location').textContent = currentSeller.location;
+  document.getElementById('profile-trade').textContent = currentSeller.trade;
+  sellerShowScreen('seller-profile');
 }
-
-function showAddListing() {
-  document.getElementById('seller-dashboard').classList.add('hidden');
-  document.getElementById('seller-add-listing').classList.remove('hidden');
+function sellerEditProfileScreen() {
+  document.getElementById('edit-profile-name').value = currentSeller.full_name;
+  document.getElementById('edit-profile-phone').value = currentSeller.phone;
+  document.getElementById('edit-profile-location').value = currentSeller.location;
+  document.getElementById('edit-profile-trade').value = currentSeller.trade;
+  sellerShowScreen('seller-edit-profile');
 }
-
-function backToDashboard() {
-  document.getElementById('seller-add-listing').classList.add('hidden');
-  document.getElementById('seller-profile').classList.add('hidden');
-  document.getElementById('seller-dashboard').classList.remove('hidden');
-  loadSellerListings();
+async function sellerSaveEditProfile() {
+  var name = document.getElementById('edit-profile-name').value.trim();
+  var phone = document.getElementById('edit-profile-phone').value.trim();
+  var location = document.getElementById('edit-profile-location').value.trim();
+  var trade = document.getElementById('edit-profile-trade').value;
+  if (!name||!phone||!location) { showToast('Fill all fields'); return; }
+  var result = await db.from('traders').update({full_name:name,phone:phone,location:location,trade:trade}).eq('id',currentSeller.id);
+  if (result.error) { showToast('Error: '+result.error.message); return; }
+  currentSeller.full_name = name;
+  currentSeller.phone = phone;
+  currentSeller.location = location;
+  currentSeller.trade = trade;
+  showToast('Profile updated!');
+  sellerProfileScreen();
+}
+async function sellerStatisticsScreen() {
+  var result = await db.from('Listing').select('*').eq('trader',currentSeller.full_name);
+  var listings = result.data || [];
+  document.getElementById('stats-active-items').textContent = listings.length;
+  var total = listings.reduce(function(s,l){return s+Number(l.price);},0);
+  document.getElementById('stats-total-value').textContent = '₦'+total.toLocaleString();
+  var html = listings.map(function(item) {
+    return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+' at '+item.location+'</div></div><div class="pright"><div class="pval">₦'+Number(item.price).toLocaleString()+'</div></div></div>';
+  }).join('');
+  if (!listings.length) html = '<div class="empty">No items yet</div>';
+  document.getElementById('stats-items-list').innerHTML = html;
+  sellerShowScreen('seller-statistics');
+}
+async function sellerChangePassword() {
+  var current = document.getElementById('settings-current-password').value.trim();
+  var newPass = document.getElementById('settings-new-password').value.trim();
+  if (!current||!newPass) { showToast('Fill all fields'); return; }
+  if (newPass.length < 6) { showToast('New password must be 6+ characters'); return; }
+  if (current !== currentSeller.password) { showToast('Current password is wrong'); return; }
+  var result = await db.from('traders').update({password:newPass}).eq('id',currentSeller.id);
+  if (result.error) { showToast('Error: '+result.error.message); return; }
+  currentSeller.password = newPass;
+  document.getElementById('settings-current-password').value='';
+  document.getElementById('settings-new-password').value='';
+  showToast('Password changed successfully');
+}
+async function sellerDeleteAccount() {
+  if (!confirm('Are you sure? This will delete your account and all your listings. This cannot be undone.')) return;
+  await db.from('Listing').delete().eq('trader',currentSeller.full_name);
+  var result = await db.from('traders').delete().eq('id',currentSeller.id);
+  if (result.error) { showToast('Error: '+result.error.message); return; }
+  showToast('Account deleted');
+  sellerLogout();
+  loadListings();
 }
 </script>
-
 <script>
 var initTimer = setInterval(function() {
   if (window.supabase) {
