@@ -93,6 +93,10 @@ input:focus,select:focus{border-color:var(--earth);}
         <select id="reg-state"><option value="Osun">Osun</option><option value="Lagos">Lagos</option><option value="Oyo">Oyo</option><option value="Kano">Kano</option></select>
         <label>City / Market</label>
         <input type="text" id="reg-location" placeholder="e.g. Iwo, Osogbo">
+        <button type="button" onclick="captureRegLocation()" style="width:100%;padding:10px;margin-top:6px;background:#E8F5EE;border:1.5px solid var(--green);color:var(--green);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" id="btn-capture-location">📍 Capture My Exact Location</button>
+        <div id="reg-gps-status" style="font-size:11px;color:var(--muted);margin-top:4px;">Tap the button above to capture your exact shop location</div>
+        <input type="hidden" id="reg-lat">
+        <input type="hidden" id="reg-lng">
         <label>Business Type</label>
         <select id="reg-trade">
           <option>Building Materials</option>
@@ -172,6 +176,7 @@ input:focus,select:focus{border-color:var(--earth);}
       <input type="text" id="add-item-unit" placeholder="e.g. per bag, per kg, per piece">
       <label>Your Location *</label>
       <input type="text" id="add-item-location" placeholder="e.g. Shop 12, Oja Oba, Iwo">
+      <label style="display:flex;align-items:center;gap:10px;margin-top:14px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--dark);"><input type="checkbox" id="add-show-phone" style="width:18px;height:18px;display:inline;" checked> Show my phone number to buyers</label>
       <button class="btn btn-p" id="btn-save-new-listing" style="margin-top:16px;">Post Item</button>
     </div>
   </div>
@@ -312,6 +317,19 @@ function showToast(msg) {
   document.getElementById('toast').classList.add('show');
   setTimeout(function() { document.getElementById('toast').classList.remove('show'); }, 3000);
 }
+async function restoreSellerSession() {
+  var saved = localStorage.getItem('ojalive_seller');
+  if (!saved) return;
+  try {
+    var seller = JSON.parse(saved);
+    var result = await db.from('traders').select('*').eq('id',seller.id).single();
+    if (result.error||!result.data) { localStorage.removeItem('ojalive_seller'); return; }
+    currentSeller = result.data;
+    document.getElementById('seller-shop-name').textContent = result.data.full_name;
+    sellerShowScreen('seller-dashboard');
+    loadSellerDashboard();
+  } catch(e) { localStorage.removeItem('ojalive_seller'); }
+}
 function initDB() {
   document.getElementById('tab-buyer').addEventListener('click', function() { switchTab('buyer'); requestBuyerLocation(); });
   document.getElementById('tab-supplier').addEventListener('click', function() { switchTab('supplier'); });
@@ -341,6 +359,7 @@ function initDB() {
   const { createClient } = window.supabase;
   db = createClient(SUPABASE_URL, SUPABASE_KEY);
   loadListings();
+  restoreSellerSession();
 }
 var allListings = [];
 var buyerLat = null;
@@ -360,16 +379,27 @@ async function loadListings() {
     var result = await db.from('Listing').select('*').eq('verified', true);
     if (result.error) { showToast('Error: '+result.error.message); return; }
     allListings = result.data || [];
-    requestBuyerLocation();
-  document.getElementById('filter-city').addEventListener('change', renderBoard);
+    document.getElementById('filter-city').addEventListener('change', renderBoard);
+  setTimeout(function() {
+    var btn = document.getElementById('btn-use-location');
+    if (btn) btn.click();
+  }, 800);
     document.getElementById('filter-category').addEventListener('change', renderBoard);
     renderBoard();
   } catch(e) {
     showToast('Fatal error: '+e.message);
   }
 }
+function showDirections(lat, lng, name, address) {
+  var destination = (lat && lng) ? lat+','+lng : encodeURIComponent(address);
+  var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination='+destination+(buyerLat?'&origin='+buyerLat+','+buyerLng:'');
+  if (confirm('Open Google Maps for directions to ' + name + '?')) {
+    window.open(mapsUrl, '_blank');
+  }
+}
 function requestBuyerLocation() {
   var btn = document.getElementById('btn-use-location');
+  if (!btn) return;
   if (!navigator.geolocation) { btn.textContent = 'GPS not supported'; return; }
   btn.textContent = '📍 Getting your location...';
   btn.disabled = true;
@@ -378,13 +408,15 @@ function requestBuyerLocation() {
       buyerLat = pos.coords.latitude;
       buyerLng = pos.coords.longitude;
       btn.textContent = '✅ Location found — sorted by distance';
+      btn.style.background = '#d4f0e0';
+      btn.disabled = false;
       renderBoard();
     },
     function(err) {
-      btn.textContent = '📍 Location denied — tap to try again';
+      btn.textContent = '📍 Tap to use your location';
       btn.disabled = false;
     },
-    { enableHighAccuracy: true, timeout: 10000 }
+    { enableHighAccuracy: false, timeout: 8000, maximumAge: 30000 }
   );
 }
 function renderBoard() {
@@ -410,7 +442,25 @@ function renderBoard() {
       var d = getDistance(buyerLat,buyerLng,item.latitude,item.longitude);
       distBadge = '<span style="font-size:10px;color:var(--green);font-weight:600;margin-left:4px;">📍 '+d+' km away</span>';
     }
-    return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+' · <span class="vdot"></span>'+item.trader+' · '+item.location+distBadge+'</div></div><div class="pright"><div class="pval">&#8358;'+Number(item.price).toLocaleString()+'</div><span class="pbadge stable">Stable</span></div></div>';
+    var dirBtn = '';
+    if (item.latitude && item.longitude) {
+      var safeName = item.name.replace(/'/g,'').replace(/"/g,'');
+      dirBtn = '<button onclick="showDirections(' + item.latitude + ',' + item.longitude + ',&quot;' + safeName + '&quot;,null)" style="margin-top:6px;width:100%;padding:7px;background:var(--dark);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">📍 Get Directions</button>';
+    } else if (item.location) {
+      var safeAddr = encodeURIComponent(item.location);
+      var safeName2 = item.name.replace(/'/g,'').replace(/"/g,'');
+      dirBtn = '<button onclick="showDirections(null,null,&quot;' + safeName2 + '&quot;,&quot;' + item.location + '&quot;)" style="margin-top:6px;width:100%;padding:7px;background:var(--dark);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">📍 Get Directions</button>';
+    }
+    var phoneBtn = '';
+    if (item.phone) { phoneBtn = '<a href="tel:'+item.phone+'" style="display:block;margin-top:4px;text-align:center;padding:7px;background:#E8F5EE;color:var(--green);border-radius:8px;font-size:11px;font-weight:600;">📞 Call Seller</a>'; }
+    var chatBtn = '<button onclick="showToast(&quot;In-app chat coming soon!&quot;)" style="display:block;width:100%;margin-top:6px;padding:10px;background:var(--earth);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">💬 Chat Now — Recommended</button>';
+    var waBtn = '';
+    if (item.phone) {
+      var waMsg = encodeURIComponent('Hi, I saw your listing on OjaLive. I am interested in '+item.name+' at ₦'+Number(item.price).toLocaleString()+' '+item.unit);
+      var waNum = item.phone.replace(/^0/, '234');
+      waBtn = '<a href="https://wa.me/'+waNum+'?text='+waMsg+'" target="_blank" style="display:block;margin-top:4px;text-align:center;padding:8px;background:#25D366;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">💬 WhatsApp</a>';
+    }
+    return '<div class="price-item" style="flex-direction:column;align-items:flex-start;"><div style="display:flex;justify-content:space-between;width:100%;"><div><div class="mname">'+item.name+'</div><div class="munit"><span class="vdot"></span>'+item.trader+' · '+item.location+distBadge+'</div></div><div class="pright"><div class="pval">&#8358;'+Number(item.price).toLocaleString()+'</div><div style="font-size:13px;font-weight:600;color:var(--muted);margin-top:2px;">per '+item.unit+'</div><span class="pbadge stable">Stable</span></div></div>'+chatBtn+waBtn+phoneBtn+dirBtn+'</div>';
   }).join('');
 }
 </script>
@@ -423,6 +473,28 @@ function sellerShowScreen(screenName) {
   });
   document.getElementById(screenName).classList.remove('hidden');
 }
+function captureRegLocation() {
+  var btn = document.getElementById('btn-capture-location');
+  var status = document.getElementById('reg-gps-status');
+  if (!navigator.geolocation) { status.textContent = 'GPS not supported'; return; }
+  btn.textContent = '📍 Getting location...';
+  btn.disabled = true;
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      document.getElementById('reg-lat').value = pos.coords.latitude;
+      document.getElementById('reg-lng').value = pos.coords.longitude;
+      btn.textContent = '✅ Location captured!';
+      status.textContent = 'GPS: '+pos.coords.latitude.toFixed(4)+', '+pos.coords.longitude.toFixed(4);
+      status.style.color = 'var(--green)';
+    },
+    function(err) {
+      btn.textContent = '📍 Tap to try again';
+      btn.disabled = false;
+      status.textContent = 'Could not get location — you can still type your city above';
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+}
 async function sellerRegister() {
   var name = document.getElementById('reg-name').value.trim();
   var phone = document.getElementById('reg-phone').value.trim();
@@ -434,7 +506,9 @@ async function sellerRegister() {
   if (!name||!phone||!location||!password) { showToast('Fill all fields'); return; }
   if (password.length < 6) { showToast('Password must be 6+ characters'); return; }
   var fullLocation = location+', '+state+', '+country;
-  var result = await db.from('traders').insert([{full_name:name,phone:phone,location:fullLocation,trade:trade,password:password,status:'approved'}]);
+  var regLat = document.getElementById('reg-lat').value || null;
+  var regLng = document.getElementById('reg-lng').value || null;
+  var result = await db.from('traders').insert([{full_name:name,phone:phone,location:fullLocation,trade:trade,password:password,status:'approved',latitude:regLat,longitude:regLng}]);
   if (result.error) { showToast('Error: '+result.error.message); return; }
   showToast('Account created! Login now.');
   document.getElementById('reg-name').value='';
@@ -449,6 +523,7 @@ async function sellerLogin() {
   var result = await db.from('traders').select('*').eq('phone',phone).eq('password',password).single();
   if (result.error||!result.data) { showToast('Wrong phone or password'); return; }
   currentSeller = result.data;
+  localStorage.setItem('ojalive_seller', JSON.stringify(result.data));
   document.getElementById('seller-shop-name').textContent = result.data.full_name;
   sellerShowScreen('seller-dashboard');
   loadSellerDashboard();
@@ -456,6 +531,7 @@ async function sellerLogin() {
 }
 function sellerLogout() {
   currentSeller = null;
+  localStorage.removeItem('ojalive_seller');
   sellerShowScreen('seller-login-wall');
   document.getElementById('login-phone').value='';
   document.getElementById('login-password').value='';
@@ -503,9 +579,14 @@ async function sellerSaveNewListing() {
   var category = document.getElementById('add-item-category').value;
   var location = document.getElementById('add-item-location').value.trim();
   if (!name||!price||!unit||!location) { showToast('Fill all fields'); return; }
-  showToast('Getting your GPS...');
-  var gps = await getSellerGPS();
-  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable',latitude:gps.lat,longitude:gps.lng}]);
+  var gps = {lat: currentSeller.latitude || null, lng: currentSeller.longitude || null};
+  if (!gps.lat || !gps.lng) {
+    showToast('Getting your GPS...');
+    gps = await getSellerGPS();
+  }
+  var showPhone = document.getElementById('add-show-phone').checked;
+  var phone = showPhone ? currentSeller.phone : null;
+  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable',latitude:gps.lat,longitude:gps.lng,phone:phone}]);
   if (result.error) { showToast('Error: '+result.error.message); return; }
   showToast('Item posted!');
   loadSellerDashboard();
@@ -613,6 +694,7 @@ async function sellerDeleteAccount() {
   showToast('Account deleted');
   sellerLogout();
   loadListings();
+  restoreSellerSession();
 }
 </script>
 <script>
