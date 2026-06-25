@@ -65,6 +65,7 @@ input:focus,select:focus{border-color:var(--earth);}
     <div class="hval" id="count">0 Listings</div>
     <div class="hsub">Loading...</div>
   </div>
+  <button id="btn-use-location" onclick="requestBuyerLocation()" style="width:100%;padding:11px 16px;background:#E8F5EE;border:1.5px solid var(--green);color:var(--green);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;">📍 Use My Location — See Nearest Prices</button>
   <div class="card">
     <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
       <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;">Live Prices</div>
@@ -312,7 +313,7 @@ function showToast(msg) {
   setTimeout(function() { document.getElementById('toast').classList.remove('show'); }, 3000);
 }
 function initDB() {
-  document.getElementById('tab-buyer').addEventListener('click', function() { switchTab('buyer'); });
+  document.getElementById('tab-buyer').addEventListener('click', function() { switchTab('buyer'); requestBuyerLocation(); });
   document.getElementById('tab-supplier').addEventListener('click', function() { switchTab('supplier'); });
   document.getElementById('tab-ai').addEventListener('click', function() { switchTab('ai'); });
   document.getElementById('tab-admin').addEventListener('click', function() { switchTab('admin'); });
@@ -356,22 +357,35 @@ function getDistance(lat1, lng1, lat2, lng2) {
 
 async function loadListings() {
   try {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function(pos) {
-        buyerLat = pos.coords.latitude;
-        buyerLng = pos.coords.longitude;
-        renderBoard();
-      });
-    }
     var result = await db.from('Listing').select('*').eq('verified', true);
     if (result.error) { showToast('Error: '+result.error.message); return; }
     allListings = result.data || [];
-    document.getElementById('filter-city').addEventListener('change', renderBoard);
+    requestBuyerLocation();
+  document.getElementById('filter-city').addEventListener('change', renderBoard);
     document.getElementById('filter-category').addEventListener('change', renderBoard);
     renderBoard();
   } catch(e) {
     showToast('Fatal error: '+e.message);
   }
+}
+function requestBuyerLocation() {
+  var btn = document.getElementById('btn-use-location');
+  if (!navigator.geolocation) { btn.textContent = 'GPS not supported'; return; }
+  btn.textContent = '📍 Getting your location...';
+  btn.disabled = true;
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      buyerLat = pos.coords.latitude;
+      buyerLng = pos.coords.longitude;
+      btn.textContent = '✅ Location found — sorted by distance';
+      renderBoard();
+    },
+    function(err) {
+      btn.textContent = '📍 Location denied — tap to try again';
+      btn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
 }
 function renderBoard() {
   var city = document.getElementById('filter-city').value;
@@ -459,11 +473,28 @@ async function loadSellerDashboard() {
   document.getElementById('seller-items-list').innerHTML = html;
 }
 function sellerAddListingScreen() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(pos) { showToast('📍 GPS ready for your listing'); },
+      function() { showToast('Enable GPS for exact location'); },
+      { enableHighAccuracy:true, timeout:8000 }
+    );
+  }
   document.getElementById('add-item-name').value='';
   document.getElementById('add-item-price').value='';
   document.getElementById('add-item-unit').value='';
   document.getElementById('add-item-location').value=currentSeller.location;
   sellerShowScreen('seller-add-listing');
+}
+async function getSellerGPS() {
+  return new Promise(function(resolve) {
+    if (!navigator.geolocation) { resolve({lat:null,lng:null}); return; }
+    navigator.geolocation.getCurrentPosition(
+      function(pos) { resolve({lat:pos.coords.latitude, lng:pos.coords.longitude}); },
+      function() { resolve({lat:null,lng:null}); },
+      { enableHighAccuracy:true, timeout:8000 }
+    );
+  });
 }
 async function sellerSaveNewListing() {
   var name = document.getElementById('add-item-name').value.trim();
@@ -472,7 +503,9 @@ async function sellerSaveNewListing() {
   var category = document.getElementById('add-item-category').value;
   var location = document.getElementById('add-item-location').value.trim();
   if (!name||!price||!unit||!location) { showToast('Fill all fields'); return; }
-  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable'}]);
+  showToast('Getting your GPS...');
+  var gps = await getSellerGPS();
+  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable',latitude:gps.lat,longitude:gps.lng}]);
   if (result.error) { showToast('Error: '+result.error.message); return; }
   showToast('Item posted!');
   loadSellerDashboard();
