@@ -62,17 +62,18 @@ input:focus,select:focus{border-color:var(--earth);}
 </div>
 <div class="toast" id="toast"></div>
 <div class="screen active" id="screen-buyer">
-  <div class="hero">
+  <div class="hero" onclick="loadListings()" style="cursor:pointer;">
     <div class="hlabel">Live Market Prices</div>
     <div class="hval" id="count">0 Listings</div>
-    <div class="hsub">Loading...</div>
+    <div class="hsub" id="hero-sub">Loading prices...</div>
   </div>
   <button id="btn-use-location" onclick="requestBuyerLocation()" style="width:100%;padding:11px 16px;background:#E8F5EE;border:1.5px solid var(--green);color:var(--green);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;">📍 Use My Location — See Nearest Prices</button>
   <div class="card">
     <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
       <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;">Live Prices</div>
     </div>
-    <div style="display:flex;gap:8px;margin-bottom:12px;"><select id="filter-city" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff;"><option value="">All Cities</option><option value="Iwo">Iwo</option><option value="Osogbo">Osogbo</option><option value="Ile-Ife">Ile-Ife</option><option value="Lagos">Lagos</option><option value="Ibadan">Ibadan</option></select><select id="filter-category" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff;"><option value="">All Categories</option><option value="Building Materials">Building</option><option value="Foodstuff">Foodstuff</option><option value="Hardware">Hardware</option><option value="Roofing Supplies">Roofing</option><option value="Electronics">Electronics</option></select></div>
+    <input type="text" id="search-bar" placeholder="🔍 Search items, sellers..." oninput="renderBoard()" style="margin-bottom:10px;border-color:var(--border);">
+    <div style="display:flex;gap:8px;margin-bottom:12px;"><select id="filter-city" onchange="renderBoard()" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff;"><option value="">All Cities</option><option value="Iwo">Iwo</option><option value="Osogbo">Osogbo</option><option value="Ile-Ife">Ile-Ife</option><option value="Lagos">Lagos</option><option value="Ibadan">Ibadan</option></select><select id="filter-category" onchange="renderBoard()" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff;"><option value="">All Categories</option><option value="Building Materials">Building</option><option value="Foodstuff">Foodstuff</option><option value="Hardware">Hardware</option><option value="Roofing Supplies">Roofing</option><option value="Electronics">Electronics</option></select></div>
     <div id="board"><div class="empty">Loading prices...</div></div>
   </div>
 </div>
@@ -112,7 +113,7 @@ input:focus,select:focus{border-color:var(--earth);}
         </select>
         <label>Password</label>
         <input type="password" id="reg-password" placeholder="Min 6 characters">
-        <button class="btn btn-p" id="btn-register-seller" style="margin-top:16px;">Create Account</button>
+        <button class="btn btn-p" id="btn-register-seller" onclick="sellerRegister()" style="margin-top:16px;">Create Account</button>
       </div>
       <div style="text-align:center;color:var(--muted);font-size:12px;margin:20px 0;letter-spacing:1px;text-transform:uppercase;font-weight:600;">or login</div>
       <div class="card">
@@ -121,7 +122,7 @@ input:focus,select:focus{border-color:var(--earth);}
         <input type="tel" id="login-phone" placeholder="080xxxxxxxx">
         <label>Password</label>
         <input type="password" id="login-password" placeholder="Your password">
-        <button class="btn btn-d" id="btn-login-seller" style="margin-top:16px;">Login</button>
+        <button class="btn btn-d" id="btn-login-seller" onclick="sellerLogin()" style="margin-top:16px;">Login</button>
       </div>
     </div>
   </div>
@@ -179,6 +180,10 @@ input:focus,select:focus{border-color:var(--earth);}
       <input type="text" id="add-item-unit" placeholder="e.g. per bag, per kg, per piece">
       <label>Your Location *</label>
       <input type="text" id="add-item-location" placeholder="e.g. Shop 12, Oja Oba, Iwo">
+      <label>Item Photos (Optional)</label>
+      <div id="add-images-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+      <input type="file" id="add-item-images" accept="image/*" multiple style="display:none;" onchange="previewImages('add')">
+      <button type="button" onclick="document.getElementById('add-item-images').click()" style="width:100%;padding:10px;background:#F7F2EA;border:1.5px dashed var(--border);border-radius:10px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:10px;">📷 Add Photos (up to 5)</button>
       <label style="display:flex;align-items:center;gap:10px;margin-top:14px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--dark);"><input type="checkbox" id="add-show-phone" style="width:18px;height:18px;display:inline;" checked> Show my phone number to buyers</label>
       <button class="btn btn-p" id="btn-save-new-listing" style="margin-top:16px;">Post Item</button>
     </div>
@@ -206,6 +211,10 @@ input:focus,select:focus{border-color:var(--earth);}
       <input type="text" id="edit-item-unit" placeholder="Unit">
       <label>Location</label>
       <input type="text" id="edit-item-location" placeholder="Location">
+      <label>Item Photos (Optional)</label>
+      <div id="edit-images-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+      <input type="file" id="edit-item-images" accept="image/*" multiple style="display:none;" onchange="previewImages('edit')">
+      <button type="button" onclick="document.getElementById('edit-item-images').click()" style="width:100%;padding:10px;background:#F7F2EA;border:1.5px dashed var(--border);border-radius:10px;font-size:13px;color:var(--muted);cursor:pointer;">📷 Add/Change Photos</button>
       <button class="btn btn-p" id="btn-save-edit-listing" style="margin-top:16px;">Save Changes</button>
       <button class="btn btn-o" id="btn-delete-listing" style="margin-top:10px;border-color:var(--red);color:var(--red);">Delete Item</button>
     </div>
@@ -215,7 +224,8 @@ input:focus,select:focus{border-color:var(--earth);}
     <div class="card" style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div>
-          <div id="detail-name" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--dark);"></div>
+          <div id="detail-item-image" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
+      <div id="detail-name" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--dark);"></div>
           <div id="detail-category" style="font-size:12px;color:var(--muted);margin-top:4px;"></div>
         </div>
         <div style="text-align:right;">
@@ -370,6 +380,11 @@ input:focus,select:focus{border-color:var(--earth);}
 const SUPABASE_URL = "https://ivxtmhojrwxfsfblqtcv.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2eHRtaG9qcnd4ZnNmYmxxdGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMDA4NjksImV4cCI6MjA5Nzc3Njg2OX0.hnYsiqkLwnFlo4ZZD9iGbotphOh1lvlr_31sBkds2eM";
 let db;
+function pullRefresh() {
+  var sub = document.getElementById('hero-sub');
+  if(sub) sub.textContent = 'Refreshing...';
+  loadListings();
+}
 function switchTab(tab) {
   ['buyer','supplier','ai','admin'].forEach(function(t) {
     document.getElementById('tab-'+t).classList.toggle('active', t===tab);
@@ -396,38 +411,48 @@ async function restoreSellerSession() {
   } catch(e) { localStorage.removeItem('ojalive_seller'); }
 }
 function initDB() {
-  document.getElementById('tab-buyer').addEventListener('click', function() { switchTab('buyer'); requestBuyerLocation(); });
-  document.getElementById('tab-supplier').addEventListener('click', function() { switchTab('supplier'); });
-  document.getElementById('tab-ai').addEventListener('click', function() { switchTab('ai'); });
-  document.getElementById('tab-admin').addEventListener('click', function() { switchTab('admin'); });
-  document.getElementById('btn-register-seller').addEventListener('click', sellerRegister);
-  document.getElementById('btn-login-seller').addEventListener('click', sellerLogin);
-  document.getElementById('btn-seller-logout').addEventListener('click', sellerLogout);
-  document.getElementById('btn-add-new-listing').addEventListener('click', sellerAddListingScreen);
-  document.getElementById('btn-seller-stats').addEventListener('click', sellerStatisticsScreen);
-  document.getElementById('btn-seller-history').addEventListener('click', sellerPriceHistoryScreen);
-  document.getElementById('btn-seller-profile-nav').addEventListener('click', sellerProfileScreen);
-  document.getElementById('btn-seller-settings').addEventListener('click', function() { sellerShowScreen('seller-settings'); });
-  document.getElementById('btn-save-new-listing').addEventListener('click', sellerSaveNewListing);
-  document.getElementById('btn-back-from-add').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
-  document.getElementById('btn-save-edit-listing').addEventListener('click', sellerSaveEditListing);
-  document.getElementById('btn-delete-listing').addEventListener('click', sellerDeleteListing);
-  document.getElementById('btn-back-from-edit').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
-  document.getElementById('btn-back-from-history').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
-  document.getElementById('btn-edit-profile').addEventListener('click', sellerEditProfileScreen);
-  document.getElementById('btn-back-from-profile').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
-  document.getElementById('btn-save-edit-profile').addEventListener('click', sellerSaveEditProfile);
-  document.getElementById('btn-back-from-edit-profile').addEventListener('click', sellerProfileScreen);
-  document.getElementById('btn-back-from-stats').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
-  document.getElementById('btn-change-password').addEventListener('click', sellerChangePassword);
-  document.getElementById('btn-delete-account').addEventListener('click', sellerDeleteAccount);
-  document.getElementById('btn-back-from-settings').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
-  const { createClient } = window.supabase;
-  db = createClient(SUPABASE_URL, SUPABASE_KEY);
+  var sc = window.supabase;
+  var createClient = sc && (sc.createClient || (sc.default && sc.default.createClient));
+  if (typeof createClient !== 'function') { setTimeout(initDB, 200); return; }
+  try { db = createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { setTimeout(initDB, 200); return; }
+  if (!db || typeof db.from !== 'function') { db = null; setTimeout(initDB, 200); return; }
+  try {
+    document.getElementById('tab-buyer').addEventListener('click', function() { switchTab('buyer'); requestBuyerLocation(); });
+    document.getElementById('tab-supplier').addEventListener('click', function() { switchTab('supplier'); });
+    document.getElementById('tab-ai').addEventListener('click', function() { switchTab('ai'); });
+    document.getElementById('tab-admin').addEventListener('click', function() { switchTab('admin'); });
+    document.getElementById('btn-register-seller').addEventListener('click', sellerRegister);
+    document.getElementById('btn-login-seller').addEventListener('click', sellerLogin);
+    document.getElementById('btn-seller-logout').addEventListener('click', sellerLogout);
+    document.getElementById('btn-add-new-listing').addEventListener('click', sellerAddListingScreen);
+    document.getElementById('btn-seller-stats').addEventListener('click', sellerStatisticsScreen);
+    document.getElementById('btn-seller-history').addEventListener('click', sellerPriceHistoryScreen);
+    document.getElementById('btn-seller-profile-nav').addEventListener('click', sellerProfileScreen);
+    document.getElementById('btn-seller-settings').addEventListener('click', function() { sellerShowScreen('seller-settings'); });
+    document.getElementById('btn-save-new-listing').addEventListener('click', sellerSaveNewListing);
+    document.getElementById('btn-back-from-add').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+    document.getElementById('btn-save-edit-listing').addEventListener('click', sellerSaveEditListing);
+    document.getElementById('btn-delete-listing').addEventListener('click', sellerDeleteListing);
+    document.getElementById('btn-back-from-edit').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+    document.getElementById('btn-back-from-history').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+    document.getElementById('btn-edit-profile').addEventListener('click', sellerEditProfileScreen);
+    document.getElementById('btn-back-from-profile').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+    document.getElementById('btn-save-edit-profile').addEventListener('click', sellerSaveEditProfile);
+    document.getElementById('btn-back-from-edit-profile').addEventListener('click', sellerProfileScreen);
+    document.getElementById('btn-back-from-stats').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+    document.getElementById('btn-change-password').addEventListener('click', sellerChangePassword);
+    document.getElementById('btn-delete-account').addEventListener('click', sellerDeleteAccount);
+    document.getElementById('btn-back-from-settings').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
+    var fc = document.getElementById('filter-city');
+    var fk = document.getElementById('filter-category');
+    if (fc) fc.addEventListener('change', renderBoard);
+    if (fk) fk.addEventListener('change', renderBoard);
+  } catch(e) {
+    console.error('initDB event listener error:', e.message);
+  }
+
   loadListings();
   restoreSellerSession();
-  document.getElementById('filter-city').addEventListener('change', renderBoard);
-  document.getElementById('filter-category').addEventListener('change', renderBoard);
   setTimeout(function() {
     var btn = document.getElementById('btn-use-location');
     if (btn) btn.click();
@@ -447,13 +472,18 @@ function getDistance(lat1, lng1, lat2, lng2) {
 }
 
 async function loadListings() {
+  if (!db) return;
   try {
     var result = await db.from('Listing').select('*').eq('verified', true);
-    if (result.error) { showToast('Error: '+result.error.message); return; }
+    if (result.error) { showToast('Error loading prices'); return; }
     allListings = result.data || [];
+    var now = new Date();
+    var timeStr = now.toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
+    var sub = document.getElementById('hero-sub');
+    if(sub) sub.textContent = 'Updated '+timeStr+' · Tap to refresh';
     renderBoard();
   } catch(e) {
-    showToast('Fatal error: '+e.message);
+    showToast('Connection error. Check internet.');
   }
 }
 function showDirections(lat, lng, name, address) {
@@ -462,6 +492,13 @@ function showDirections(lat, lng, name, address) {
   if (confirm('Open Google Maps for directions to ' + name + '?')) {
     window.open(mapsUrl, '_blank');
   }
+}
+function showFullImage(url) {
+  var modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = '<img src="'+url+'" style="max-width:95%;max-height:90vh;border-radius:12px;object-fit:contain;"><button onclick="this.parentElement.remove()" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;">✕</button>';
+  modal.onclick = function(e) { if(e.target===modal) modal.remove(); };
+  document.body.appendChild(modal);
 }
 function requestBuyerLocation() {
   var btn = document.getElementById('btn-use-location');
@@ -488,10 +525,12 @@ function requestBuyerLocation() {
 function renderBoard() {
   var city = document.getElementById('filter-city').value;
   var cat = document.getElementById('filter-category').value;
+  var search = (document.getElementById('search-bar')||{value:''}).value.toLowerCase();
   var data = allListings.filter(function(item) {
     var cm = !city || (item.location||'').toLowerCase().includes(city.toLowerCase());
     var km = !cat || item.category === cat;
-    return cm && km;
+    var sm = !search || (item.name||'').toLowerCase().includes(search) || (item.trader||'').toLowerCase().includes(search) || (item.location||'').toLowerCase().includes(search);
+    return cm && km && sm;
   });
   if (buyerLat && buyerLng) {
     data.sort(function(a,b) {
@@ -500,8 +539,8 @@ function renderBoard() {
       return da - db2;
     });
   }
-  document.getElementById('count').textContent = data.length + ' Listings';
-  if (!data.length) { document.getElementById('board').innerHTML = '<div class="empty">No listings found</div>'; return; }
+  document.getElementById('count').textContent = allListings.length + ' Listings';
+  if (!data.length) { document.getElementById('board').innerHTML = '<div class="empty">No listings found for this filter</div>'; return; }
   document.getElementById('board').innerHTML = data.map(function(item) {
     var distBadge = '';
     if (buyerLat && buyerLng && item.latitude && item.longitude) {
@@ -522,7 +561,11 @@ function renderBoard() {
       var waNum = item.phone.replace(/^0/, '234');
       waBtn = '<a href="https://wa.me/'+waNum+'?text='+waMsg+'" target="_blank" style="display:block;margin-top:4px;text-align:center;padding:8px;background:#25D366;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">💬 WhatsApp</a>';
     }
-    return '<div class="price-item" style="flex-direction:column;align-items:flex-start;"><div style="display:flex;justify-content:space-between;width:100%;"><div><div class="mname">'+item.name+'</div><div style="font-size:13px;font-weight:700;color:var(--dark);margin-top:3px;">'+item.trader+'</div><div class="munit"><span class="vdot"></span>'+item.location+distBadge+'</div></div><div class="pright"><div class="pval">&#8358;'+Number(item.price).toLocaleString()+'</div><div style="font-size:12px;font-weight:600;color:var(--muted);margin-top:2px;">per '+item.unit+'</div><span class="pbadge stable">Stable</span></div></div>'+chatBtn+waBtn+phoneBtn+dirBtn+'</div>';
+    var chg = item.change||'stable';
+    var badgeStyle = chg==='up' ? 'background:#E8F5EE;color:var(--green);' : chg==='down' ? 'background:#FDECEA;color:var(--red);' : 'background:#FDF6E3;color:var(--amber);';
+    var badgeTxt = chg==='up' ? '▲ Rising' : chg==='down' ? '▼ Falling' : '● Stable';
+    return '<div class="price-item" style="flex-direction:column;align-items:flex-start;"><div style="display:flex;justify-content:space-between;width:100%;"><div><div class="mname">'+item.name+'</div><div style="font-size:13px;font-weight:700;color:var(--dark);margin-top:3px;">'+item.trader+'</div><div class="munit"><span class="vdot"></span>'+item.location+distBadge+'</div></div><div class="pright"><div class="pval">&#8358;'+Number(item.price).toLocaleString()+'</div><div style="font-size:12px;font-weight:600;color:var(--muted);margin-top:2px;">per '+item.unit+'</div><span class="pbadge" style="'+badgeStyle+'">'+badgeTxt+'</span></div></div>'+chatBtn+waBtn+phoneBtn+dirBtn+'</div>';
+
   }).join('');
 }
 </script>
@@ -534,6 +577,36 @@ function sellerShowScreen(screenName) {
     document.getElementById(s).classList.add('hidden');
   });
   document.getElementById(screenName).classList.remove('hidden');
+}
+function previewImages(mode) {
+  var input = document.getElementById(mode+'-item-images');
+  var preview = document.getElementById(mode+'-images-preview');
+  preview.innerHTML = '';
+  var files = Array.from(input.files).slice(0,5);
+  files.forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = document.createElement('div');
+      img.style.cssText = 'width:70px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);position:relative;';
+      img.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">';
+      preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function uploadImages(files, listingId) {
+  var urls = [];
+  for (var i = 0; i < Math.min(files.length, 5); i++) {
+    var file = files[i];
+    var ext = file.name.split('.').pop();
+    var path = 'listing-'+listingId+'-'+i+'-'+Date.now()+'.'+ext;
+    var result = await db.storage.from('listing-images').upload(path, file, {upsert:true});
+    if (!result.error) {
+      var pub = db.storage.from('listing-images').getPublicUrl(path);
+      urls.push(pub.data.publicUrl);
+    }
+  }
+  return urls;
 }
 function captureRegLocation() {
   var btn = document.getElementById('btn-capture-location');
@@ -640,9 +713,7 @@ async function sellerRegister() {
   var regLat = document.getElementById('reg-lat').value || null;
   var regLng = document.getElementById('reg-lng').value || null;
   var fullLocation = location || state+', '+country;
-  console.log('Registering:', {name,phone,fullLocation,regLat,regLng});
   var result = await db.from('traders').insert([{full_name:name,phone:phone,location:fullLocation,trade:trade,password:password,status:'approved',latitude:regLat,longitude:regLng}]);
-  console.log('Register result:', result);
   if (result.error) { showToast('Register Error: '+result.error.message); return; }
   showToast('Account created! Login now.');
   document.getElementById('reg-name').value='';
@@ -660,6 +731,7 @@ async function sellerLogin() {
   var phone = document.getElementById('login-phone').value.trim();
   var password = document.getElementById('login-password').value.trim();
   if (!phone||!password) { showToast('Enter phone and password'); return; }
+  if (!db) { showToast('App still loading, please wait'); return; }
   var result = await db.from('traders').select('*').eq('phone',phone).eq('password',password).single();
   if (result.error||!result.data) { showToast('Wrong phone or password'); return; }
   currentSeller = result.data;
@@ -679,7 +751,8 @@ function sellerLogout() {
 async function loadSellerDashboard() {
   var result = await db.from('Listing').select('*').eq('trader',currentSeller.full_name);
   var listings = result.data || [];
-  document.getElementById('dashboard-listings-count').textContent = listings.length;
+  var activeCount = listings.filter(function(l){return l.verified!==false;}).length;
+  document.getElementById('dashboard-listings-count').textContent = activeCount;
   var total = listings.reduce(function(s,l){return s+Number(l.price);},0);
   document.getElementById('dashboard-total-value').textContent = '₦'+total.toLocaleString();
   var html = listings.map(function(item) {
@@ -722,7 +795,8 @@ async function sellerSaveNewListing() {
   var unit = document.getElementById('add-item-unit').value.trim();
   var category = document.getElementById('add-item-category').value;
   var location = document.getElementById('add-item-location').value.trim();
-  if (!name||!price||!unit||!location) { showToast('Fill all fields'); return; }
+  if (!name||!price||!unit) { showToast('Fill all fields'); return; }
+  if (!location) location = currentSeller.location || '';
   var gps = {lat: currentSeller.latitude || null, lng: currentSeller.longitude || null};
   if (!gps.lat || !gps.lng) {
     showToast('Getting your GPS...');
@@ -730,7 +804,17 @@ async function sellerSaveNewListing() {
   }
   var showPhone = document.getElementById('add-show-phone').checked;
   var phone = showPhone ? currentSeller.phone : null;
-  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable',latitude:gps.lat,longitude:gps.lng,phone:phone}]);
+  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable',latitude:gps.lat,longitude:gps.lng,phone:phone}]).select();
+  if (!result.error) {
+    var imgFiles = document.getElementById('add-item-images').files;
+    if (imgFiles.length > 0 && result.data && result.data[0]) {
+      showToast('Uploading photos...');
+      var urls = await uploadImages(Array.from(imgFiles), result.data[0].id);
+      if (urls.length > 0) {
+        await db.from('Listing').update({image_url:JSON.stringify(urls)}).eq('id',result.data[0].id);
+      }
+    }
+  }
   if (result.error) { showToast('Error: '+result.error.message); return; }
   showToast('Item posted!');
   loadSellerDashboard();
@@ -747,6 +831,19 @@ async function sellerEditListingScreen(id) {
   document.getElementById('edit-item-unit').value = item.unit;
   document.getElementById('edit-item-location').value = item.location;
   document.getElementById('edit-item-category').value = item.category;
+  var editPreview = document.getElementById('edit-images-preview');
+  editPreview.innerHTML = '';
+  if (item.image_url) {
+    try {
+      var imgs = JSON.parse(item.image_url);
+      imgs.forEach(function(url) {
+        var div = document.createElement('div');
+        div.style.cssText = 'width:70px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);';
+        div.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;">';
+        editPreview.appendChild(div);
+      });
+    } catch(e) {}
+  }
   sellerShowScreen('seller-edit-listing');
 }
 async function sellerSaveEditListing() {
@@ -756,13 +853,25 @@ async function sellerSaveEditListing() {
   var unit = document.getElementById('edit-item-unit').value.trim();
   var category = document.getElementById('edit-item-category').value;
   var location = document.getElementById('edit-item-location').value.trim();
-  if (!name||!price||!unit||!location) { showToast('Fill all fields'); return; }
+  if (!name||!price||!unit) { showToast('Fill all fields'); return; }
+  if (!location) location = currentSeller.location || '';
   var oldItem = await db.from('Listing').select('price').eq('id',currentEditingListingId).single();
   var oldPrice = oldItem.data ? oldItem.data.price : null;
-  var result = await db.from('Listing').update({name:name,price:price,unit:unit,category:category,location:location}).eq('id',currentEditingListingId);
+  var changeDir = 'stable';
+  if (oldPrice && price > oldPrice) changeDir = 'up';
+  if (oldPrice && price < oldPrice) changeDir = 'down';
+  var result = await db.from('Listing').update({name:name,price:price,unit:unit,category:category,location:location,change:changeDir}).eq('id',currentEditingListingId);
   if (result.error) { showToast('Error: '+result.error.message); return; }
   if (oldPrice && oldPrice !== price) {
     await db.from('price_history').insert([{listing_id:currentEditingListingId,old_price:oldPrice,new_price:price,trader:currentSeller.full_name,location:currentSeller.location}]);
+  }
+  var editImgFiles = document.getElementById('edit-item-images').files;
+  if (editImgFiles.length > 0) {
+    showToast('Uploading photos...');
+    var editUrls = await uploadImages(Array.from(editImgFiles), currentEditingListingId);
+    if (editUrls.length > 0) {
+      await db.from('Listing').update({image_url:JSON.stringify(editUrls)}).eq('id',currentEditingListingId);
+    }
   }
   showToast('Item updated!');
   loadSellerDashboard();
@@ -785,6 +894,21 @@ async function sellerItemDetail(id) {
   if (result.error||!result.data) { showToast('Item not found'); return; }
   var item = result.data;
   currentEditingListingId = item.id;
+  var detailImgEl = document.getElementById('detail-item-image');
+  if (detailImgEl) {
+    if (item.image_url) {
+      try {
+        var dimgs = JSON.parse(item.image_url);
+        if (dimgs.length > 0) {
+          detailImgEl.style.display = 'flex';
+          detailImgEl.innerHTML = dimgs.map(function(url,i) {
+            var safeUrl = url.replace(/"/g,'&quot;');
+            return '<div style="flex:none;width:'+(dimgs.length===1?'100%':'48%')+';aspect-ratio:4/3;border-radius:10px;overflow:hidden;cursor:pointer;" onclick="showFullImage(this.firstChild.src)"><img src="'+safeUrl+'" style="width:100%;height:100%;object-fit:cover;pointer-events:none;"></div>';
+          }).join('');
+        } else { detailImgEl.style.display = 'none'; }
+      } catch(e) { detailImgEl.style.display = 'none'; }
+    } else { detailImgEl.style.display = 'none'; }
+  }
   document.getElementById('detail-name').textContent = item.name;
   document.getElementById('detail-category').textContent = item.category;
   document.getElementById('detail-price').textContent = '₦'+Number(item.price).toLocaleString();
@@ -808,10 +932,7 @@ async function sellerItemDetail(id) {
     sellerItemDetail(id);
   };
   document.getElementById('btn-detail-share').onclick = function() {
-    var shareText = item.name+' - ₦'+Number(item.price).toLocaleString()+' per '+item.unit+'
-Seller: '+item.trader+'
-Location: '+item.location+'
-Find on OjaLive: https://ojalive.aamuda34.workers.dev';
+    var shareText = item.name+' - ₦'+Number(item.price).toLocaleString()+' per '+item.unit+'\nSeller: '+item.trader+'\nLocation: '+item.location+'\nFind on OjaLive: https://ojalive.aamuda34.workers.dev';
     if (navigator.share) {
       navigator.share({title:'OjaLive - '+item.name, text:shareText});
     } else {
@@ -820,25 +941,18 @@ Find on OjaLive: https://ojalive.aamuda34.workers.dev';
     }
   };
   document.getElementById('btn-detail-export').onclick = function() {
-    var text = 'Price History: '+item.name+'
-';
-    text += '========================
-';
-    text += 'Current Price: ₦'+Number(item.price).toLocaleString()+'
-
-';
+    var lines = ['Price History: '+item.name, '========================', 'Current Price: ₦'+Number(item.price).toLocaleString(), ''];
     (window._allChartChanges||[]).forEach(function(h,i){
       var up = h.new_price > h.old_price;
       var ago = '';
       if(h.created_at){var diff=Math.floor((Date.now()-new Date(h.created_at).getTime())/1000);ago=diff<3600?Math.floor(diff/60)+'m ago':diff<86400?Math.floor(diff/3600)+'h ago':Math.floor(diff/86400)+'d ago';}
-      text += (i+1)+'. '+(up?'UP':'DOWN')+': ₦'+Number(h.old_price).toLocaleString()+' → ₦'+Number(h.new_price).toLocaleString()+' ('+ago+')
-';
+      lines.push((i+1)+'. '+(up?'UP':'DOWN')+': ₦'+Number(h.old_price).toLocaleString()+' to ₦'+Number(h.new_price).toLocaleString()+' ('+ago+')');
     });
+    var text = lines.join('\n');
     if (navigator.share) {
       navigator.share({title:'Price History - '+item.name, text:text});
     } else {
-      var waUrl = 'https://wa.me/?text='+encodeURIComponent(text);
-      window.open(waUrl,'_blank');
+      window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
     }
   };
   sellerShowScreen('seller-item-detail');
@@ -988,16 +1102,6 @@ function drawDetailChart(changes) {
     chEl.style.color=lineColor;
     document.getElementById('chart-high').textContent='₦'+high.toLocaleString();
     document.getElementById('chart-low').textContent='₦'+low2.toLocaleString();
-  }
-  var times=changes.map(function(h){return timeAgo2(h.created_at);});
-  function timeAgo2(ts){
-    if(!ts)return '';
-    var diff=Math.floor((Date.now()-new Date(ts).getTime())/1000);
-    if(diff<60)return diff+'s';
-    if(diff<3600)return Math.floor(diff/60)+'m';
-    if(diff<86400)return Math.floor(diff/3600)+'h';
-    if(diff<604800)return Math.floor(diff/86400)+'d';
-    return Math.floor(diff/604800)+'w';
   }
   times.forEach(function(t,i){
     if(i===0)return;
@@ -1222,14 +1326,6 @@ async function sellerDeleteAccount() {
   if (result.error) { showToast('Error: '+result.error.message); return; }
   showToast('Account deleted');
   sellerLogout();
-  loadListings();
-  restoreSellerSession();
-  document.getElementById('filter-city').addEventListener('change', renderBoard);
-  document.getElementById('filter-category').addEventListener('change', renderBoard);
-  setTimeout(function() {
-    var btn = document.getElementById('btn-use-location');
-    if (btn) btn.click();
-  }, 1200);
 }
 </script>
 <script>

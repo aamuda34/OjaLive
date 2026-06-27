@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="out">Testing...</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+var timer = setInterval(function() {
+  if (!window.supabase) return;
+  clearInterval(timer);
+  var db = window.supabase.createClient(
+    "https://ivxtmhojrwxfsfblqtcv.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2eHRtaG9qcnd4ZnNmYmxxdGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMDA4NjksImV4cCI6MjA5Nzc3Njg2OX0.hnYsiqkLwnFlo4ZZD9iGbotphOh1lvlr_31sBkds2eM"
+  );
+  db.from('Listing').select('*').then(function(r) {
+    document.getElementById('out').innerHTML =
+      '<b>Error:</b> ' + JSON.stringify(r.error) +
+      '<br><b>Count:</b> ' + (r.data ? r.data.length : 'null') +
+      '<br><b>Data:</b> ' + JSON.stringify(r.data);
+  });
+}, 100);
+</script>
+</body>
+</html>
