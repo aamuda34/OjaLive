@@ -178,8 +178,8 @@ input:focus,select:focus{border-color:var(--earth);}
       <input type="number" id="add-item-price" placeholder="e.g. 4400">
       <label>Unit *</label>
       <input type="text" id="add-item-unit" placeholder="e.g. per bag, per kg, per piece">
-      <label>Your Location *</label>
-      <input type="text" id="add-item-location" placeholder="e.g. Shop 12, Oja Oba, Iwo">
+      <label style="display:none;">Your Location *</label>
+      <input type="text" id="add-item-location" placeholder="e.g. Shop 12, Oja Oba, Iwo" style="display:none;">
       <label>Item Photos (Optional)</label>
       <div id="add-images-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
       <input type="file" id="add-item-images" accept="image/*" multiple style="display:none;" onchange="previewImages('add')">
@@ -758,7 +758,9 @@ async function loadSellerDashboard() {
   var html = listings.map(function(item) {
     var pausedBadge = item.verified===false ? '<span style="font-size:10px;background:#FDF6E3;color:var(--amber);border:1px solid var(--amber);border-radius:4px;padding:1px 5px;margin-left:6px;">PAUSED</span>' : '';
     var priceColor = 'var(--earth)';
-    return '<div class="price-item" onclick="sellerItemDetail('+item.id+')" style="cursor:pointer;opacity:'+(item.verified===false?'0.6':'1')+';"><div><div class="mname">'+item.name+pausedBadge+'</div><div class="munit">'+item.unit+' · '+item.location+'</div></div><div class="pright"><div class="pval" style="color:'+priceColor+';">₦'+Number(item.price).toLocaleString()+'</div><button class="bsm bapp" onclick="event.stopPropagation();sellerEditListingScreen('+item.id+')">Edit</button></div></div>';
+    var thumb = '';
+    if(item.image_url){try{var imgs=JSON.parse(item.image_url);if(imgs.length>0)thumb='<img src="'+imgs[0]+'" style="width:44px;height:44px;border-radius:8px;object-fit:cover;margin-right:10px;flex-shrink:0;">';}catch(e){}}
+    return '<div class="price-item" onclick="sellerItemDetail('+item.id+')" style="cursor:pointer;opacity:'+(item.verified===false?'0.6':'1')+';align-items:center;">'+thumb+'<div style="flex:1;"><div class="mname">'+item.name+pausedBadge+'</div><div class="munit">'+item.unit+' · '+item.location+'</div></div><div class="pright"><div class="pval" style="color:'+priceColor+';">₦'+Number(item.price).toLocaleString()+'</div><button class="bsm bapp" onclick="event.stopPropagation();sellerEditListingScreen('+item.id+')">Edit</button></div></div>';
   }).join('');
   if (!listings.length) html = '<div class="empty">No items yet. Add your first item!</div>';
   document.getElementById('seller-items-list').innerHTML = html;
@@ -1186,11 +1188,23 @@ async function sellerPriceHistoryScreen() {
   var changes = history.data || [];
   var listEl = document.getElementById('seller-history-list');
   if (!changes.length) { listEl.innerHTML = '<div class="empty">No price changes yet. Edit an item price to start tracking.</div>'; return; }
+  var listingIds = changes.map(function(h){return h.listing_id;}).filter(function(v,i,a){return a.indexOf(v)===i;});
+  var namesMap = {};
+  listings.forEach(function(l){ namesMap[l.id] = l.name; });
+  var extraIds = listingIds.filter(function(id){return !namesMap[id];});
+  if (extraIds.length) {
+    var extra = await db.from('Listing').select('id,name').in('id',extraIds);
+    (extra.data||[]).forEach(function(l){ namesMap[l.id] = l.name; });
+  }
   listEl.innerHTML = changes.map(function(h) {
     var up = h.new_price > h.old_price;
     var arrow = up ? '▲' : '▼';
-    var color = up ? 'var(--red)' : 'var(--green)';
-    return '<div class="price-item"><div><div class="mname">Listing #'+h.listing_id+'</div><div class="munit">'+h.location+'</div></div><div class="pright"><div style="font-size:13px;color:var(--muted);text-decoration:line-through;">₦'+Number(h.old_price).toLocaleString()+'</div><div style="font-size:15px;font-weight:700;color:'+color+';">'+arrow+' ₦'+Number(h.new_price).toLocaleString()+'</div></div></div>';
+    var color = up ? '#0ECB81' : '#F6465D';
+    var pct = (up?'+':'')+((h.new_price-h.old_price)/h.old_price*100).toFixed(1)+'%';
+    var itemName = namesMap[h.listing_id] || 'Item #'+h.listing_id;
+    var ago = '';
+    if(h.created_at){var diff=Math.floor((Date.now()-new Date(h.created_at).getTime())/1000);ago=diff<60?diff+'s ago':diff<3600?Math.floor(diff/60)+'m ago':diff<86400?Math.floor(diff/3600)+'h ago':Math.floor(diff/86400)+'d ago';}
+    return '<div class="price-item"><div><div class="mname" style="color:'+color+';">'+arrow+' '+itemName+'</div><div class="munit">₦'+Number(h.old_price).toLocaleString()+' → ₦'+Number(h.new_price).toLocaleString()+' &nbsp;·&nbsp; '+pct+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">'+ago+'</div></div><div class="pright"><div style="font-size:15px;font-weight:800;color:'+color+';">₦'+Number(h.new_price).toLocaleString()+'</div></div></div>';
   }).join('');
 }
 async function renderPriceChart() {
