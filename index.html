@@ -1485,7 +1485,9 @@ async function sellerSaveEditProfile() {
       photoUrl = pub.data.publicUrl;
     }
   }
-  var result = await db.from('traders').update({full_name:name,phone:phone,location:location,trade:trade,latitude:editLat,longitude:editLng,description:description,photo_url:photoUrl}).eq('id',currentSeller.id);
+  var updateData = {full_name:name,phone:phone,location:location,trade:trade,latitude:editLat,longitude:editLng,photo_url:photoUrl};
+  if (description !== undefined) updateData.description = description;
+  var result = await db.from('traders').update(updateData).eq('id',currentSeller.id);
   if (result.error) { showToast('Error: '+result.error.message); return; }
   currentSeller.full_name = name;
   currentSeller.phone = phone;
