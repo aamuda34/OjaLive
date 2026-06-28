@@ -93,13 +93,19 @@ input:focus,select:focus{border-color:var(--earth);}
         <label>Country</label>
         <select id="reg-country"><option value="Nigeria">Nigeria</option><option value="Ghana">Ghana</option></select>
         <label>State</label>
-        <select id="reg-state"><option value="Osun">Osun</option><option value="Lagos">Lagos</option><option value="Oyo">Oyo</option><option value="Kano">Kano</option></select>
+        <select id="reg-state"><option value="">Select State</option><option value="Abia">Abia</option><option value="Adamawa">Adamawa</option><option value="Akwa Ibom">Akwa Ibom</option><option value="Anambra">Anambra</option><option value="Bauchi">Bauchi</option><option value="Bayelsa">Bayelsa</option><option value="Benue">Benue</option><option value="Borno">Borno</option><option value="Cross River">Cross River</option><option value="Delta">Delta</option><option value="Ebonyi">Ebonyi</option><option value="Edo">Edo</option><option value="Ekiti">Ekiti</option><option value="Enugu">Enugu</option><option value="FCT">FCT (Abuja)</option><option value="Gombe">Gombe</option><option value="Imo">Imo</option><option value="Jigawa">Jigawa</option><option value="Kaduna">Kaduna</option><option value="Kano">Kano</option><option value="Katsina">Katsina</option><option value="Kebbi">Kebbi</option><option value="Kogi">Kogi</option><option value="Kwara">Kwara</option><option value="Lagos">Lagos</option><option value="Nasarawa">Nasarawa</option><option value="Niger">Niger</option><option value="Ogun">Ogun</option><option value="Ondo">Ondo</option><option value="Osun">Osun</option><option value="Oyo">Oyo</option><option value="Plateau">Plateau</option><option value="Rivers">Rivers</option><option value="Sokoto">Sokoto</option><option value="Taraba">Taraba</option><option value="Yobe">Yobe</option><option value="Zamfara">Zamfara</option></select>
         <label>Shop Location</label>
         <input type="text" id="reg-location" placeholder="Auto-filled when you capture location" readonly style="background:#f5f5f5;color:var(--muted);">
         <button type="button" onclick="captureRegLocation()" style="width:100%;padding:12px;margin-top:8px;background:var(--earth);border:none;color:#fff;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;" id="btn-capture-location">📍 Capture My Exact Shop Location</button>
         <div id="reg-gps-status" style="font-size:12px;color:var(--muted);margin-top:6px;text-align:center;">Tap above — your exact location will be auto-filled</div>
         <input type="hidden" id="reg-lat">
         <input type="hidden" id="reg-lng">
+        <label>Profile/Shop Photo (Optional)</label>
+        <div id="reg-photo-preview" style="margin-bottom:8px;"></div>
+        <input type="file" id="reg-photo" accept="image/*" style="display:none;" onchange="previewRegPhoto()">
+        <button type="button" onclick="document.getElementById('reg-photo').click()" style="width:100%;padding:10px;background:#F7F2EA;border:1.5px dashed var(--border);border-radius:10px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:10px;">📷 Add Shop Photo</button>
+        <label>Business Description (Optional)</label>
+        <textarea id="reg-description" placeholder="e.g. We sell quality building materials in Iwo since 2010..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;resize:none;height:80px;font-family:inherit;"></textarea>
         <label>Business Type</label>
         <select id="reg-trade">
           <option>Building Materials</option>
@@ -288,6 +294,8 @@ input:focus,select:focus{border-color:var(--earth);}
     <button class="btn btn-o" id="btn-back-from-profile" style="background:transparent;color:var(--muted);border-color:var(--border);margin-bottom:14px;">← Back to Dashboard</button>
     <div class="card">
       <div class="card-title">Business Profile</div>
+      <div id="profile-photo"></div>
+      <div id="profile-description" style="display:none;font-size:13px;color:var(--muted);text-align:center;padding:8px 0 12px;border-bottom:1px solid var(--border);margin-bottom:12px;font-style:italic;"></div>
       <div style="padding:16px 0;border-bottom:1px solid var(--border);">
         <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Shop Name</div>
         <div style="font-size:15px;font-weight:600;margin-top:6px;" id="profile-shop-name">-</div>
@@ -316,6 +324,9 @@ input:focus,select:focus{border-color:var(--earth);}
     <div class="card">
       <div class="card-title">Update Profile</div>
       <label>Shop Name</label>
+      <div id="edit-profile-photo-preview" style="text-align:center;margin-bottom:10px;"></div>
+      <input type="file" id="edit-profile-photo-file" accept="image/*" style="display:none;" onchange="previewEditProfilePhoto()">
+      <button type="button" onclick="document.getElementById('edit-profile-photo-file').click()" style="width:100%;padding:10px;background:#F7F2EA;border:1.5px dashed var(--border);border-radius:10px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:10px;">📷 Change Profile Photo</button>
       <input type="text" id="edit-profile-name" placeholder="Shop name">
       <label>Phone Number</label>
       <input type="tel" id="edit-profile-phone" placeholder="Phone">
@@ -336,12 +347,14 @@ input:focus,select:focus{border-color:var(--earth);}
         <option>Electronics</option>
         <option>Other</option>
       </select>
+      <label>Business Description</label>
+      <textarea id="edit-profile-description" placeholder="Tell buyers about your business..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;resize:none;height:80px;font-family:inherit;"></textarea>
       <button class="btn btn-p" id="btn-save-edit-profile" style="margin-top:16px;">Save Changes</button>
     </div>
   </div>
   <div id="seller-statistics" class="hidden">
     <button class="btn btn-o" id="btn-back-from-stats" style="background:transparent;color:var(--muted);border-color:var(--border);margin-bottom:14px;">← Back to Dashboard</button>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
       <div class="card" style="text-align:center;padding:14px 8px;">
         <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--earth);" id="stats-active-items">0</div>
         <div style="font-size:11px;color:var(--muted);font-weight:600;">Active Items</div>
@@ -350,6 +363,23 @@ input:focus,select:focus{border-color:var(--earth);}
         <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);" id="stats-total-value">₦0</div>
         <div style="font-size:11px;color:var(--muted);font-weight:600;">Total Value</div>
       </div>
+      <div class="card" style="text-align:center;padding:14px 8px;">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--dark);" id="stats-paused-items">0</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Paused Items</div>
+      </div>
+      <div class="card" style="text-align:center;padding:14px 8px;">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#0ECB81;" id="stats-price-changes">0</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Price Changes</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:10px;">
+      <div class="card-title">Price Activity</div>
+      <div id="stats-chart-summary" style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;"></div>
+      <canvas id="stats-chart" style="width:100%;height:180px;border-radius:10px;"></canvas>
+    </div>
+    <div class="card" style="margin-bottom:10px;">
+      <div class="card-title">Category Breakdown</div>
+      <div id="stats-categories"></div>
     </div>
     <div class="card">
       <div class="card-title">Item Performance</div>
@@ -608,6 +638,24 @@ async function uploadImages(files, listingId) {
   }
   return urls;
 }
+function previewEditProfilePhoto() {
+  var file = document.getElementById('edit-profile-photo-file').files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('edit-profile-photo-preview').innerHTML = '<img src="'+e.target.result+'" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--earth);">';
+  };
+  reader.readAsDataURL(file);
+}
+function previewRegPhoto() {
+  var file = document.getElementById('reg-photo').files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('reg-photo-preview').innerHTML = '<img src="'+e.target.result+'" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--earth);">';
+  };
+  reader.readAsDataURL(file);
+}
 function captureRegLocation() {
   var btn = document.getElementById('btn-capture-location');
   var status = document.getElementById('reg-gps-status');
@@ -713,7 +761,20 @@ async function sellerRegister() {
   var regLat = document.getElementById('reg-lat').value || null;
   var regLng = document.getElementById('reg-lng').value || null;
   var fullLocation = location || state+', '+country;
-  var result = await db.from('traders').insert([{full_name:name,phone:phone,location:fullLocation,trade:trade,password:password,status:'approved',latitude:regLat,longitude:regLng}]);
+  var description = document.getElementById('reg-description').value.trim();
+  var result = await db.from('traders').insert([{full_name:name,phone:phone,location:fullLocation,trade:trade,password:password,status:'approved',latitude:regLat,longitude:regLng,description:description}]).select();
+  if (!result.error && result.data && result.data[0]) {
+    var photoFile = document.getElementById('reg-photo').files[0];
+    if (photoFile) {
+      var ext = photoFile.name.split('.').pop();
+      var path = 'trader-'+result.data[0].id+'-photo.'+ext;
+      var upRes = await db.storage.from('listing-images').upload(path, photoFile, {upsert:true});
+      if (!upRes.error) {
+        var pub = db.storage.from('listing-images').getPublicUrl(path);
+        await db.from('traders').update({photo_url:pub.data.publicUrl}).eq('id',result.data[0].id);
+      }
+    }
+  }
   if (result.error) { showToast('Register Error: '+result.error.message); return; }
   showToast('Account created! Login now.');
   document.getElementById('reg-name').value='';
@@ -1212,6 +1273,97 @@ async function renderPriceChart() {
   if (!listingId) return;
   var history = await db.from('price_history').select('*').eq('listing_id',listingId).order('id',{ascending:true});
   var changes = history.data || [];
+  var canvas2 = document.getElementById('price-chart');
+  var empty2 = document.getElementById('history-empty');
+  if (!changes.length) {
+    if(canvas2) canvas2.style.display='none';
+    if(empty2){empty2.textContent='No price changes for this item yet.';empty2.style.display='block';}
+    return;
+  }
+  if(empty2) empty2.style.display='none';
+  if(canvas2) {
+    canvas2.style.display='block';
+    canvas2.style.borderRadius='12px';
+    var prices2=[Number(changes[0].old_price)].concat(changes.map(function(h){return Number(h.new_price);}));
+    var times2=changes.map(function(h){if(!h.created_at)return'';var d=Math.floor((Date.now()-new Date(h.created_at).getTime())/1000);return d<60?d+'s':d<3600?Math.floor(d/60)+'m':d<86400?Math.floor(d/3600)+'h':Math.floor(d/86400)+'d';});
+    var W2=canvas2.offsetWidth||320,H2=200;
+    canvas2.width=W2;canvas2.height=H2;
+    var ctx2=canvas2.getContext('2d');
+    var isUp2=prices2[prices2.length-1]>=prices2[0];
+    var lc2=isUp2?'#0ECB81':'#F6465D';
+    ctx2.fillStyle='#1E2026';ctx2.fillRect(0,0,W2,H2);
+    var mn2=Math.min.apply(null,prices2)*0.999,mx2=Math.max.apply(null,prices2)*1.001;
+    var pL2=55,pR2=10,pT2=20,pB2=28,rng2=mx2-mn2||1;
+    function px2(i){return pL2+(i/(prices2.length-1||1))*(W2-pL2-pR2);}
+    function py2(v){return H2-pB2-((v-mn2)/rng2)*(H2-pT2-pB2);}
+    ctx2.setLineDash([2,4]);ctx2.lineWidth=1;
+    [0,0.25,0.5,0.75,1].forEach(function(t){
+      var yy=H2-pB2-t*(H2-pT2-pB2);
+      ctx2.strokeStyle='#2B2F36';ctx2.beginPath();ctx2.moveTo(pL2,yy);ctx2.lineTo(W2-pR2,yy);ctx2.stroke();
+      ctx2.fillStyle='#848E9C';ctx2.font='9px sans-serif';ctx2.textAlign='right';
+      ctx2.fillText('₦'+(mn2+t*rng2).toLocaleString('en',{maximumFractionDigits:0}),pL2-3,yy+3);
+    });
+    ctx2.setLineDash([]);
+    ctx2.beginPath();ctx2.moveTo(px2(0),py2(prices2[0]));
+    for(var i=1;i<prices2.length;i++){var cpx2=(px2(i-1)+px2(i))/2;ctx2.bezierCurveTo(cpx2,py2(prices2[i-1]),cpx2,py2(prices2[i]),px2(i),py2(prices2[i]));}
+    var gr2=ctx2.createLinearGradient(0,pT2,0,H2-pB2);
+    gr2.addColorStop(0,isUp2?'rgba(14,203,129,0.3)':'rgba(246,70,93,0.3)');gr2.addColorStop(1,'rgba(30,32,38,0)');
+    ctx2.lineTo(px2(prices2.length-1),H2-pB2);ctx2.lineTo(px2(0),H2-pB2);ctx2.closePath();ctx2.fillStyle=gr2;ctx2.fill();
+    ctx2.beginPath();ctx2.moveTo(px2(0),py2(prices2[0]));
+    for(var i=1;i<prices2.length;i++){var cpx2=(px2(i-1)+px2(i))/2;ctx2.bezierCurveTo(cpx2,py2(prices2[i-1]),cpx2,py2(prices2[i]),px2(i),py2(prices2[i]));}
+    ctx2.strokeStyle=lc2;ctx2.lineWidth=2;ctx2.stroke();
+    prices2.forEach(function(p,i){ctx2.beginPath();ctx2.arc(px2(i),py2(p),i===prices2.length-1?5:3,0,Math.PI*2);ctx2.fillStyle=lc2;ctx2.fill();});
+    var last2=prices2[prices2.length-1];
+    ctx2.fillStyle=lc2;ctx2.font='bold 12px sans-serif';ctx2.textAlign='left';
+    ctx2.fillText('₦'+last2.toLocaleString(),pL2,pT2-4);
+    var pct2=((last2-prices2[0])/prices2[0]*100).toFixed(1);
+    ctx2.fillStyle=lc2;ctx2.font='11px sans-serif';
+    ctx2.fillText((last2>=prices2[0]?'+':'')+pct2+'%',pL2+80,pT2-4);
+    var wRows2=[H2*0.25,H2*0.5,H2*0.75];
+    var wCols2=[W2*0.2,W2*0.5,W2*0.8];
+    ctx2.globalAlpha=0.08;ctx2.fillStyle='#fff';ctx2.font='bold 13px sans-serif';ctx2.textAlign='center';
+    wRows2.forEach(function(wy){wCols2.forEach(function(wx){ctx2.save();ctx2.translate(wx,wy);ctx2.rotate(-20*Math.PI/180);ctx2.fillText('OjaLive',0,0);ctx2.restore();});});
+    ctx2.globalAlpha=1;
+    canvas2.ontouchstart=function(e){
+      e.preventDefault();
+      var rect=canvas2.getBoundingClientRect();
+      var tx=(e.touches[0].clientX-rect.left)*(W2/rect.width);
+      var idx=Math.round((tx-pL2)/(W2-pL2-pR2)*(prices2.length-1));
+      idx=Math.max(0,Math.min(prices2.length-1,idx));
+      var tp=prices2[idx];
+      ctx2.clearRect(0,0,W2,H2);
+      ctx2.fillStyle='#1E2026';ctx2.fillRect(0,0,W2,H2);
+      ctx2.setLineDash([2,4]);ctx2.lineWidth=1;
+      [0,0.25,0.5,0.75,1].forEach(function(t){
+        var yy=H2-pB2-t*(H2-pT2-pB2);
+        ctx2.strokeStyle='#2B2F36';ctx2.beginPath();ctx2.moveTo(pL2,yy);ctx2.lineTo(W2-pR2,yy);ctx2.stroke();
+        ctx2.fillStyle='#848E9C';ctx2.font='9px sans-serif';ctx2.textAlign='right';
+        ctx2.fillText('₦'+(mn2+t*rng2).toLocaleString('en',{maximumFractionDigits:0}),pL2-3,yy+3);
+      });
+      ctx2.setLineDash([]);
+      ctx2.beginPath();ctx2.moveTo(px2(0),py2(prices2[0]));
+      for(var i=1;i<prices2.length;i++){var cpx2=(px2(i-1)+px2(i))/2;ctx2.bezierCurveTo(cpx2,py2(prices2[i-1]),cpx2,py2(prices2[i]),px2(i),py2(prices2[i]));}
+      ctx2.strokeStyle=lc2;ctx2.lineWidth=2;ctx2.stroke();
+      ctx2.setLineDash([3,3]);ctx2.strokeStyle='rgba(255,255,255,0.5)';ctx2.lineWidth=1;
+      ctx2.beginPath();ctx2.moveTo(px2(idx),pT2);ctx2.lineTo(px2(idx),H2-pB2);ctx2.stroke();
+      ctx2.beginPath();ctx2.moveTo(pL2,py2(tp));ctx2.lineTo(W2-pR2,py2(tp));ctx2.stroke();
+      ctx2.setLineDash([]);
+      ctx2.beginPath();ctx2.arc(px2(idx),py2(tp),5,0,Math.PI*2);ctx2.fillStyle=lc2;ctx2.fill();
+      var tLabel=idx===0?'start':(times2[idx-1]||'');
+      var ttW=115,ttH=36;
+      var ttX=Math.min(Math.max(px2(idx)-ttW/2,pL2),W2-pR2-ttW);
+      var ttY=py2(tp)<pT2+50?py2(tp)+10:py2(tp)-ttH-8;
+      ctx2.fillStyle='rgba(15,15,20,0.97)';ctx2.strokeStyle=lc2;ctx2.lineWidth=1.5;
+      ctx2.beginPath();if(ctx2.roundRect)ctx2.roundRect(ttX,ttY,ttW,ttH,6);else ctx2.rect(ttX,ttY,ttW,ttH);
+      ctx2.fill();ctx2.stroke();
+      ctx2.fillStyle='#fff';ctx2.font='bold 12px sans-serif';ctx2.textAlign='center';
+      ctx2.fillText('₦'+tp.toLocaleString(),ttX+ttW/2,ttY+14);
+      ctx2.fillStyle='#E0E0E0';ctx2.font='bold 10px sans-serif';
+      ctx2.fillText(tLabel?tLabel+' ago':'now',ttX+ttW/2,ttY+28);
+      wRows2.forEach(function(wy){wCols2.forEach(function(wx){ctx2.save();ctx2.globalAlpha=0.08;ctx2.fillStyle='#fff';ctx2.font='bold 13px sans-serif';ctx2.translate(wx,wy);ctx2.rotate(-20*Math.PI/180);ctx2.fillText('OjaLive',0,0);ctx2.restore();});});
+    };
+  }
+  return;
   var canvas = document.getElementById('price-chart');
   var empty = document.getElementById('history-empty');
   if (!changes.length) {
@@ -1278,6 +1430,19 @@ function sellerProfileScreen() {
   document.getElementById('profile-phone').textContent = currentSeller.phone;
   document.getElementById('profile-location').textContent = currentSeller.location;
   document.getElementById('profile-trade').textContent = currentSeller.trade;
+  var photoEl = document.getElementById('profile-photo');
+  if (photoEl) {
+    if (currentSeller.photo_url) {
+      photoEl.innerHTML = '<img src="'+currentSeller.photo_url+'" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--earth);display:block;margin:0 auto 12px;">';
+    } else {
+      photoEl.innerHTML = '<div style="width:80px;height:80px;border-radius:50%;background:var(--earth);color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">'+currentSeller.full_name.charAt(0).toUpperCase()+'</div>';
+    }
+  }
+  var descEl = document.getElementById('profile-description');
+  if (descEl && currentSeller.description) {
+    descEl.style.display = 'block';
+    descEl.textContent = currentSeller.description;
+  }
   sellerShowScreen('seller-profile');
 }
 function sellerEditProfileScreen() {
@@ -1288,6 +1453,15 @@ function sellerEditProfileScreen() {
   document.getElementById('edit-profile-lat').value = currentSeller.latitude || '';
   document.getElementById('edit-profile-lng').value = currentSeller.longitude || '';
   document.getElementById('update-location-status').textContent = currentSeller.location ? '📍 Current: '+currentSeller.location : '';
+  document.getElementById('edit-profile-description').value = currentSeller.description || '';
+  var epPreview = document.getElementById('edit-profile-photo-preview');
+  if (epPreview) {
+    if (currentSeller.photo_url) {
+      epPreview.innerHTML = '<img src="'+currentSeller.photo_url+'" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--earth);display:block;margin:0 auto 8px;">';
+    } else {
+      epPreview.innerHTML = '<div style="width:80px;height:80px;border-radius:50%;background:var(--earth);color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">'+currentSeller.full_name.charAt(0).toUpperCase()+'</div>';
+    }
+  }
   sellerShowScreen('seller-edit-profile');
 }
 async function sellerSaveEditProfile() {
@@ -1295,30 +1469,97 @@ async function sellerSaveEditProfile() {
   var phone = document.getElementById('edit-profile-phone').value.trim();
   var location = document.getElementById('edit-profile-location').value.trim();
   var trade = document.getElementById('edit-profile-trade').value;
+  var description = document.getElementById('edit-profile-description').value.trim();
   if (!name||!phone||!location) { showToast('Fill all fields'); return; }
   var editLat = document.getElementById('edit-profile-lat').value || currentSeller.latitude || null;
   var editLng = document.getElementById('edit-profile-lng').value || currentSeller.longitude || null;
-  var result = await db.from('traders').update({full_name:name,phone:phone,location:location,trade:trade,latitude:editLat,longitude:editLng}).eq('id',currentSeller.id);
+  var photoUrl = currentSeller.photo_url || null;
+  var photoFile = document.getElementById('edit-profile-photo-file').files[0];
+  if (photoFile) {
+    showToast('Uploading photo...');
+    var ext = photoFile.name.split('.').pop();
+    var path = 'trader-'+currentSeller.id+'-photo.'+ext;
+    var upRes = await db.storage.from('listing-images').upload(path, photoFile, {upsert:true});
+    if (!upRes.error) {
+      var pub = db.storage.from('listing-images').getPublicUrl(path);
+      photoUrl = pub.data.publicUrl;
+    }
+  }
+  var result = await db.from('traders').update({full_name:name,phone:phone,location:location,trade:trade,latitude:editLat,longitude:editLng,description:description,photo_url:photoUrl}).eq('id',currentSeller.id);
   if (result.error) { showToast('Error: '+result.error.message); return; }
   currentSeller.full_name = name;
   currentSeller.phone = phone;
   currentSeller.location = location;
   currentSeller.trade = trade;
+  currentSeller.description = description;
+  currentSeller.photo_url = photoUrl;
+  localStorage.setItem('ojalive_seller', JSON.stringify(currentSeller));
   showToast('Profile updated!');
   sellerProfileScreen();
 }
 async function sellerStatisticsScreen() {
+  sellerShowScreen('seller-statistics');
   var result = await db.from('Listing').select('*').eq('trader',currentSeller.full_name);
   var listings = result.data || [];
-  document.getElementById('stats-active-items').textContent = listings.length;
-  var total = listings.reduce(function(s,l){return s+Number(l.price);},0);
+  var active = listings.filter(function(l){return l.verified!==false;});
+  var paused = listings.filter(function(l){return l.verified===false;});
+  var total = active.reduce(function(s,l){return s+Number(l.price);},0);
+  var highest = listings.reduce(function(a,b){return Number(a.price)>Number(b.price)?a:b},{price:0});
+  var lowest = active.length?active.reduce(function(a,b){return Number(a.price)<Number(b.price)?a:b},active[0]):{name:'-',price:0};
+  document.getElementById('stats-active-items').textContent = active.length;
   document.getElementById('stats-total-value').textContent = '₦'+total.toLocaleString();
-  var html = listings.map(function(item) {
-    return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+' at '+item.location+'</div></div><div class="pright"><div class="pval">₦'+Number(item.price).toLocaleString()+'</div></div></div>';
-  }).join('');
-  if (!listings.length) html = '<div class="empty">No items yet</div>';
-  document.getElementById('stats-items-list').innerHTML = html;
-  sellerShowScreen('seller-statistics');
+  document.getElementById('stats-paused-items').textContent = paused.length;
+  var histResult = await db.from('price_history').select('*').eq('trader',currentSeller.full_name).order('id',{ascending:false}).limit(50);
+  var history = histResult.data || [];
+  document.getElementById('stats-price-changes').textContent = history.length;
+  var catMap = {};
+  listings.forEach(function(l){catMap[l.category]=(catMap[l.category]||0)+1;});
+  var cats = Object.keys(catMap).sort(function(a,b){return catMap[b]-catMap[a];});
+  document.getElementById('stats-categories').innerHTML = cats.length ? cats.map(function(c){
+    var pct = Math.round(catMap[c]/listings.length*100);
+    return '<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span style="font-weight:600;">'+c+'</span><span>'+catMap[c]+' items ('+pct+'%)</span></div><div style="background:#f0f0f0;border-radius:6px;height:8px;"><div style="background:var(--earth);border-radius:6px;height:8px;width:'+pct+'%;"></div></div></div>';
+  }).join('') : '<div class="empty">No categories yet</div>';
+  var sortedByPrice = listings.slice().sort(function(a,b){return Number(b.price)-Number(a.price);});
+  document.getElementById('stats-items-list').innerHTML = sortedByPrice.length ? '<div style="margin-bottom:10px;padding:10px;background:#FDF6E3;border-radius:10px;"><div style="font-size:11px;color:var(--amber);font-weight:700;">HIGHEST PRICE</div><div style="font-size:15px;font-weight:800;color:var(--dark);">'+highest.name+'</div><div style="font-size:13px;color:var(--earth);">₦'+Number(highest.price).toLocaleString()+' per '+highest.unit+'</div></div><div style="margin-bottom:10px;padding:10px;background:#E8F5EE;border-radius:10px;"><div style="font-size:11px;color:var(--green);font-weight:700;">LOWEST PRICE</div><div style="font-size:15px;font-weight:800;color:var(--dark);">'+lowest.name+'</div><div style="font-size:13px;color:var(--green);">₦'+Number(lowest.price).toLocaleString()+' per '+lowest.unit+'</div></div>'+sortedByPrice.map(function(item){var chg=item.change||'stable';var chgColor=chg==='up'?'#0ECB81':chg==='down'?'#F6465D':'var(--muted)';var chgArrow=chg==='up'?'▲':chg==='down'?'▼':'•';return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+' · '+item.category+'</div></div><div class="pright"><div class="pval">₦'+Number(item.price).toLocaleString()+'</div><div style="font-size:11px;color:'+chgColor+';font-weight:700;">'+chgArrow+' '+chg+'</div></div></div>';}).join('') : '<div class="empty">No items yet</div>';
+  if (history.length > 1) {
+    var canvas = document.getElementById('stats-chart');
+    var prices = history.map(function(h){return Number(h.new_price);}).reverse();
+    var W = canvas.offsetWidth||320; var H = 180;
+    canvas.width=W; canvas.height=H;
+    var ctx = canvas.getContext('2d');
+    var isUp = prices[prices.length-1]>=prices[0];
+    var lc = isUp?'#0ECB81':'#F6465D';
+    ctx.fillStyle='#1E2026'; ctx.fillRect(0,0,W,H);
+    var mn=Math.min.apply(null,prices)*0.998,mx=Math.max.apply(null,prices)*1.002;
+    var pL=50,pR=10,pT=20,pB=25,rng=mx-mn||1;
+    function px(i){return pL+(i/(prices.length-1||1))*(W-pL-pR);}
+    function py(v){return H-pB-((v-mn)/rng)*(H-pT-pB);}
+    ctx.setLineDash([2,4]); ctx.lineWidth=1;
+    [0,0.5,1].forEach(function(t){
+      var yy=H-pB-t*(H-pT-pB);
+      ctx.strokeStyle='#2B2F36'; ctx.beginPath(); ctx.moveTo(pL,yy); ctx.lineTo(W-pR,yy); ctx.stroke();
+      ctx.fillStyle='#848E9C'; ctx.font='9px sans-serif'; ctx.textAlign='right';
+      ctx.fillText('₦'+(mn+t*rng).toLocaleString('en',{maximumFractionDigits:0}),pL-3,yy+3);
+    });
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(px(0),py(prices[0]));
+    for(var i=1;i<prices.length;i++){var cpx=(px(i-1)+px(i))/2;ctx.bezierCurveTo(cpx,py(prices[i-1]),cpx,py(prices[i]),px(i),py(prices[i]));}
+    var gr=ctx.createLinearGradient(0,pT,0,H-pB);
+    gr.addColorStop(0,isUp?'rgba(14,203,129,0.25)':'rgba(246,70,93,0.25)'); gr.addColorStop(1,'rgba(30,32,38,0)');
+    ctx.lineTo(px(prices.length-1),H-pB); ctx.lineTo(px(0),H-pB); ctx.closePath(); ctx.fillStyle=gr; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(px(0),py(prices[0]));
+    for(var i=1;i<prices.length;i++){var cpx=(px(i-1)+px(i))/2;ctx.bezierCurveTo(cpx,py(prices[i-1]),cpx,py(prices[i]),px(i),py(prices[i]));}
+    ctx.strokeStyle=lc; ctx.lineWidth=2; ctx.stroke();
+    var last=prices[prices.length-1],first=prices[0];
+    var pct=((last-first)/first*100).toFixed(1);
+    document.getElementById('stats-chart-summary').innerHTML='<span style="font-weight:800;color:'+lc+';">₦'+last.toLocaleString()+'</span><span style="color:'+lc+';">'+(last>=first?'+':'')+pct+'% overall</span>';
+    ctx.globalAlpha=0.1; ctx.fillStyle='#fff'; ctx.font='bold 14px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('OjaLive',W/2,H/2); ctx.globalAlpha=1;
+  } else {
+    var canvas2 = document.getElementById('stats-chart');
+    canvas2.style.display = history.length<=1?'none':'block';
+    document.getElementById('stats-chart-summary').innerHTML = '<span style="color:var(--muted);font-size:12px;">Edit item prices to see activity chart</span>';
+  }
 }
 async function sellerChangePassword() {
   var current = document.getElementById('settings-current-password').value.trim();
