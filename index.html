@@ -104,6 +104,21 @@ input:focus,select:focus{border-color:var(--earth);}
         <div id="reg-photo-preview" style="margin-bottom:8px;"></div>
         <input type="file" id="reg-photo" accept="image/*" style="display:none;" onchange="previewRegPhoto()">
         <button type="button" onclick="document.getElementById('reg-photo').click()" style="width:100%;padding:10px;background:#F7F2EA;border:1.5px dashed var(--border);border-radius:10px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:10px;">📷 Add Shop Photo</button>
+        <label>Opening Hours (Optional)</label>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input type="time" id="reg-open-from" style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;" placeholder="Open from">
+          <span style="align-self:center;color:var(--muted);">to</span>
+          <input type="time" id="reg-open-to" style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;" placeholder="Close at">
+        </div>
+        <select id="reg-open-days" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff;margin-bottom:10px;">
+          <option value="Mon-Fri">Monday - Friday</option>
+          <option value="Mon-Sat">Monday - Saturday</option>
+          <option value="Mon-Sun">Monday - Sunday (All week)</option>
+          <option value="Tue-Sun">Tuesday - Sunday</option>
+          <option value="Weekends">Weekends Only</option>
+        </select>
+        <label>WhatsApp Number (Optional)</label>
+        <input type="tel" id="reg-whatsapp" placeholder="e.g. 08012345678 (if different from phone)">
         <label>Business Description (Optional)</label>
         <textarea id="reg-description" placeholder="e.g. We sell quality building materials in Iwo since 2010..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;resize:none;height:80px;font-family:inherit;"></textarea>
         <label>Business Type</label>
@@ -178,6 +193,16 @@ input:focus,select:focus{border-color:var(--earth);}
         <option>Timber & Plywood</option>
         <option>Fabric & Clothing</option>
         <option>Electronics</option>
+        <option>Phones & Accessories</option>
+        <option>Beverages</option>
+        <option>Cosmetics & Beauty</option>
+        <option>Furniture</option>
+        <option>Automobile Parts</option>
+        <option>Stationery & Books</option>
+        <option>Livestock & Poultry</option>
+        <option>Agricultural Produce</option>
+        <option>Chemicals & Fertilizers</option>
+        <option>Plastics & Rubber</option>
         <option>Other</option>
       </select>
       <label>Price (₦) *</label>
@@ -186,6 +211,8 @@ input:focus,select:focus{border-color:var(--earth);}
       <input type="text" id="add-item-unit" placeholder="e.g. per bag, per kg, per piece">
       <label style="display:none;">Your Location *</label>
       <input type="text" id="add-item-location" placeholder="e.g. Shop 12, Oja Oba, Iwo" style="display:none;">
+      <label>Stock Quantity (Optional)</label>
+      <input type="number" id="add-item-stock" placeholder="e.g. 50 (how many units available)" min="0">
       <label>Item Photos (Optional)</label>
       <div id="add-images-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
       <input type="file" id="add-item-images" accept="image/*" multiple style="display:none;" onchange="previewImages('add')">
@@ -209,6 +236,16 @@ input:focus,select:focus{border-color:var(--earth);}
         <option>Timber & Plywood</option>
         <option>Fabric & Clothing</option>
         <option>Electronics</option>
+        <option>Phones & Accessories</option>
+        <option>Beverages</option>
+        <option>Cosmetics & Beauty</option>
+        <option>Furniture</option>
+        <option>Automobile Parts</option>
+        <option>Stationery & Books</option>
+        <option>Livestock & Poultry</option>
+        <option>Agricultural Produce</option>
+        <option>Chemicals & Fertilizers</option>
+        <option>Plastics & Rubber</option>
         <option>Other</option>
       </select>
       <label>Price (₦)</label>
@@ -217,6 +254,8 @@ input:focus,select:focus{border-color:var(--earth);}
       <input type="text" id="edit-item-unit" placeholder="Unit">
       <label>Location</label>
       <input type="text" id="edit-item-location" placeholder="Location">
+      <label>Stock Quantity (Optional)</label>
+      <input type="number" id="add-item-stock" placeholder="e.g. 50 (how many units available)" min="0">
       <label>Item Photos (Optional)</label>
       <div id="edit-images-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
       <input type="file" id="edit-item-images" accept="image/*" multiple style="display:none;" onchange="previewImages('edit')">
@@ -249,8 +288,9 @@ input:focus,select:focus{border-color:var(--earth);}
         <button class="btn btn-o" id="btn-detail-delete" style="flex:1;margin:0;border-color:var(--red);color:var(--red);">🗑️ Delete</button>
       </div>
       <div style="display:flex;gap:8px;margin-top:8px;">
-        <button class="btn btn-o" id="btn-detail-share" style="flex:1;margin:0;border-color:var(--green);color:var(--green);">📤 Share</button>
-        <button class="btn btn-o" id="btn-detail-export" style="flex:1;margin:0;">📋 Export History</button>
+        <button class="btn btn-o" id="btn-detail-duplicate" style="flex:1;margin:0;border-color:var(--green);color:var(--green);">📋 Duplicate</button>
+        <button class="btn btn-o" id="btn-detail-share" style="flex:1;margin:0;border-color:var(--dark);color:var(--dark);">📤 Share</button>
+        <button class="btn btn-o" id="btn-detail-export" style="flex:1;margin:0;">📊 Export</button>
       </div>
     </div>
     <div class="card">
@@ -305,6 +345,14 @@ input:focus,select:focus{border-color:var(--earth);}
         <div style="font-size:15px;font-weight:600;margin-top:6px;" id="profile-phone">-</div>
       </div>
       <div style="padding:16px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Member Since</div>
+        <div style="font-size:15px;font-weight:600;margin-top:6px;" id="profile-member-since">-</div>
+      </div>
+      <div style="padding:16px 0;border-bottom:1px solid var(--border);" id="profile-hours-row">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Opening Hours</div>
+        <div style="font-size:15px;font-weight:600;margin-top:6px;" id="profile-opening-hours">Not set</div>
+      </div>
+      <div style="padding:16px 0;border-bottom:1px solid var(--border);">
         <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Location</div>
         <div style="font-size:15px;font-weight:600;margin-top:6px;" id="profile-location">-</div>
       </div>
@@ -345,7 +393,30 @@ input:focus,select:focus{border-color:var(--earth);}
         <option>Timber & Plywood</option>
         <option>Fabric & Clothing</option>
         <option>Electronics</option>
+        <option>Phones & Accessories</option>
+        <option>Beverages</option>
+        <option>Cosmetics & Beauty</option>
+        <option>Furniture</option>
+        <option>Automobile Parts</option>
+        <option>Stationery & Books</option>
+        <option>Livestock & Poultry</option>
+        <option>Agricultural Produce</option>
+        <option>Chemicals & Fertilizers</option>
+        <option>Plastics & Rubber</option>
         <option>Other</option>
+      </select>
+      <label>Opening Hours</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input type="time" id="edit-open-from" style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;">
+        <span style="align-self:center;color:var(--muted);">to</span>
+        <input type="time" id="edit-open-to" style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;">
+      </div>
+      <select id="edit-open-days" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff;margin-bottom:10px;">
+        <option value="Mon-Fri">Monday - Friday</option>
+        <option value="Mon-Sat">Monday - Saturday</option>
+        <option value="Mon-Sun">Monday - Sunday (All week)</option>
+        <option value="Tue-Sun">Tuesday - Sunday</option>
+        <option value="Weekends">Weekends Only</option>
       </select>
       <label>Business Description</label>
       <textarea id="edit-profile-description" placeholder="Tell buyers about your business..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;resize:none;height:80px;font-family:inherit;"></textarea>
@@ -379,6 +450,7 @@ input:focus,select:focus{border-color:var(--earth);}
     </div>
     <div class="card" style="margin-bottom:10px;">
       <div class="card-title">Category Breakdown</div>
+      <canvas id="stats-pie-chart" style="width:100%;height:200px;border-radius:10px;display:none;"></canvas>
       <div id="stats-categories"></div>
     </div>
     <div class="card">
@@ -762,7 +834,12 @@ async function sellerRegister() {
   var regLng = document.getElementById('reg-lng').value || null;
   var fullLocation = location || state+', '+country;
   var description = document.getElementById('reg-description').value.trim();
-  var result = await db.from('traders').insert([{full_name:name,phone:phone,location:fullLocation,trade:trade,password:password,status:'approved',latitude:regLat,longitude:regLng,description:description}]).select();
+  var whatsapp = document.getElementById('reg-whatsapp').value.trim() || phone;
+  var openFrom = document.getElementById('reg-open-from').value;
+  var openTo = document.getElementById('reg-open-to').value;
+  var openDays = document.getElementById('reg-open-days').value;
+  var openHours = (openFrom && openTo) ? openDays+' '+openFrom+'-'+openTo : '';
+  var result = await db.from('traders').insert([{full_name:name,phone:phone,whatsapp:whatsapp,location:fullLocation,trade:trade,password:password,status:'approved',latitude:regLat,longitude:regLng,description:description,opening_hours:openHours}]).select();
   if (!result.error && result.data && result.data[0]) {
     var photoFile = document.getElementById('reg-photo').files[0];
     if (photoFile) {
@@ -783,6 +860,10 @@ async function sellerRegister() {
   document.getElementById('reg-lat').value='';
   document.getElementById('reg-lng').value='';
   document.getElementById('reg-password').value='';
+  document.getElementById('reg-description').value='';
+  document.getElementById('reg-whatsapp').value='';
+  document.getElementById('reg-photo-preview').innerHTML='';
+  document.getElementById('reg-photo').value='';
   document.getElementById('btn-capture-location').textContent = '📍 Capture My Exact Shop Location';
   document.getElementById('btn-capture-location').style.background = 'var(--earth)';
   document.getElementById('btn-capture-location').disabled = false;
@@ -814,14 +895,15 @@ async function loadSellerDashboard() {
   var listings = result.data || [];
   var activeCount = listings.filter(function(l){return l.verified!==false;}).length;
   document.getElementById('dashboard-listings-count').textContent = activeCount;
-  var total = listings.reduce(function(s,l){return s+Number(l.price);},0);
+  var total = listings.filter(function(l){return l.verified!==false;}).reduce(function(s,l){return s+Number(l.price);},0);
   document.getElementById('dashboard-total-value').textContent = '₦'+total.toLocaleString();
   var html = listings.map(function(item) {
     var pausedBadge = item.verified===false ? '<span style="font-size:10px;background:#FDF6E3;color:var(--amber);border:1px solid var(--amber);border-radius:4px;padding:1px 5px;margin-left:6px;">PAUSED</span>' : '';
     var priceColor = 'var(--earth)';
     var thumb = '';
     if(item.image_url){try{var imgs=JSON.parse(item.image_url);if(imgs.length>0)thumb='<img src="'+imgs[0]+'" style="width:44px;height:44px;border-radius:8px;object-fit:cover;margin-right:10px;flex-shrink:0;">';}catch(e){}}
-    return '<div class="price-item" onclick="sellerItemDetail('+item.id+')" style="cursor:pointer;opacity:'+(item.verified===false?'0.6':'1')+';align-items:center;">'+thumb+'<div style="flex:1;"><div class="mname">'+item.name+pausedBadge+'</div><div class="munit">'+item.unit+' · '+item.location+'</div></div><div class="pright"><div class="pval" style="color:'+priceColor+';">₦'+Number(item.price).toLocaleString()+'</div><button class="bsm bapp" onclick="event.stopPropagation();sellerEditListingScreen('+item.id+')">Edit</button></div></div>';
+    var stockBadge = item.stock ? '<span style="font-size:10px;background:#E8F5EE;color:var(--green);border:1px solid var(--green);border-radius:4px;padding:1px 5px;margin-left:6px;">'+item.stock+' left</span>' : '';
+    return '<div class="price-item" onclick="sellerItemDetail('+item.id+')" style="cursor:pointer;opacity:'+(item.verified===false?'0.6':'1')+';align-items:center;">'+thumb+'<div style="flex:1;"><div class="mname">'+item.name+pausedBadge+stockBadge+'</div><div class="munit">'+item.unit+' · '+item.location+'</div></div><div class="pright"><div class="pval" style="color:'+priceColor+';">₦'+Number(item.price).toLocaleString()+'</div><button class="bsm bapp" onclick="event.stopPropagation();sellerEditListingScreen('+item.id+')">Edit</button></div></div>';
   }).join('');
   if (!listings.length) html = '<div class="empty">No items yet. Add your first item!</div>';
   document.getElementById('seller-items-list').innerHTML = html;
@@ -867,7 +949,8 @@ async function sellerSaveNewListing() {
   }
   var showPhone = document.getElementById('add-show-phone').checked;
   var phone = showPhone ? currentSeller.phone : null;
-  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable',latitude:gps.lat,longitude:gps.lng,phone:phone}]).select();
+  var stock = document.getElementById('add-item-stock').value ? parseInt(document.getElementById('add-item-stock').value) : null;
+  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable',latitude:gps.lat,longitude:gps.lng,phone:phone,stock:stock}]).select();
   if (!result.error) {
     var imgFiles = document.getElementById('add-item-images').files;
     if (imgFiles.length > 0 && result.data && result.data[0]) {
@@ -993,6 +1076,30 @@ async function sellerItemDetail(id) {
     loadSellerDashboard();
     loadListings();
     sellerItemDetail(id);
+  };
+  document.getElementById('btn-detail-duplicate').onclick = async function() {
+    if (!confirm('Duplicate this listing?')) return;
+    showToast('Duplicating...');
+    var gps = {lat: currentSeller.latitude||null, lng: currentSeller.longitude||null};
+    var dupResult = await db.from('Listing').insert([{
+      name: item.name+' (Copy)',
+      price: item.price,
+      unit: item.unit,
+      category: item.category,
+      location: item.location,
+      trader: currentSeller.full_name,
+      verified: true,
+      change: 'stable',
+      latitude: gps.lat,
+      longitude: gps.lng,
+      phone: item.phone,
+      image_url: item.image_url
+    }]);
+    if (dupResult.error) { showToast('Error: '+dupResult.error.message); return; }
+    showToast('Item duplicated! Edit to update details.');
+    loadSellerDashboard();
+    loadListings();
+    sellerShowScreen('seller-dashboard');
   };
   document.getElementById('btn-detail-share').onclick = function() {
     var shareText = item.name+' - ₦'+Number(item.price).toLocaleString()+' per '+item.unit+'\nSeller: '+item.trader+'\nLocation: '+item.location+'\nFind on OjaLive: https://ojalive.aamuda34.workers.dev';
@@ -1430,18 +1537,29 @@ function sellerProfileScreen() {
   document.getElementById('profile-phone').textContent = currentSeller.phone;
   document.getElementById('profile-location').textContent = currentSeller.location;
   document.getElementById('profile-trade').textContent = currentSeller.trade;
+  var memberEl = document.getElementById('profile-member-since');
+  if (memberEl && currentSeller.created_at) {
+    var d = new Date(currentSeller.created_at);
+    memberEl.textContent = d.toLocaleDateString('en-NG',{day:'numeric',month:'long',year:'numeric'});
+  }
+  var hoursEl = document.getElementById('profile-opening-hours');
+  if (hoursEl) hoursEl.textContent = currentSeller.opening_hours || 'Not set';
   var photoEl = document.getElementById('profile-photo');
   if (photoEl) {
     if (currentSeller.photo_url) {
-      photoEl.innerHTML = '<img src="'+currentSeller.photo_url+'" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--earth);display:block;margin:0 auto 12px;">';
+      photoEl.innerHTML = '<img src="'+currentSeller.photo_url+'" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--earth);display:block;margin:0 auto 12px;">';
     } else {
-      photoEl.innerHTML = '<div style="width:80px;height:80px;border-radius:50%;background:var(--earth);color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">'+currentSeller.full_name.charAt(0).toUpperCase()+'</div>';
+      photoEl.innerHTML = '<div style="width:90px;height:90px;border-radius:50%;background:var(--earth);color:#fff;font-size:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">'+currentSeller.full_name.charAt(0).toUpperCase()+'</div>';
     }
   }
   var descEl = document.getElementById('profile-description');
-  if (descEl && currentSeller.description) {
-    descEl.style.display = 'block';
-    descEl.textContent = currentSeller.description;
+  if (descEl) {
+    if (currentSeller.description) {
+      descEl.style.display = 'block';
+      descEl.textContent = '"'+currentSeller.description+'"';
+    } else {
+      descEl.style.display = 'none';
+    }
   }
   sellerShowScreen('seller-profile');
 }
@@ -1485,10 +1603,15 @@ async function sellerSaveEditProfile() {
       photoUrl = pub.data.publicUrl;
     }
   }
-  var result = await db.from('traders').update({full_name:name,phone:phone,location:location,trade:trade,latitude:editLat,longitude:editLng,photo_url:photoUrl}).eq('id',currentSeller.id);
+  var editOpenFrom = document.getElementById('edit-open-from').value;
+  var editOpenTo = document.getElementById('edit-open-to').value;
+  var editOpenDays = document.getElementById('edit-open-days').value;
+  var editOpenHours = (editOpenFrom && editOpenTo) ? editOpenDays+' '+editOpenFrom+'-'+editOpenTo : currentSeller.opening_hours||'';
+  var result = await db.from('traders').update({full_name:name,phone:phone,location:location,trade:trade,latitude:editLat,longitude:editLng,photo_url:photoUrl,opening_hours:editOpenHours}).eq('id',currentSeller.id);
   if (!result.error && description) {
     await db.from('traders').update({description:description}).eq('id',currentSeller.id);
   }
+  currentSeller.opening_hours = editOpenHours;
   if (result.error) { showToast('Error: '+result.error.message); return; }
   currentSeller.full_name = name;
   currentSeller.phone = phone;
@@ -1518,9 +1641,48 @@ async function sellerStatisticsScreen() {
   var catMap = {};
   listings.forEach(function(l){catMap[l.category]=(catMap[l.category]||0)+1;});
   var cats = Object.keys(catMap).sort(function(a,b){return catMap[b]-catMap[a];});
-  document.getElementById('stats-categories').innerHTML = cats.length ? cats.map(function(c){
+  var pieCanvas = document.getElementById('stats-pie-chart');
+  var pieColors = ['#C55A11','#0ECB81','#F6465D','#3B82F6','#F59E0B','#8B5CF6','#EC4899','#14B8A6'];
+  if (cats.length > 0 && pieCanvas) {
+    pieCanvas.style.display = 'block';
+    var PW = pieCanvas.offsetWidth||320, PH = 200;
+    pieCanvas.width = PW; pieCanvas.height = PH;
+    var pctx = pieCanvas.getContext('2d');
+    pctx.fillStyle = '#1E2026'; pctx.fillRect(0,0,PW,PH);
+    var cx = PW*0.38, cy = PH/2, pr = Math.min(cx,cy)*0.85;
+    var total2 = listings.length;
+    var startAngle = -Math.PI/2;
+    cats.forEach(function(c,i){
+      var slice = (catMap[c]/total2)*Math.PI*2;
+      pctx.beginPath();
+      pctx.moveTo(cx,cy);
+      pctx.arc(cx,cy,pr,startAngle,startAngle+slice);
+      pctx.closePath();
+      pctx.fillStyle = pieColors[i%pieColors.length];
+      pctx.fill();
+      pctx.strokeStyle = '#1E2026'; pctx.lineWidth = 2; pctx.stroke();
+      startAngle += slice;
+    });
+    pctx.beginPath(); pctx.arc(cx,cy,pr*0.5,0,Math.PI*2);
+    pctx.fillStyle='#1E2026'; pctx.fill();
+    var lx = PW*0.68, ly = PH*0.15;
+    cats.forEach(function(c,i){
+      if(i>5)return;
+      pctx.fillStyle=pieColors[i%pieColors.length];
+      pctx.fillRect(lx,ly+i*26,12,12);
+      pctx.fillStyle='#fff'; pctx.font='10px sans-serif'; pctx.textAlign='left';
+      var short = c.length>12?c.substring(0,12)+'..':c;
+      pctx.fillText(short+' '+Math.round(catMap[c]/total2*100)+'%',lx+16,ly+i*26+10);
+    });
+    pctx.globalAlpha=0.08; pctx.fillStyle='#fff'; pctx.font='bold 13px sans-serif'; pctx.textAlign='center';
+    [[PW*0.3,PH*0.3],[PW*0.6,PH*0.6],[PW*0.15,PH*0.65]].forEach(function(pos){
+      pctx.save();pctx.translate(pos[0],pos[1]);pctx.rotate(-20*Math.PI/180);pctx.fillText('OjaLive',0,0);pctx.restore();
+    });
+    pctx.globalAlpha=1;
+  }
+  document.getElementById('stats-categories').innerHTML = cats.length ? cats.map(function(c,i){
     var pct = Math.round(catMap[c]/listings.length*100);
-    return '<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span style="font-weight:600;">'+c+'</span><span>'+catMap[c]+' items ('+pct+'%)</span></div><div style="background:#f0f0f0;border-radius:6px;height:8px;"><div style="background:var(--earth);border-radius:6px;height:8px;width:'+pct+'%;"></div></div></div>';
+    return '<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:'+pieColors[i%pieColors.length]+';display:inline-block;"></span><b>'+c+'</b></span><span>'+catMap[c]+' items ('+pct+'%)</span></div><div style="background:#f0f0f0;border-radius:6px;height:8px;"><div style="background:'+pieColors[i%pieColors.length]+';border-radius:6px;height:8px;width:'+pct+'%;"></div></div></div>';
   }).join('') : '<div class="empty">No categories yet</div>';
   var sortedByPrice = listings.slice().sort(function(a,b){return Number(b.price)-Number(a.price);});
   document.getElementById('stats-items-list').innerHTML = sortedByPrice.length ? '<div style="margin-bottom:10px;padding:10px;background:#FDF6E3;border-radius:10px;"><div style="font-size:11px;color:var(--amber);font-weight:700;">HIGHEST PRICE</div><div style="font-size:15px;font-weight:800;color:var(--dark);">'+highest.name+'</div><div style="font-size:13px;color:var(--earth);">₦'+Number(highest.price).toLocaleString()+' per '+highest.unit+'</div></div><div style="margin-bottom:10px;padding:10px;background:#E8F5EE;border-radius:10px;"><div style="font-size:11px;color:var(--green);font-weight:700;">LOWEST PRICE</div><div style="font-size:15px;font-weight:800;color:var(--dark);">'+lowest.name+'</div><div style="font-size:13px;color:var(--green);">₦'+Number(lowest.price).toLocaleString()+' per '+lowest.unit+'</div></div>'+sortedByPrice.map(function(item){var chg=item.change||'stable';var chgColor=chg==='up'?'#0ECB81':chg==='down'?'#F6465D':'var(--muted)';var chgArrow=chg==='up'?'▲':chg==='down'?'▼':'•';return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+' · '+item.category+'</div></div><div class="pright"><div class="pval">₦'+Number(item.price).toLocaleString()+'</div><div style="font-size:11px;color:'+chgColor+';font-weight:700;">'+chgArrow+' '+chg+'</div></div></div>';}).join('') : '<div class="empty">No items yet</div>';
@@ -1556,8 +1718,48 @@ async function sellerStatisticsScreen() {
     var last=prices[prices.length-1],first=prices[0];
     var pct=((last-first)/first*100).toFixed(1);
     document.getElementById('stats-chart-summary').innerHTML='<span style="font-weight:800;color:'+lc+';">₦'+last.toLocaleString()+'</span><span style="color:'+lc+';">'+(last>=first?'+':'')+pct+'% overall</span>';
-    ctx.globalAlpha=0.1; ctx.fillStyle='#fff'; ctx.font='bold 14px sans-serif'; ctx.textAlign='center';
-    ctx.fillText('OjaLive',W/2,H/2); ctx.globalAlpha=1;
+    var wR=[H*0.25,H*0.5,H*0.75],wC=[W*0.2,W*0.5,W*0.8];
+    ctx.globalAlpha=0.08;ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign='center';
+    wR.forEach(function(wy){wC.forEach(function(wx){ctx.save();ctx.translate(wx,wy);ctx.rotate(-20*Math.PI/180);ctx.fillText('OjaLive',0,0);ctx.restore();});});
+    ctx.globalAlpha=1;
+    var sCanvas=document.getElementById('stats-chart');
+    sCanvas.ontouchstart=function(e){
+      e.preventDefault();
+      var rect=sCanvas.getBoundingClientRect();
+      var tx=(e.touches[0].clientX-rect.left)*(W/rect.width);
+      var idx=Math.round((tx-pL)/(W-pL-pR)*(prices.length-1));
+      idx=Math.max(0,Math.min(prices.length-1,idx));
+      var tp=prices[idx];
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle='#1E2026';ctx.fillRect(0,0,W,H);
+      ctx.setLineDash([2,4]);ctx.lineWidth=1;
+      [0,0.5,1].forEach(function(t){
+        var yy=H-pB-t*(H-pT-pB);
+        ctx.strokeStyle='#2B2F36';ctx.beginPath();ctx.moveTo(pL,yy);ctx.lineTo(W-pR,yy);ctx.stroke();
+        ctx.fillStyle='#848E9C';ctx.font='9px sans-serif';ctx.textAlign='right';
+        ctx.fillText('₦'+(mn+t*rng).toLocaleString('en',{maximumFractionDigits:0}),pL-3,yy+3);
+      });
+      ctx.setLineDash([]);
+      ctx.beginPath();ctx.moveTo(px(0),py(prices[0]));
+      for(var i=1;i<prices.length;i++){var cpx=(px(i-1)+px(i))/2;ctx.bezierCurveTo(cpx,py(prices[i-1]),cpx,py(prices[i]),px(i),py(prices[i]));}
+      ctx.strokeStyle=lc;ctx.lineWidth=2;ctx.stroke();
+      ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(px(idx),pT);ctx.lineTo(px(idx),H-pB);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(pL,py(tp));ctx.lineTo(W-pR,py(tp));ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.beginPath();ctx.arc(px(idx),py(tp),5,0,Math.PI*2);ctx.fillStyle=lc;ctx.fill();
+      var ttW=110,ttH=34;
+      var ttX=Math.min(Math.max(px(idx)-ttW/2,pL),W-pR-ttW);
+      var ttY=py(tp)<pT+50?py(tp)+10:py(tp)-ttH-8;
+      ctx.fillStyle='rgba(15,15,20,0.97)';ctx.strokeStyle=lc;ctx.lineWidth=1.5;
+      ctx.beginPath();if(ctx.roundRect)ctx.roundRect(ttX,ttY,ttW,ttH,6);else ctx.rect(ttX,ttY,ttW,ttH);
+      ctx.fill();ctx.stroke();
+      ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+      ctx.fillText('₦'+tp.toLocaleString(),ttX+ttW/2,ttY+14);
+      ctx.fillStyle='#E0E0E0';ctx.font='10px sans-serif';
+      ctx.fillText('change #'+(idx+1),ttX+ttW/2,ttY+27);
+      wR.forEach(function(wy){wC.forEach(function(wx){ctx.save();ctx.globalAlpha=0.08;ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.translate(wx,wy);ctx.rotate(-20*Math.PI/180);ctx.fillText('OjaLive',0,0);ctx.restore();});});
+    };
   } else {
     var canvas2 = document.getElementById('stats-chart');
     canvas2.style.display = history.length<=1?'none':'block';
