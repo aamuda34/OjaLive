@@ -47,6 +47,17 @@ input:focus,select:focus{border-color:var(--earth);}
 .bapp{background:var(--earth);color:#fff;}
 .range-btn{padding:4px 10px;background:#2B2F36;color:#848E9C;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;}
 .range-btn.active-range{background:var(--earth);color:#fff;}
+.cat-pill{padding:6px 14px;background:var(--card);color:var(--muted);border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.cat-pill.active-pill{background:var(--earth);color:#fff;border-color:var(--earth);}
+.listing-card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden;cursor:pointer;transition:transform 0.1s;}
+.listing-card:active{transform:scale(0.98);}
+.lc-img{width:100px;height:100px;object-fit:cover;flex-shrink:0;background:#f0ebe3;}
+.lc-body{padding:10px 12px;flex:1;min-width:0;}
+.lc-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lc-trader{font-size:12px;font-weight:600;color:var(--earth);margin-top:2px;}
+.lc-loc{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lc-price{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--earth);}
+.lc-unit{font-size:11px;color:var(--muted);}
 </style>
 </head>
 <body>
@@ -61,20 +72,168 @@ input:focus,select:focus{border-color:var(--earth);}
   <button class="tab" id="tab-admin">Admin</button>
 </div>
 <div class="toast" id="toast"></div>
-<div class="screen active" id="screen-buyer">
-  <div class="hero" onclick="loadListings()" style="cursor:pointer;">
-    <div class="hlabel">Live Market Prices</div>
-    <div class="hval" id="count">0 Listings</div>
-    <div class="hsub" id="hero-sub">Loading prices...</div>
-  </div>
-  <button id="btn-use-location" onclick="requestBuyerLocation()" style="width:100%;padding:11px 16px;background:#E8F5EE;border:1.5px solid var(--green);color:var(--green);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;">📍 Use My Location — See Nearest Prices</button>
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
-      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;">Live Prices</div>
+<div class="screen active" id="screen-buyer" style="padding:0;">
+  <!-- STICKY TOP BAR -->
+  <div style="position:sticky;top:0;z-index:200;background:var(--dark);padding:10px 14px 8px;">
+    <div style="position:relative;">
+      <input type="text" id="search-bar" placeholder="🔍 Search items, sellers..." oninput="renderBoard()" style="background:#fff;padding:10px 36px 10px 14px;border:none;border-radius:10px;font-size:14px;margin:0;width:100%;">
+      <span onclick="document.getElementById('search-bar').value='';renderBoard();" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);cursor:pointer;font-size:18px;">✕</span>
     </div>
-    <input type="text" id="search-bar" placeholder="🔍 Search items, sellers..." oninput="renderBoard()" style="margin-bottom:10px;border-color:var(--border);">
-    <div style="display:flex;gap:8px;margin-bottom:12px;"><select id="filter-city" onchange="renderBoard()" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff;"><option value="">All Cities</option><option value="Iwo">Iwo</option><option value="Osogbo">Osogbo</option><option value="Ile-Ife">Ile-Ife</option><option value="Lagos">Lagos</option><option value="Ibadan">Ibadan</option></select><select id="filter-category" onchange="renderBoard()" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff;"><option value="">All Categories</option><option value="Building Materials">Building</option><option value="Foodstuff">Foodstuff</option><option value="Hardware">Hardware</option><option value="Roofing Supplies">Roofing</option><option value="Electronics">Electronics</option></select></div>
-    <div id="board"><div class="empty">Loading prices...</div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+      <button id="btn-use-location" onclick="requestBuyerLocation()" style="background:none;border:none;color:#A0C878;font-size:12px;font-weight:600;cursor:pointer;padding:0;">📍 <span id="loc-label">Tap to use location</span></button>
+      <div style="display:flex;gap:6px;">
+        <select id="filter-sort" onchange="renderBoard()" style="padding:5px 8px;border:none;border-radius:8px;font-size:11px;background:#2E2415;color:#A08060;">
+          <option value="default">Sort</option>
+          <option value="nearest">📍 Nearest</option>
+          <option value="price-low">⬇ Price</option>
+          <option value="price-high">⬆ Price</option>
+          <option value="rising">▲ Rising</option>
+          <option value="falling">▼ Falling</option>
+        </select>
+        <select id="filter-city" onchange="renderBoard()" style="padding:5px 8px;border:none;border-radius:8px;font-size:11px;background:#2E2415;color:#A08060;">
+          <option value="">All Cities</option>
+          <option value="Iwo">Iwo</option><option value="Osogbo">Osogbo</option>
+          <option value="Ile-Ife">Ile-Ife</option><option value="Lagos">Lagos</option>
+          <option value="Ibadan">Ibadan</option><option value="Abuja">Abuja</option>
+          <option value="Kano">Kano</option><option value="Port Harcourt">Port Harcourt</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <!-- CATEGORY PILLS -->
+  <div style="display:flex;gap:8px;overflow-x:auto;padding:10px 14px;scrollbar-width:none;background:var(--card);border-bottom:1px solid var(--border);">
+    <button class="cat-pill active-pill" onclick="filterCat(this,'')">All</button>
+    <button class="cat-pill" onclick="filterCat(this,'Foodstuff')">🌾 Food</button>
+    <button class="cat-pill" onclick="filterCat(this,'Building Materials')">🏗️ Building</button>
+    <button class="cat-pill" onclick="filterCat(this,'Hardware')">🔧 Hardware</button>
+    <button class="cat-pill" onclick="filterCat(this,'Electronics')">📱 Electronics</button>
+    <button class="cat-pill" onclick="filterCat(this,'Phones & Accessories')">📲 Phones</button>
+    <button class="cat-pill" onclick="filterCat(this,'Roofing Supplies')">🏠 Roofing</button>
+    <button class="cat-pill" onclick="filterCat(this,'Timber & Plywood')">🪵 Timber</button>
+    <button class="cat-pill" onclick="filterCat(this,'Fabric & Clothing')">👗 Fashion</button>
+    <button class="cat-pill" onclick="filterCat(this,'Beverages')">🥤 Drinks</button>
+    <button class="cat-pill" onclick="filterCat(this,'Cosmetics & Beauty')">💄 Beauty</button>
+    <button class="cat-pill" onclick="filterCat(this,'Furniture')">🛋️ Furniture</button>
+    <button class="cat-pill" onclick="filterCat(this,'Automobile Parts')">🚗 Auto</button>
+    <button class="cat-pill" onclick="filterCat(this,'Agricultural Produce')">🌱 Farm</button>
+    <button class="cat-pill" onclick="filterCat(this,'Livestock & Poultry')">🐓 Livestock</button>
+    <button class="cat-pill" onclick="filterCat(this,'Other')">📦 Other</button>
+  </div>
+  <!-- STATS BAR -->
+  <div style="background:linear-gradient(135deg,var(--dark),#3D2810);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="loadListings()">
+    <div>
+      <div style="font-size:10px;color:var(--earth-lt);font-weight:700;letter-spacing:1px;text-transform:uppercase;">Live Market</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;" id="count">0 Listings</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:11px;color:#A0C878;" id="hero-sub">Tap to refresh</div>
+      <div style="font-size:11px;color:var(--earth-lt);margin-top:2px;" id="results-count"></div>
+    </div>
+  </div>
+  <!-- BOARD -->
+  <div id="board" style="padding:12px 14px;"><div class="empty">Loading prices...</div></div>
+  <!-- BUYER ITEM DETAIL MODAL -->
+  <div id="buyer-item-detail" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:500;overflow-y:auto;">
+    <div style="position:sticky;top:0;background:var(--dark);padding:14px 16px;display:flex;align-items:center;gap:12px;z-index:10;">
+      <button onclick="closeBuyerDetail()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">←</button>
+      <div style="color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;" id="bd-title">Item Detail</div>
+    </div>
+    <div id="bd-images" style="background:#000;min-height:200px;display:flex;overflow-x:auto;scrollbar-width:none;"></div>
+    <div style="padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+        <div style="flex:1;">
+          <div id="bd-name" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--dark);"></div>
+          <div id="bd-category" style="font-size:12px;color:var(--muted);margin-top:4px;"></div>
+        </div>
+        <div style="text-align:right;">
+          <div id="bd-price" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--earth);"></div>
+          <div id="bd-unit" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
+          <div id="bd-badge" style="margin-top:4px;"></div>
+        </div>
+      </div>
+      <div id="bd-stock" style="display:none;background:#E8F5EE;color:var(--green);font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;margin-bottom:12px;"></div>
+      <!-- SELLER INFO -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:10px;">Seller Info</div>
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div id="bd-seller-photo" style="width:54px;height:54px;border-radius:50%;background:var(--earth);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div id="bd-trader" style="font-size:15px;font-weight:700;color:var(--dark);"></div>
+              <button id="bd-follow-btn2" onclick="toggleFollow()" style="padding:7px 14px;background:var(--earth);color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">+ Follow</button>
+            </div>
+            <div id="bd-followers-count" style="font-size:11px;color:var(--muted);margin-top:2px;"></div>
+            <div id="bd-location" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
+            <div id="bd-hours" style="font-size:11px;color:var(--green);margin-top:2px;"></div>
+            <div id="bd-dist" style="font-size:11px;color:var(--green);font-weight:600;margin-top:2px;"></div>
+          </div>
+        </div>
+      </div>
+      <!-- ITEM DESCRIPTION -->
+      <div id="bd-description" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:8px;">About this item</div>
+        <div id="bd-desc-text" style="font-size:13px;color:var(--dark);line-height:1.6;"></div>
+      </div>
+      <!-- SELLER DESCRIPTION -->
+      <div id="bd-seller-desc" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px;">About the seller</div>
+        <div id="bd-seller-desc-text" style="font-size:12px;color:var(--muted);font-style:italic;line-height:1.5;"></div>
+      </div>
+      <!-- LIKES/DISLIKES -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button id="bd-like-btn" onclick="likeItem()" style="flex:1;padding:10px;background:#E8F5EE;color:var(--green);border:1.5px solid var(--green);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">👍 <span id="bd-likes">0</span></button>
+        <button id="bd-dislike-btn" onclick="dislikeItem()" style="flex:1;padding:10px;background:#FDECEA;color:var(--red);border:1.5px solid var(--red);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">👎 <span id="bd-dislikes">0</span></button>
+      </div>
+      <!-- ACTION BUTTONS -->
+      <button id="bd-chat-btn" style="width:100%;padding:14px;background:var(--earth);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;">💬 Chat Now — Recommended</button>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <a id="bd-wa-btn" href="#" target="_blank" style="flex:1;padding:12px;background:#25D366;color:#fff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;text-align:center;display:block;">💬 WhatsApp</a>
+        <a id="bd-call-btn" href="#" style="flex:1;padding:12px;background:#E8F5EE;color:var(--green);border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;text-align:center;display:block;">📞 Call</a>
+        <button id="bd-dir-btn" style="flex:1;padding:12px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">📍 Directions</button>
+      </div>
+      <!-- REVIEWS -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;">Reviews</div>
+          <div id="bd-avg-rating" style="font-size:13px;font-weight:700;color:var(--earth);"></div>
+        </div>
+        <div id="bd-reviews-list"><div style="font-size:13px;color:var(--muted);text-align:center;padding:10px;">No reviews yet. Be the first!</div></div>
+        <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+          <div style="font-size:12px;font-weight:600;color:var(--dark);margin-bottom:8px;">Write a Review</div>
+          <div id="bd-star-rating" style="display:flex;gap:6px;margin-bottom:8px;font-size:24px;">
+            <span onclick="setReviewRating(1)" style="cursor:pointer;" class="star">☆</span>
+            <span onclick="setReviewRating(2)" style="cursor:pointer;" class="star">☆</span>
+            <span onclick="setReviewRating(3)" style="cursor:pointer;" class="star">☆</span>
+            <span onclick="setReviewRating(4)" style="cursor:pointer;" class="star">☆</span>
+            <span onclick="setReviewRating(5)" style="cursor:pointer;" class="star">☆</span>
+          </div>
+          <textarea id="bd-review-text" placeholder="Share your experience with this item..." style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;resize:none;height:70px;font-family:inherit;margin-bottom:8px;"></textarea>
+          <input type="text" id="bd-reviewer-name" placeholder="Your name (optional)" style="margin-bottom:8px;font-size:13px;">
+          <button onclick="submitReview()" style="width:100%;padding:10px;background:var(--earth);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Submit Review</button>
+        </div>
+      </div>
+      <!-- SELLER RATING -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;">Rate this Seller</div>
+          <div id="bd-seller-avg-rating" style="font-size:13px;font-weight:700;color:#F59E0B;"></div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:0;font-size:28px;">
+          <span onclick="setSellerRating(1)" style="cursor:pointer;" class="seller-star">☆</span>
+          <span onclick="setSellerRating(2)" style="cursor:pointer;" class="seller-star">☆</span>
+          <span onclick="setSellerRating(3)" style="cursor:pointer;" class="seller-star">☆</span>
+          <span onclick="setSellerRating(4)" style="cursor:pointer;" class="seller-star">☆</span>
+          <span onclick="setSellerRating(5)" style="cursor:pointer;" class="seller-star">☆</span>
+        </div>
+        <button onclick="submitSellerRating()" style="width:100%;margin-top:10px;padding:10px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Submit Rating</button>
+      </div>
+      <!-- PRICE HISTORY MINI -->
+      <div id="bd-history-section" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:10px;">Price History</div>
+        <canvas id="bd-price-chart" style="width:100%;height:140px;border-radius:8px;"></canvas>
+        <div id="bd-history-list" style="margin-top:10px;"></div>
+      </div>
+    </div>
   </div>
 </div>
 <div class="screen" id="screen-supplier">
@@ -211,6 +370,8 @@ input:focus,select:focus{border-color:var(--earth);}
       <input type="text" id="add-item-unit" placeholder="e.g. per bag, per kg, per piece">
       <label style="display:none;">Your Location *</label>
       <input type="text" id="add-item-location" placeholder="e.g. Shop 12, Oja Oba, Iwo" style="display:none;">
+      <label>Item Description (Optional)</label>
+      <textarea id="add-item-description" placeholder="Describe your item... e.g. Fresh from farm, quality guaranteed, wholesale available" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;resize:none;height:80px;font-family:inherit;margin-bottom:0;"></textarea>
       <label>Stock Quantity (Optional)</label>
       <input type="number" id="add-item-stock" placeholder="e.g. 50 (how many units available)" min="0">
       <label>Item Photos (Optional)</label>
@@ -254,6 +415,8 @@ input:focus,select:focus{border-color:var(--earth);}
       <input type="text" id="edit-item-unit" placeholder="Unit">
       <label>Location</label>
       <input type="text" id="edit-item-location" placeholder="Location">
+      <label>Item Description (Optional)</label>
+      <textarea id="add-item-description" placeholder="Describe your item... e.g. Fresh from farm, quality guaranteed, wholesale available" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;resize:none;height:80px;font-family:inherit;margin-bottom:0;"></textarea>
       <label>Stock Quantity (Optional)</label>
       <input type="number" id="add-item-stock" placeholder="e.g. 50 (how many units available)" min="0">
       <label>Item Photos (Optional)</label>
@@ -546,21 +709,16 @@ function initDB() {
     document.getElementById('btn-delete-account').addEventListener('click', sellerDeleteAccount);
     document.getElementById('btn-back-from-settings').addEventListener('click', function() { sellerShowScreen('seller-dashboard'); });
     var fc = document.getElementById('filter-city');
-    var fk = document.getElementById('filter-category');
     if (fc) fc.addEventListener('change', renderBoard);
-    if (fk) fk.addEventListener('change', renderBoard);
   } catch(e) {
     console.error('initDB event listener error:', e.message);
   }
 
   loadListings();
   restoreSellerSession();
-  setTimeout(function() {
-    var btn = document.getElementById('btn-use-location');
-    if (btn) btn.click();
-  }, 1200);
 }
 var allListings = [];
+var listingMap = {};
 var buyerLat = null;
 var buyerLng = null;
 
@@ -588,6 +746,326 @@ async function loadListings() {
     showToast('Connection error. Check internet.');
   }
 }
+var currentDetailItemId = null;
+var currentDetailTrader = null;
+var currentReviewRating = 0;
+var currentSellerRating = 0;
+
+function closeBuyerDetail() {
+  document.getElementById('buyer-item-detail').style.display = 'none';
+  currentDetailItemId = null;
+  currentDetailTrader = null;
+  currentReviewRating = 0;
+  currentSellerRating = 0;
+}
+function setReviewRating(r) {
+  currentReviewRating = r;
+  document.querySelectorAll('.star').forEach(function(s,i){s.textContent=i<r?'★':'☆';s.style.color=i<r?'#F59E0B':'#ccc';});
+}
+function setSellerRating(r) {
+  currentSellerRating = r;
+  document.querySelectorAll('.seller-star').forEach(function(s,i){s.textContent=i<r?'★':'☆';s.style.color=i<r?'#F59E0B':'#ccc';});
+}
+async function likeItem() {
+  if (!currentDetailItemId) return;
+  var key = 'liked_'+currentDetailItemId;
+  var disKey = 'disliked_'+currentDetailItemId;
+  var liked = localStorage.getItem(key);
+  var cur = parseInt(document.getElementById('bd-likes').textContent)||0;
+  if (liked) {
+    await db.from('Listing').update({likes:Math.max(0,cur-1)}).eq('id',currentDetailItemId);
+    document.getElementById('bd-likes').textContent = Math.max(0,cur-1);
+    document.getElementById('bd-like-btn').style.background = '#E8F5EE';
+    document.getElementById('bd-like-btn').style.color = 'var(--green)';
+    localStorage.removeItem(key);
+  } else {
+    if (localStorage.getItem(disKey)) {
+      var dc = parseInt(document.getElementById('bd-dislikes').textContent)||0;
+      await db.from('Listing').update({dislikes:Math.max(0,dc-1)}).eq('id',currentDetailItemId);
+      document.getElementById('bd-dislikes').textContent = Math.max(0,dc-1);
+      document.getElementById('bd-dislike-btn').style.background = '#FDECEA';
+      document.getElementById('bd-dislike-btn').style.color = 'var(--red)';
+      localStorage.removeItem(disKey);
+    }
+    await db.from('Listing').update({likes:cur+1}).eq('id',currentDetailItemId);
+    document.getElementById('bd-likes').textContent = cur+1;
+    document.getElementById('bd-like-btn').style.background = '#0ECB81';
+    document.getElementById('bd-like-btn').style.color = '#fff';
+    localStorage.setItem(key,'1');
+    showToast('Liked!');
+  }
+}
+async function dislikeItem() {
+  if (!currentDetailItemId) return;
+  var key = 'disliked_'+currentDetailItemId;
+  var likeKey = 'liked_'+currentDetailItemId;
+  var disliked = localStorage.getItem(key);
+  var cur = parseInt(document.getElementById('bd-dislikes').textContent)||0;
+  if (disliked) {
+    await db.from('Listing').update({dislikes:Math.max(0,cur-1)}).eq('id',currentDetailItemId);
+    document.getElementById('bd-dislikes').textContent = Math.max(0,cur-1);
+    document.getElementById('bd-dislike-btn').style.background = '#FDECEA';
+    document.getElementById('bd-dislike-btn').style.color = 'var(--red)';
+    localStorage.removeItem(key);
+  } else {
+    if (localStorage.getItem(likeKey)) {
+      var lc = parseInt(document.getElementById('bd-likes').textContent)||0;
+      await db.from('Listing').update({likes:Math.max(0,lc-1)}).eq('id',currentDetailItemId);
+      document.getElementById('bd-likes').textContent = Math.max(0,lc-1);
+      document.getElementById('bd-like-btn').style.background = '#E8F5EE';
+      document.getElementById('bd-like-btn').style.color = 'var(--green)';
+      localStorage.removeItem(likeKey);
+    }
+    await db.from('Listing').update({dislikes:cur+1}).eq('id',currentDetailItemId);
+    document.getElementById('bd-dislikes').textContent = cur+1;
+    document.getElementById('bd-dislike-btn').style.background = '#F6465D';
+    document.getElementById('bd-dislike-btn').style.color = '#fff';
+    localStorage.setItem(key,'1');
+    showToast('Feedback noted!');
+  }
+}
+async function submitReview() {
+  if (!currentReviewRating) { showToast('Please select a star rating'); return; }
+  if (!currentDetailItemId) return;
+  var comment = document.getElementById('bd-review-text').value.trim();
+  var reviewer = document.getElementById('bd-reviewer-name').value.trim() || 'Anonymous';
+  var result = await db.from('reviews').insert([{listing_id:currentDetailItemId,seller_name:currentDetailTrader,rating:currentReviewRating,comment:comment,reviewer:reviewer}]);
+  if (result.error) { showToast('Error submitting review'); return; }
+  showToast('Review submitted! Thank you.');
+  document.getElementById('bd-review-text').value='';
+  document.getElementById('bd-reviewer-name').value='';
+  setReviewRating(0);
+  loadItemReviews(currentDetailItemId);
+}
+async function toggleFollow() {
+  if (!currentDetailTrader) return;
+  var key = 'following_'+currentDetailTrader;
+  var btn = document.getElementById('bd-follow-btn2');
+  var countEl = document.getElementById('bd-followers-count');
+  if (localStorage.getItem(key)) {
+    localStorage.removeItem(key);
+    if(btn){btn.textContent='+ Follow';btn.style.background='var(--earth)';}
+    var r = await db.from('traders').select('followers_count').eq('full_name',currentDetailTrader).single();
+    var cur = (r.data&&r.data.followers_count)||0;
+    await db.from('traders').update({followers_count:Math.max(0,cur-1)}).eq('full_name',currentDetailTrader);
+    if(countEl) countEl.textContent = Math.max(0,cur-1)+' followers';
+    showToast('Unfollowed '+currentDetailTrader);
+  } else {
+    localStorage.setItem(key,'1');
+    if(btn){btn.textContent='✓ Following';btn.style.background='var(--green)';}
+    var r = await db.from('traders').select('followers_count').eq('full_name',currentDetailTrader).single();
+    var cur = (r.data&&r.data.followers_count)||0;
+    await db.from('traders').update({followers_count:cur+1}).eq('full_name',currentDetailTrader);
+    if(countEl) countEl.textContent = (cur+1)+' followers';
+    showToast('Following '+currentDetailTrader+'!');
+  }
+}
+async function submitSellerRating() {
+  if (!currentSellerRating) { showToast('Please select a star rating'); return; }
+  if (!currentDetailTrader) return;
+  var ratingKey = 'rated_seller_'+currentDetailTrader;
+  if (localStorage.getItem(ratingKey)) { showToast('You have already rated this seller'); return; }
+  var result = await db.from('seller_ratings').insert([{trader_name:currentDetailTrader,rating:currentSellerRating,comment:'',reviewer:'Anonymous'}]);
+  if (result.error) { showToast('Error submitting rating'); return; }
+  localStorage.setItem(ratingKey,'1');
+  showToast('Rating submitted! Thank you.');
+  setSellerRating(0);
+  loadSellerReviews(currentDetailTrader);
+}
+async function submitSellerReview() {
+  if (!currentSellerRating) { showToast('Please select a star rating'); return; }
+  if (!currentDetailTrader) return;
+  var comment = document.getElementById('bd-seller-review-text').value.trim();
+  var reviewer = document.getElementById('bd-seller-reviewer-name').value.trim() || 'Anonymous';
+  var result = await db.from('seller_ratings').insert([{trader_name:currentDetailTrader,rating:currentSellerRating,comment:comment,reviewer:reviewer}]);
+  if (result.error) { showToast('Error submitting review'); return; }
+  showToast('Seller review submitted! Thank you.');
+  document.getElementById('bd-seller-review-text').value='';
+  document.getElementById('bd-seller-reviewer-name').value='';
+  setSellerRating(0);
+  loadSellerReviews(currentDetailTrader);
+}
+async function loadItemReviews(id) {
+  var result = await db.from('reviews').select('*').eq('listing_id',id).order('id',{ascending:false}).limit(10);
+  var reviews = result.data||[];
+  var avgRating = reviews.length ? (reviews.reduce(function(s,r){return s+r.rating;},0)/reviews.length).toFixed(1) : null;
+  var avgEl = document.getElementById('bd-avg-rating');
+  if(avgEl) avgEl.textContent = avgRating ? '⭐ '+avgRating+' ('+reviews.length+')' : '';
+  var listEl = document.getElementById('bd-reviews-list');
+  if(!listEl) return;
+  if(!reviews.length){listEl.innerHTML='<div style="font-size:13px;color:var(--muted);text-align:center;padding:10px;">No reviews yet. Be the first!</div>';return;}
+  listEl.innerHTML = reviews.map(function(r){
+    var stars='';for(var i=1;i<=5;i++)stars+='<span style="color:'+(i<=r.rating?'#F59E0B':'#ddd')+';">★</span>';
+    var ago='';if(r.created_at){var d=Math.floor((Date.now()-new Date(r.created_at).getTime())/86400000);ago=d===0?'today':d===1?'yesterday':d+'d ago';}
+    return '<div style="padding:10px 0;border-bottom:1px solid var(--border);"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:13px;font-weight:600;">'+r.reviewer+'</div><div style="font-size:11px;color:var(--muted);">'+ago+'</div></div><div style="font-size:14px;margin:2px 0;">'+stars+'</div>'+(r.comment?'<div style="font-size:13px;color:var(--dark);margin-top:4px;">'+r.comment+'</div>':'')+'</div>';
+  }).join('');
+}
+async function loadSellerReviews(trader) {
+  var result = await db.from('seller_ratings').select('*').eq('trader_name',trader).order('id',{ascending:false}).limit(10);
+  var reviews = result.data||[];
+  var avgRating = reviews.length ? (reviews.reduce(function(s,r){return s+r.rating;},0)/reviews.length).toFixed(1) : null;
+  var avgEl = document.getElementById('bd-seller-avg-rating');
+  if(avgEl) avgEl.textContent = avgRating ? '⭐ '+avgRating+' ('+reviews.length+')' : '';
+  var listEl = document.getElementById('bd-seller-reviews-list');
+  if(!listEl) return;
+  if(!reviews.length){listEl.innerHTML='<div style="font-size:13px;color:var(--muted);text-align:center;padding:10px;">No seller reviews yet.</div>';return;}
+  listEl.innerHTML = reviews.map(function(r){
+    var stars='';for(var i=1;i<=5;i++)stars+='<span style="color:'+(i<=r.rating?'#F59E0B':'#ddd')+';">★</span>';
+    var ago='';if(r.created_at){var d=Math.floor((Date.now()-new Date(r.created_at).getTime())/86400000);ago=d===0?'today':d===1?'yesterday':d+'d ago';}
+    return '<div style="padding:10px 0;border-bottom:1px solid var(--border);"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:13px;font-weight:600;">'+r.reviewer+'</div><div style="font-size:11px;color:var(--muted);">'+ago+'</div></div><div style="font-size:14px;margin:2px 0;">'+stars+'</div>'+(r.comment?'<div style="font-size:13px;color:var(--dark);margin-top:4px;">'+r.comment+'</div>':'')+'</div>';
+  }).join('');
+}
+async function openBuyerDetail(id) {
+  var item = listingMap[id];
+  if (!item) return;
+  var modal = document.getElementById('buyer-item-detail');
+  modal.style.display = 'block';
+  modal.scrollTop = 0;
+  document.getElementById('bd-title').textContent = item.name;
+  document.getElementById('bd-name').textContent = item.name;
+  document.getElementById('bd-category').textContent = item.category;
+  document.getElementById('bd-price').textContent = '₦'+Number(item.price).toLocaleString();
+  document.getElementById('bd-unit').textContent = 'per '+item.unit;
+  var chg = item.change||'stable';
+  var chgColor = chg==='up'?'#0ECB81':chg==='down'?'#F6465D':'var(--amber)';
+  var chgTxt = chg==='up'?'▲ Rising':chg==='down'?'▼ Falling':'● Stable';
+  document.getElementById('bd-badge').innerHTML = '<span style="font-size:12px;font-weight:700;color:'+chgColor+';">'+chgTxt+'</span>';
+  var stockEl = document.getElementById('bd-stock');
+  if(item.stock){stockEl.style.display='block';stockEl.textContent='📦 '+item.stock+' units available';}
+  else{stockEl.style.display='none';}
+  var imgEl = document.getElementById('bd-images');
+  imgEl.innerHTML = '';
+  if(item.image_url){
+    try{
+      var imgs=JSON.parse(item.image_url);
+      if(imgs.length>0){
+        imgs.forEach(function(url){
+          imgEl.innerHTML+='<img src="'+url+'" style="height:220px;min-width:100%;object-fit:cover;flex-shrink:0;" onclick="showFullImage(this.src)">';
+        });
+      } else {
+        imgEl.innerHTML='<div style="width:100%;height:180px;display:flex;align-items:center;justify-content:center;font-size:60px;background:#f0ebe3;">🏪</div>';
+      }
+    }catch(e){imgEl.innerHTML='<div style="width:100%;height:180px;display:flex;align-items:center;justify-content:center;font-size:60px;background:#f0ebe3;">🏪</div>';}
+  } else {
+    imgEl.innerHTML='<div style="width:100%;height:180px;display:flex;align-items:center;justify-content:center;font-size:60px;background:#f0ebe3;">🏪</div>';
+  }
+  currentDetailItemId = item.id;
+  currentDetailTrader = item.trader;
+  var followBtn2 = document.getElementById('bd-follow-btn2');
+  if(followBtn2){
+    var isFollowing = localStorage.getItem('following_'+item.trader);
+    followBtn2.textContent = isFollowing ? '✓ Following' : '+ Follow';
+    followBtn2.style.background = isFollowing ? 'var(--green)' : 'var(--earth)';
+  }
+  var liked = localStorage.getItem('liked_'+item.id);
+  var disliked = localStorage.getItem('disliked_'+item.id);
+  if(liked){
+    document.getElementById('bd-like-btn').style.background='#0ECB81';
+    document.getElementById('bd-like-btn').style.color='#fff';
+  }
+  if(disliked){
+    document.getElementById('bd-dislike-btn').style.background='#F6465D';
+    document.getElementById('bd-dislike-btn').style.color='#fff';
+  }
+  document.getElementById('bd-likes').textContent = item.likes||0;
+  document.getElementById('bd-dislikes').textContent = item.dislikes||0;
+  document.getElementById('bd-like-btn').style.background = '#E8F5EE';
+  document.getElementById('bd-like-btn').style.color = 'var(--green)';
+  document.getElementById('bd-dislike-btn').style.background = '#FDECEA';
+  document.getElementById('bd-dislike-btn').style.color = 'var(--red)';
+  var descEl = document.getElementById('bd-description');
+  var descText = document.getElementById('bd-desc-text');
+  if(item.description){descEl.style.display='block';descText.textContent=item.description;}
+  else{descEl.style.display='none';}
+  document.getElementById('bd-trader').textContent = item.trader;
+  document.getElementById('bd-location').textContent = '📍 '+item.location;
+  var distEl = document.getElementById('bd-dist');
+  if(buyerLat && buyerLng && item.latitude && item.longitude){
+    var d = getDistance(buyerLat,buyerLng,item.latitude,item.longitude);
+    distEl.textContent = '📍 '+d+' km from you';
+  } else { distEl.textContent = ''; }
+  var sellerPhotoEl = document.getElementById('bd-seller-photo');
+  sellerPhotoEl.textContent = item.trader.charAt(0).toUpperCase();
+  var hoursEl = document.getElementById('bd-hours');
+  hoursEl.textContent = '';
+  try {
+    var selResult = await db.from('traders').select('photo_url,opening_hours,whatsapp').eq('full_name',item.trader).single();
+    if(selResult.data){
+      if(selResult.data.photo_url){
+        sellerPhotoEl.innerHTML='<img src="'+selResult.data.photo_url+'" style="width:54px;height:54px;border-radius:50%;object-fit:cover;">';
+      }
+      var fCount = selResult.data.followers_count||0;
+      var countEl = document.getElementById('bd-followers-count');
+      if(countEl) countEl.textContent = fCount+' follower'+(fCount!==1?'s':'');
+      if(selResult.data.opening_hours) hoursEl.textContent='🕐 '+selResult.data.opening_hours;
+      if(selResult.data.description){
+        document.getElementById('bd-seller-desc').style.display='block';
+        document.getElementById('bd-seller-desc-text').textContent=selResult.data.description;
+      }
+      if(selResult.data.whatsapp||item.phone){
+        var waNum=(selResult.data.whatsapp||item.phone).replace(/^0/,'234');
+        var waMsg=encodeURIComponent('Hi, I saw your listing on OjaLive. I am interested in '+item.name+' at ₦'+Number(item.price).toLocaleString()+' per '+item.unit);
+        document.getElementById('bd-wa-btn').href='https://wa.me/'+waNum+'?text='+waMsg;
+        document.getElementById('bd-call-btn').href='tel:'+(selResult.data.whatsapp||item.phone);
+      }
+    }
+  } catch(e){}
+  if(item.phone){
+    var waNum2=item.phone.replace(/^0/,'234');
+    var waMsg2=encodeURIComponent('Hi, I saw your listing on OjaLive. I am interested in '+item.name+' at ₦'+Number(item.price).toLocaleString()+' per '+item.unit);
+    document.getElementById('bd-wa-btn').href='https://wa.me/'+waNum2+'?text='+waMsg2;
+    document.getElementById('bd-call-btn').href='tel:'+item.phone;
+  }
+  document.getElementById('bd-chat-btn').onclick = function(){ showToast('In-app chat coming soon!'); };
+  document.getElementById('bd-dir-btn').onclick = function(){
+    var dest = (item.latitude&&item.longitude)?item.latitude+','+item.longitude:encodeURIComponent(item.location);
+    var url='https://www.google.com/maps/dir/?api=1&destination='+dest+(buyerLat?'&origin='+buyerLat+','+buyerLng:'');
+    if(confirm('Open Google Maps for directions to '+item.name+'?')) window.open(url,'_blank');
+  };
+  loadItemReviews(item.id);
+  loadSellerReviews(item.trader);
+  var histResult = await db.from('price_history').select('*').eq('listing_id',item.id).order('id',{ascending:true});
+  var changes = histResult.data||[];
+  var histSection = document.getElementById('bd-history-section');
+  if(changes.length>1){
+    histSection.style.display='block';
+    var prices=[Number(changes[0].old_price)].concat(changes.map(function(h){return Number(h.new_price);}));
+    var canvas=document.getElementById('bd-price-chart');
+    var W=canvas.offsetWidth||320,H=140;
+    canvas.width=W;canvas.height=H;
+    var ctx=canvas.getContext('2d');
+    var isUp=prices[prices.length-1]>=prices[0];
+    var lc=isUp?'#0ECB81':'#F6465D';
+    ctx.fillStyle='#1E2026';ctx.fillRect(0,0,W,H);
+    var mn=Math.min.apply(null,prices)*0.999,mx=Math.max.apply(null,prices)*1.001;
+    var pL=50,pR=10,pT=15,pB=20,rng=mx-mn||1;
+    function bpx(i){return pL+(i/(prices.length-1||1))*(W-pL-pR);}
+    function bpy(v){return H-pB-((v-mn)/rng)*(H-pT-pB);}
+    ctx.setLineDash([2,4]);ctx.lineWidth=1;
+    [0,0.5,1].forEach(function(t){
+      var yy=H-pB-t*(H-pT-pB);
+      ctx.strokeStyle='#2B2F36';ctx.beginPath();ctx.moveTo(pL,yy);ctx.lineTo(W-pR,yy);ctx.stroke();
+      ctx.fillStyle='#848E9C';ctx.font='9px sans-serif';ctx.textAlign='right';
+      ctx.fillText('₦'+(mn+t*rng).toLocaleString('en',{maximumFractionDigits:0}),pL-3,yy+3);
+    });
+    ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(bpx(0),bpy(prices[0]));
+    for(var i=1;i<prices.length;i++){var cpx=(bpx(i-1)+bpx(i))/2;ctx.bezierCurveTo(cpx,bpy(prices[i-1]),cpx,bpy(prices[i]),bpx(i),bpy(prices[i]));}
+    var gr=ctx.createLinearGradient(0,pT,0,H-pB);
+    gr.addColorStop(0,isUp?'rgba(14,203,129,0.25)':'rgba(246,70,93,0.25)');gr.addColorStop(1,'rgba(30,32,38,0)');
+    ctx.lineTo(bpx(prices.length-1),H-pB);ctx.lineTo(bpx(0),H-pB);ctx.closePath();ctx.fillStyle=gr;ctx.fill();
+    ctx.beginPath();ctx.moveTo(bpx(0),bpy(prices[0]));
+    for(var i=1;i<prices.length;i++){var cpx=(bpx(i-1)+bpx(i))/2;ctx.bezierCurveTo(cpx,bpy(prices[i-1]),cpx,bpy(prices[i]),bpx(i),bpy(prices[i]));}
+    ctx.strokeStyle=lc;ctx.lineWidth=2;ctx.stroke();
+    ctx.globalAlpha=0.1;ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign='center';
+    ctx.save();ctx.translate(W/2,H/2);ctx.rotate(-20*Math.PI/180);ctx.fillText('OjaLive',0,0);ctx.restore();
+    ctx.globalAlpha=1;
+    var last=changes[changes.length-1];
+    document.getElementById('bd-history-list').innerHTML='<div style="font-size:12px;color:var(--muted);">'+changes.length+' price changes recorded. Last: '+(last.new_price>last.old_price?'▲':'▼')+' ₦'+Number(last.new_price).toLocaleString()+'</div>';
+  } else {
+    histSection.style.display='none';
+  }
+}
 function showDirections(lat, lng, name, address) {
   var destination = (lat && lng) ? lat+','+lng : encodeURIComponent(address);
   var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination='+destination+(buyerLat?'&origin='+buyerLat+','+buyerLng:'');
@@ -603,47 +1081,73 @@ function showFullImage(url) {
   document.body.appendChild(modal);
 }
 function requestBuyerLocation() {
-  var btn = document.getElementById('btn-use-location');
-  if (!btn) return;
-  if (!navigator.geolocation) { btn.textContent = 'GPS not supported'; return; }
-  btn.textContent = '📍 Getting your location...';
-  btn.disabled = true;
+  var lbl = document.getElementById('loc-label');
+  if (!lbl) return;
+  if (!navigator.geolocation) { lbl.textContent = 'GPS not available'; return; }
+  lbl.textContent = 'Getting location...';
   navigator.geolocation.getCurrentPosition(
     function(pos) {
       buyerLat = pos.coords.latitude;
       buyerLng = pos.coords.longitude;
-      btn.textContent = '✅ Location found — sorted by distance';
-      btn.style.background = '#d4f0e0';
-      btn.disabled = false;
+      lbl.textContent = '✅ Location found';
+      document.getElementById('filter-sort').value = 'nearest';
       renderBoard();
     },
     function(err) {
-      btn.textContent = '📍 Tap to use your location';
-      btn.disabled = false;
+      lbl.textContent = 'Tap to use location';
     },
-    { enableHighAccuracy: false, timeout: 8000, maximumAge: 30000 }
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
   );
+}
+var activeCat = '';
+function filterCat(btn, cat) {
+  activeCat = cat;
+  document.querySelectorAll('.cat-pill').forEach(function(p){ p.classList.remove('active-pill'); });
+  btn.classList.add('active-pill');
+  renderBoard();
 }
 function renderBoard() {
   var city = document.getElementById('filter-city').value;
-  var cat = document.getElementById('filter-category').value;
+  var sort = (document.getElementById('filter-sort')||{value:'default'}).value;
   var search = (document.getElementById('search-bar')||{value:''}).value.toLowerCase();
+  var now24 = Date.now();
   var data = allListings.filter(function(item) {
     var cm = !city || (item.location||'').toLowerCase().includes(city.toLowerCase());
-    var km = !cat || item.category === cat;
+    var km = !activeCat || item.category === activeCat;
     var sm = !search || (item.name||'').toLowerCase().includes(search) || (item.trader||'').toLowerCase().includes(search) || (item.location||'').toLowerCase().includes(search);
+    if(item.change!=='stable'&&item.updated_at&&(now24-new Date(item.updated_at).getTime())>86400000) item.change='stable';
     return cm && km && sm;
   });
-  if (buyerLat && buyerLng) {
-    data.sort(function(a,b) {
-      var da = (a.latitude && a.longitude) ? getDistance(buyerLat,buyerLng,a.latitude,a.longitude) : 99999;
-      var db2 = (b.latitude && b.longitude) ? getDistance(buyerLat,buyerLng,b.latitude,b.longitude) : 99999;
-      return da - db2;
+  if (sort === 'nearest' && buyerLat && buyerLng) {
+    data.sort(function(a,b){
+      var da=(a.latitude&&a.longitude)?getDistance(buyerLat,buyerLng,a.latitude,a.longitude):99999;
+      var db2=(b.latitude&&b.longitude)?getDistance(buyerLat,buyerLng,b.latitude,b.longitude):99999;
+      return da-db2;
+    });
+  } else if (sort === 'price-low') {
+    data.sort(function(a,b){return Number(a.price)-Number(b.price);});
+  } else if (sort === 'price-high') {
+    data.sort(function(a,b){return Number(b.price)-Number(a.price);});
+  } else if (sort === 'rising') {
+    data = data.filter(function(i){return i.change==='up';}).concat(data.filter(function(i){return i.change!=='up';}));
+  } else if (sort === 'falling') {
+    data = data.filter(function(i){return i.change==='down';}).concat(data.filter(function(i){return i.change!=='down';}));
+  } else if (buyerLat && buyerLng) {
+    data.sort(function(a,b){
+      var da=(a.latitude&&a.longitude)?getDistance(buyerLat,buyerLng,a.latitude,a.longitude):99999;
+      var db2=(b.latitude&&b.longitude)?getDistance(buyerLat,buyerLng,b.latitude,b.longitude):99999;
+      return da-db2;
     });
   }
   document.getElementById('count').textContent = allListings.length + ' Listings';
-  if (!data.length) { document.getElementById('board').innerHTML = '<div class="empty">No listings found for this filter</div>'; return; }
-  document.getElementById('board').innerHTML = data.map(function(item) {
+  var rc = document.getElementById('results-count');
+  if(rc) rc.textContent = data.length + ' result'+(data.length!==1?'s':'')+(activeCat?' in '+activeCat:'');
+  var ft = document.getElementById('results-filter-tag');
+  if(ft) ft.textContent = search?'🔍 "'+search+'"':'';
+  if (!data.length) { document.getElementById('board').innerHTML = '<div class="empty" style="padding:40px 20px;"><div style="font-size:40px;margin-bottom:12px;">🔍</div><div style="font-size:15px;font-weight:600;">No listings found</div><div style="font-size:13px;color:var(--muted);margin-top:6px;">Try a different search or category</div></div>'; return; }
+  var html = '';
+  document.getElementById('board').innerHTML = '<div class="empty" style="padding:20px;">Loading...</div>';
+  html = data.map(function(item) {
     var distBadge = '';
     if (buyerLat && buyerLng && item.latitude && item.longitude) {
       var d = getDistance(buyerLat,buyerLng,item.latitude,item.longitude);
@@ -664,11 +1168,37 @@ function renderBoard() {
       waBtn = '<a href="https://wa.me/'+waNum+'?text='+waMsg+'" target="_blank" style="display:block;margin-top:4px;text-align:center;padding:8px;background:#25D366;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">💬 WhatsApp</a>';
     }
     var chg = item.change||'stable';
-    var badgeStyle = chg==='up' ? 'background:#E8F5EE;color:var(--green);' : chg==='down' ? 'background:#FDECEA;color:var(--red);' : 'background:#FDF6E3;color:var(--amber);';
-    var badgeTxt = chg==='up' ? '▲ Rising' : chg==='down' ? '▼ Falling' : '● Stable';
-    return '<div class="price-item" style="flex-direction:column;align-items:flex-start;"><div style="display:flex;justify-content:space-between;width:100%;"><div><div class="mname">'+item.name+'</div><div style="font-size:13px;font-weight:700;color:var(--dark);margin-top:3px;">'+item.trader+'</div><div class="munit"><span class="vdot"></span>'+item.location+distBadge+'</div></div><div class="pright"><div class="pval">&#8358;'+Number(item.price).toLocaleString()+'</div><div style="font-size:12px;font-weight:600;color:var(--muted);margin-top:2px;">per '+item.unit+'</div><span class="pbadge" style="'+badgeStyle+'">'+badgeTxt+'</span></div></div>'+chatBtn+waBtn+phoneBtn+dirBtn+'</div>';
-
+    var chgColor = chg==='up'?'#0ECB81':chg==='down'?'#F6465D':'var(--amber)';
+    var chgArrow = chg==='up'?'▲':chg==='down'?'▼':'●';
+    var chgLabel = chg==='up'?'Rising':chg==='down'?'Falling':'Stable';
+    var imgHtml = '';
+    if(item.image_url){try{var imgs=JSON.parse(item.image_url);if(imgs[0])imgHtml='<img src="'+imgs[0]+'" style="width:100%;height:140px;object-fit:cover;" loading="lazy">';}catch(e){}}
+    if(!imgHtml){
+      var catEmoji={'Foodstuff':'🌾','Building Materials':'🏗️','Hardware':'🔧','Electronics':'📱','Phones & Accessories':'📲','Roofing Supplies':'🏠','Timber & Plywood':'🪵','Fabric & Clothing':'👗','Beverages':'🥤','Cosmetics & Beauty':'💄','Furniture':'🛋️','Automobile Parts':'🚗','Agricultural Produce':'🌱','Livestock & Poultry':'🐓'};
+      var emoji = catEmoji[item.category]||'🏪';
+      imgHtml='<div style="width:100%;height:140px;display:flex;align-items:center;justify-content:center;font-size:48px;background:linear-gradient(135deg,#F7F2EA,#EDE5D8);">'+emoji+'</div>';
+    }
+    listingMap[item.id] = item;
+    var likeCount = item.likes||0;
+    var ratingBadge = likeCount>0 ? '<div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:#0ECB81;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;">👍 '+likeCount+'</div>' : '';
+    return '<div onclick="openBuyerDetail('+item.id+')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;">'
+      +'<div style="position:relative;">'
+      +imgHtml
+      +'<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;">'+item.category+'</div>'
+      +'<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);color:'+chgColor+';font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;">'+chgArrow+' '+chgLabel+'</div>'
+      +(item.stock?'<div style="position:absolute;bottom:8px;left:8px;background:#0ECB81;color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;">'+item.stock+' left</div>':'')
+      +'</div>'
+      +'<div style="padding:10px;">'
+      +'<div style="font-size:13px;font-weight:700;color:var(--dark);line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">'+item.name+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+item.trader+'</div>'
+      +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:800;color:var(--earth);">₦'+Number(item.price).toLocaleString()+'</div>'
+      +'<div style="font-size:10px;color:var(--muted);margin-bottom:4px;">per '+item.unit+'</div>'
+      +(distBadge?'<div style="font-size:10px;color:var(--green);font-weight:600;">'+distBadge+'</div>':'<div style="font-size:10px;color:var(--muted);">📍 '+item.location+'</div>')
+      +'</div>'
+      +'</div>';
   }).join('');
+  document.getElementById('board').innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'+html+'</div>';
+  return;
 }
 </script>
 <script>
@@ -950,7 +1480,8 @@ async function sellerSaveNewListing() {
   var showPhone = document.getElementById('add-show-phone').checked;
   var phone = showPhone ? currentSeller.phone : null;
   var stock = document.getElementById('add-item-stock').value ? parseInt(document.getElementById('add-item-stock').value) : null;
-  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable',latitude:gps.lat,longitude:gps.lng,phone:phone,stock:stock}]).select();
+  var itemDesc = document.getElementById('add-item-description').value.trim();
+  var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable',latitude:gps.lat,longitude:gps.lng,phone:phone,stock:stock,description:itemDesc}]).select();
   if (!result.error) {
     var imgFiles = document.getElementById('add-item-images').files;
     if (imgFiles.length > 0 && result.data && result.data[0]) {
