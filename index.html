@@ -47,8 +47,8 @@ input:focus,select:focus{border-color:var(--earth);}
 .bapp{background:var(--earth);color:#fff;}
 .range-btn{padding:4px 10px;background:#2B2F36;color:#848E9C;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;}
 .range-btn.active-range{background:var(--earth);color:#fff;}
-.cat-pill{padding:6px 14px;background:var(--card);color:var(--muted);border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;}
-.cat-pill.active-pill{background:var(--earth);color:#fff;border-color:var(--earth);}
+.cat-pill{padding:8px 14px;background:transparent;color:var(--muted);border:none;border-bottom:2px solid transparent;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:0.2px;}
+.cat-pill.active-pill{color:var(--earth);border-bottom:2px solid var(--earth);}
 .listing-card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden;cursor:pointer;transition:transform 0.1s;}
 .listing-card:active{transform:scale(0.98);}
 .lc-img{width:100px;height:100px;object-fit:cover;flex-shrink:0;background:#f0ebe3;}
@@ -63,7 +63,10 @@ input:focus,select:focus{border-color:var(--earth);}
 <body>
 <div class="topbar">
   <div class="logo">Oja<span>Live</span></div>
-  <div style="background:var(--earth);color:#fff;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;">OjaLive v2.0</div>
+  <div style="display:flex;align-items:center;gap:6px;background:rgba(14,203,129,0.12);padding:5px 12px 5px 10px;border-radius:20px;">
+    <span style="width:6px;height:6px;background:#0ECB81;border-radius:50%;box-shadow:0 0 5px #0ECB81;"></span>
+    <span style="color:#0ECB81;font-size:11px;font-weight:700;letter-spacing:0.3px;">LIVE</span>
+  </div>
 </div>
 <div class="tabs">
   <button class="tab active" id="tab-buyer">Buy</button>
@@ -74,15 +77,15 @@ input:focus,select:focus{border-color:var(--earth);}
 <div class="toast" id="toast"></div>
 <div class="screen active" id="screen-buyer" style="padding:0;">
   <!-- STICKY TOP BAR -->
-  <div style="position:sticky;top:0;z-index:200;background:var(--dark);padding:10px 14px 8px;">
-    <div style="position:relative;">
-      <input type="text" id="search-bar" placeholder="🔍 Search items, sellers..." oninput="renderBoard()" style="background:#fff;padding:10px 36px 10px 14px;border:none;border-radius:10px;font-size:14px;margin:0;width:100%;">
+  <div style="position:sticky;top:0;z-index:200;background:var(--dark);padding:4px 14px 12px;">
+    <div style="position:relative;margin-bottom:10px;">
+      <input type="text" id="search-bar" placeholder="🔍 Search items, sellers..." oninput="renderBoard()" style="background:#fff;padding:11px 38px 11px 14px;border:none;border-radius:10px;font-size:14px;margin:0;width:100%;box-shadow:0 1px 3px rgba(0,0,0,0.15);">
       <span onclick="document.getElementById('search-bar').value='';renderBoard();" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);cursor:pointer;font-size:18px;">✕</span>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-      <button id="btn-use-location" onclick="requestBuyerLocation()" style="background:none;border:none;color:#A0C878;font-size:12px;font-weight:600;cursor:pointer;padding:0;">📍 <span id="loc-label">Tap to use location</span></button>
-      <div style="display:flex;gap:6px;">
-        <select id="filter-sort" onchange="renderBoard()" style="padding:5px 8px;border:none;border-radius:8px;font-size:11px;background:#2E2415;color:#A08060;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <button id="btn-use-location" onclick="requestBuyerLocation()" style="background:none;border:none;color:#A0C878;font-size:12px;font-weight:600;cursor:pointer;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;">📍 <span id="loc-label">Tap to use location</span></button>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <select id="filter-sort" onchange="renderBoard()" style="padding:6px 8px;border:none;border-radius:8px;font-size:11px;background:rgba(255,255,255,0.08);color:#D4C5AC;">
           <option value="default">Sort</option>
           <option value="nearest">📍 Nearest</option>
           <option value="price-low">⬇ Price</option>
@@ -90,7 +93,7 @@ input:focus,select:focus{border-color:var(--earth);}
           <option value="rising">▲ Rising</option>
           <option value="falling">▼ Falling</option>
         </select>
-        <select id="filter-city" onchange="renderBoard()" style="padding:5px 8px;border:none;border-radius:8px;font-size:11px;background:#2E2415;color:#A08060;">
+        <select id="filter-city" onchange="renderBoard()" style="padding:6px 8px;border:none;border-radius:8px;font-size:11px;background:rgba(255,255,255,0.08);color:#D4C5AC;">
           <option value="">All Cities</option>
           <option value="Iwo">Iwo</option><option value="Osogbo">Osogbo</option>
           <option value="Ile-Ife">Ile-Ife</option><option value="Lagos">Lagos</option>
@@ -103,34 +106,31 @@ input:focus,select:focus{border-color:var(--earth);}
   <!-- CATEGORY PILLS -->
   <div style="display:flex;gap:8px;overflow-x:auto;padding:10px 14px;scrollbar-width:none;background:var(--card);border-bottom:1px solid var(--border);">
     <button class="cat-pill active-pill" onclick="filterCat(this,'')">All</button>
-    <button class="cat-pill" onclick="filterCat(this,'Foodstuff')">🌾 Food</button>
-    <button class="cat-pill" onclick="filterCat(this,'Building Materials')">🏗️ Building</button>
-    <button class="cat-pill" onclick="filterCat(this,'Hardware')">🔧 Hardware</button>
-    <button class="cat-pill" onclick="filterCat(this,'Electronics')">📱 Electronics</button>
-    <button class="cat-pill" onclick="filterCat(this,'Phones & Accessories')">📲 Phones</button>
-    <button class="cat-pill" onclick="filterCat(this,'Roofing Supplies')">🏠 Roofing</button>
-    <button class="cat-pill" onclick="filterCat(this,'Timber & Plywood')">🪵 Timber</button>
-    <button class="cat-pill" onclick="filterCat(this,'Fabric & Clothing')">👗 Fashion</button>
-    <button class="cat-pill" onclick="filterCat(this,'Beverages')">🥤 Drinks</button>
-    <button class="cat-pill" onclick="filterCat(this,'Cosmetics & Beauty')">💄 Beauty</button>
-    <button class="cat-pill" onclick="filterCat(this,'Furniture')">🛋️ Furniture</button>
-    <button class="cat-pill" onclick="filterCat(this,'Automobile Parts')">🚗 Auto</button>
-    <button class="cat-pill" onclick="filterCat(this,'Agricultural Produce')">🌱 Farm</button>
-    <button class="cat-pill" onclick="filterCat(this,'Livestock & Poultry')">🐓 Livestock</button>
-    <button class="cat-pill" onclick="filterCat(this,'Other')">📦 Other</button>
+    <button class="cat-pill" onclick="filterCat(this,'Foodstuff')">Foodstuff</button>
+    <button class="cat-pill" onclick="filterCat(this,'Building Materials')">Building</button>
+    <button class="cat-pill" onclick="filterCat(this,'Hardware')">Hardware</button>
+    <button class="cat-pill" onclick="filterCat(this,'Electronics')">Electronics</button>
+    <button class="cat-pill" onclick="filterCat(this,'Phones & Accessories')">Phones</button>
+    <button class="cat-pill" onclick="filterCat(this,'Roofing Supplies')">Roofing</button>
+    <button class="cat-pill" onclick="filterCat(this,'Timber & Plywood')">Timber</button>
+    <button class="cat-pill" onclick="filterCat(this,'Fabric & Clothing')">Fashion</button>
+    <button class="cat-pill" onclick="filterCat(this,'Beverages')">Beverages</button>
+    <button class="cat-pill" onclick="filterCat(this,'Cosmetics & Beauty')">Beauty</button>
+    <button class="cat-pill" onclick="filterCat(this,'Furniture')">Furniture</button>
+    <button class="cat-pill" onclick="filterCat(this,'Automobile Parts')">Auto Parts</button>
+    <button class="cat-pill" onclick="filterCat(this,'Agricultural Produce')">Farm</button>
+    <button class="cat-pill" onclick="filterCat(this,'Livestock & Poultry')">Livestock</button>
+    <button class="cat-pill" onclick="filterCat(this,'Other')">Other</button>
   </div>
   <!-- STATS BAR -->
-  <div style="background:linear-gradient(135deg,#1A1208,#3D2810);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);" onclick="loadListings()">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:8px;height:8px;background:#0ECB81;border-radius:50%;box-shadow:0 0 6px #0ECB81;flex-shrink:0;"></div>
-      <div>
-        <div style="font-size:9px;color:var(--earth-lt);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Live Market</div>
-        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;line-height:1.1;" id="count">0 Listings</div>
-      </div>
+  <div style="background:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border-bottom:1px solid var(--border);" onclick="loadListings()">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:7px;height:7px;background:#0ECB81;border-radius:50%;box-shadow:0 0 5px #0ECB81;flex-shrink:0;"></div>
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--dark);" id="count">0 Listings</div>
     </div>
-    <div style="text-align:right;">
-      <div style="font-size:10px;color:#A0C878;font-weight:600;" id="hero-sub">↻ Tap to refresh</div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:3px;" id="results-count"></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="font-size:10px;color:var(--muted);" id="results-count"></div>
+      <div style="font-size:11px;color:var(--earth);font-weight:600;" id="hero-sub">↻ Refresh</div>
     </div>
   </div>
   <!-- BOARD -->
@@ -908,6 +908,15 @@ async function loadItemReviews(id) {
       inlineEl.style.display='none';
     }
   }
+  var inlineEl = document.getElementById('bd-inline-rating');
+  if(inlineEl){
+    if(avgRating){
+      inlineEl.style.display='block';
+      inlineEl.innerHTML = '<span style="color:#F59E0B;">★</span> <span style="font-weight:700;color:var(--dark);">'+avgRating+'</span> <span style="color:var(--muted);">('+reviews.length+' review'+(reviews.length!==1?'s':'')+')</span>';
+    } else {
+      inlineEl.style.display='none';
+    }
+  }
   var listEl = document.getElementById('bd-reviews-list');
   if(!listEl) return;
   if(!reviews.length){listEl.innerHTML='<div style="font-size:13px;color:var(--muted);text-align:center;padding:10px;">No reviews yet. Be the first!</div>';return;}
@@ -923,6 +932,15 @@ async function loadSellerReviews(trader) {
   var avgRating = reviews.length ? (reviews.reduce(function(s,r){return s+r.rating;},0)/reviews.length).toFixed(1) : null;
   var avgEl = document.getElementById('bd-seller-avg-rating');
   if(avgEl) avgEl.textContent = avgRating ? '⭐ '+avgRating+' ('+reviews.length+')' : '';
+  var inlineSellerEl = document.getElementById('bd-seller-inline-rating');
+  if(inlineSellerEl){
+    if(avgRating){
+      inlineSellerEl.style.display='inline';
+      inlineSellerEl.innerHTML = '★ '+avgRating+' <span style="color:var(--muted);font-weight:500;">('+reviews.length+')</span>';
+    } else {
+      inlineSellerEl.style.display='none';
+    }
+  }
   var inlineSellerEl = document.getElementById('bd-seller-inline-rating');
   if(inlineSellerEl){
     if(avgRating){
@@ -1099,6 +1117,16 @@ function showDirections(lat, lng, name, address) {
   var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination='+destination+(buyerLat?'&origin='+buyerLat+','+buyerLng:'');
   if (confirm('Open Google Maps for directions to ' + name + '?')) {
     window.open(mapsUrl, '_blank');
+  }
+}
+function shareItem() {
+  if (!currentDetailItemId || !listingMap[currentDetailItemId]) return;
+  var item = listingMap[currentDetailItemId];
+  var text = item.name + ' - ₦' + Number(item.price).toLocaleString() + ' (' + item.unit + ') from ' + item.trader + ' on OjaLive';
+  if (navigator.share) {
+    navigator.share({ title: item.name, text: text, url: window.location.href }).catch(function(){});
+  } else {
+    navigator.clipboard.writeText(text).then(function(){ showToast('Copied to clipboard!'); }).catch(function(){ showToast('Could not share'); });
   }
 }
 function shareItem() {
