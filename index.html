@@ -144,7 +144,7 @@ input:focus,select:focus{border-color:var(--earth);}
       <button onclick="shareItem()" style="background:rgba(0,0,0,0.4);backdrop-filter:blur(6px);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);">⤴</button>
       <div style="display:none;color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;" id="bd-title">Item Detail</div>
     </div>
-    <div id="bd-images" style="background:#fff;height:300px;padding-top:env(safe-area-inset-top,0px);display:flex;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;border-bottom:1px solid #F0F0F0;"></div>
+    <div id="bd-images" style="background:#fff;height:360px;padding-top:env(safe-area-inset-top,0px);display:flex;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;border-bottom:1px solid #F0F0F0;position:relative;"></div>
     <div style="padding:18px 16px 16px;border-radius:20px 20px 0 0;background:#fff;position:relative;margin-top:-16px;">
       <div id="bd-category" style="font-size:11px;color:var(--earth);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;"></div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;">
@@ -186,18 +186,7 @@ input:focus,select:focus{border-color:var(--earth);}
         <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px;">About the seller</div>
         <div id="bd-seller-desc-text" style="font-size:12px;color:var(--muted);font-style:italic;line-height:1.5;"></div>
       </div>
-      <!-- LIKES/DISLIKES -->
-      <div style="display:flex;gap:8px;margin-bottom:12px;">
-        <button id="bd-like-btn" onclick="likeItem()" style="flex:1;padding:10px;background:#E8F5EE;color:var(--green);border:1.5px solid var(--green);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">👍 <span id="bd-likes">0</span></button>
-        <button id="bd-dislike-btn" onclick="dislikeItem()" style="flex:1;padding:10px;background:#FDECEA;color:var(--red);border:1.5px solid var(--red);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">👎 <span id="bd-dislikes">0</span></button>
-      </div>
-      <!-- ACTION BUTTONS -->
-      <div style="display:flex;gap:8px;margin-bottom:14px;">
-        <a id="bd-wa-btn" href="#" target="_blank" style="flex:1.3;padding:13px;background:#25D366;color:#fff;border-radius:11px;font-size:13px;font-weight:700;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;">💬 WhatsApp</a>
-        <a id="bd-call-btn" href="#" style="flex:1;padding:13px;background:var(--dark);color:#fff;border-radius:11px;font-size:13px;font-weight:700;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;">📞 Call</a>
-        <button id="bd-dir-btn" style="width:46px;flex-shrink:0;padding:13px 0;background:#fff;border:1.5px solid var(--border);color:var(--dark);border-radius:11px;font-size:16px;cursor:pointer;">📍</button>
-      </div>
-      <button id="bd-chat-btn" style="display:none;width:100%;padding:14px;background:var(--earth);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;">💬 Chat Now</button>
+      <button id="bd-chat-btn" style="display:none;width:100%;padding:14px;background:var(--earth);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:14px;">💬 Chat Now</button>
       <!-- REVIEWS -->
       <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -235,11 +224,18 @@ input:focus,select:focus{border-color:var(--earth);}
         <button onclick="submitSellerRating()" style="width:100%;margin-top:10px;padding:10px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Submit Rating</button>
       </div>
       <!-- PRICE HISTORY MINI -->
-      <div id="bd-history-section" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
+      <div id="bd-history-section" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:80px;">
         <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:10px;">Price History</div>
         <canvas id="bd-price-chart" style="width:100%;height:140px;border-radius:8px;"></canvas>
         <div id="bd-history-list" style="margin-top:10px;"></div>
       </div>
+      <div style="height:80px;"></div>
+    </div>
+    <!-- STICKY BOTTOM ACTION BAR -->
+    <div style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:20;box-shadow:0 -4px 16px rgba(0,0,0,0.06);">
+      <a id="bd-wa-btn" href="#" target="_blank" style="flex:1.3;padding:13px;background:#25D366;color:#fff;border-radius:11px;font-size:13px;font-weight:700;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;">💬 WhatsApp</a>
+      <a id="bd-call-btn" href="#" style="flex:1;padding:13px;background:var(--dark);color:#fff;border-radius:11px;font-size:13px;font-weight:700;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;">📞 Call</a>
+      <button id="bd-dir-btn" style="width:46px;flex-shrink:0;padding:13px 0;background:#fff;border:1.5px solid var(--border);color:var(--dark);border-radius:11px;font-size:16px;cursor:pointer;">📍</button>
     </div>
   </div>
 </div>
@@ -758,6 +754,17 @@ var currentDetailTrader = null;
 var currentReviewRating = 0;
 var currentSellerRating = 0;
 
+function updateImageCounter() {
+  var el = document.getElementById('bd-images');
+  var counterEl = document.getElementById('bd-img-counter');
+  if(!el || !counterEl) return;
+  var total = window.bdGalleryCount||0;
+  if(total <= 1) { counterEl.style.display='none'; return; }
+  var idx = Math.round(el.scrollLeft / (el.offsetWidth||1)) + 1;
+  idx = Math.max(1, Math.min(total, idx));
+  counterEl.style.display = 'block';
+  counterEl.textContent = idx+'/'+total;
+}
 function closeBuyerDetail() {
   document.getElementById('buyer-item-detail').style.display = 'none';
   currentDetailItemId = null;
@@ -988,12 +995,29 @@ async function openBuyerDetail(id) {
       if(Array.isArray(imgs)) galleryImgs = imgs.filter(function(u){return u && typeof u==='string' && u.indexOf('http')===0;});
     }catch(e){}
   }
+  var oldDots = document.getElementById('bd-img-dots');
+  if(oldDots) oldDots.remove();
+  var oldCounter = document.getElementById('bd-img-counter');
+  if(oldCounter) oldCounter.remove();
   if(galleryImgs.length > 0){
     galleryImgs.forEach(function(url){
       imgEl.innerHTML += '<div style="min-width:100%;height:100%;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:20px;box-sizing:border-box;">'
         + '<img src="'+url+'" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;" loading="lazy" onclick="showFullImage(this.src)" onerror="this.style.display=\'none\'">'
         + '</div>';
     });
+    if(galleryImgs.length > 1){
+      var dotsHtml = '<div id="bd-img-dots" style="position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:5px;z-index:5;pointer-events:none;">';
+      for(var di=0; di<galleryImgs.length; di++){ dotsHtml += '<div style="width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,0.25);"></div>'; }
+      dotsHtml += '</div>';
+      imgEl.insertAdjacentHTML('afterend', dotsHtml);
+      var counterHtml = '<div id="bd-img-counter" style="position:absolute;top:16px;right:16px;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;z-index:5;">1/'+galleryImgs.length+'</div>';
+      imgEl.insertAdjacentHTML('afterend', counterHtml);
+      imgEl.onscroll = function(){
+        var idx = Math.round(imgEl.scrollLeft / imgEl.offsetWidth);
+        var cEl = document.getElementById('bd-img-counter');
+        if(cEl) cEl.textContent = (idx+1)+'/'+galleryImgs.length;
+      };
+    }
   } else {
     imgEl.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;">🏪</div>';
   }
@@ -1005,22 +1029,7 @@ async function openBuyerDetail(id) {
     followBtn2.textContent = isFollowing ? '✓ Following' : '+ Follow';
     followBtn2.style.background = isFollowing ? 'var(--green)' : 'var(--earth)';
   }
-  var liked = localStorage.getItem('liked_'+item.id);
-  var disliked = localStorage.getItem('disliked_'+item.id);
-  if(liked){
-    document.getElementById('bd-like-btn').style.background='#0ECB81';
-    document.getElementById('bd-like-btn').style.color='#fff';
-  }
-  if(disliked){
-    document.getElementById('bd-dislike-btn').style.background='#F6465D';
-    document.getElementById('bd-dislike-btn').style.color='#fff';
-  }
-  document.getElementById('bd-likes').textContent = item.likes||0;
-  document.getElementById('bd-dislikes').textContent = item.dislikes||0;
-  document.getElementById('bd-like-btn').style.background = '#E8F5EE';
-  document.getElementById('bd-like-btn').style.color = 'var(--green)';
-  document.getElementById('bd-dislike-btn').style.background = '#FDECEA';
-  document.getElementById('bd-dislike-btn').style.color = 'var(--red)';
+  updateImageCounter();
   var descEl = document.getElementById('bd-description');
   var descText = document.getElementById('bd-desc-text');
   if(item.description){descEl.style.display='block';descText.textContent=item.description;}

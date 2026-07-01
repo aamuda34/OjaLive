@@ -3,185 +3,153 @@ with open('/storage/emulated/0/OjaLive/index.html', 'r') as f:
 
 fixes = 0
 
-# 1. Update Seller Info section - add follow button and follower count
-old = '''        <div style="display:flex;align-items:center;gap:12px;">
-          <div id="bd-seller-photo" style="width:48px;height:48px;border-radius:50%;background:var(--earth);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
-          <div>
-            <div id="bd-trader" style="font-size:15px;font-weight:700;color:var(--dark);"></div>
-            <div id="bd-location" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
-            <div id="bd-hours" style="font-size:11px;color:var(--green);margin-top:2px;"></div>
-            <div id="bd-dist" style="font-size:11px;color:var(--green);font-weight:600;margin-top:2px;"></div>
-          </div>
-        </div>'''
-
-new = '''        <div style="display:flex;align-items:flex-start;gap:12px;">
-          <div id="bd-seller-photo" style="width:54px;height:54px;border-radius:50%;background:var(--earth);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
-          <div style="flex:1;">
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div id="bd-trader" style="font-size:15px;font-weight:700;color:var(--dark);"></div>
-              <button id="bd-follow-btn2" onclick="toggleFollow()" style="padding:7px 14px;background:var(--earth);color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">+ Follow</button>
-            </div>
-            <div id="bd-followers-count" style="font-size:11px;color:var(--muted);margin-top:2px;"></div>
-            <div id="bd-location" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
-            <div id="bd-hours" style="font-size:11px;color:var(--green);margin-top:2px;"></div>
-            <div id="bd-dist" style="font-size:11px;color:var(--green);font-weight:600;margin-top:2px;"></div>
-          </div>
-        </div>'''
-
+# 1. Add image counter overlay
+old = '''    <div id="bd-images" style="background:#fff;height:300px;padding-top:env(safe-area-inset-top,0px);display:flex;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;border-bottom:1px solid #F0F0F0;"></div>'''
+new = '''    <div style="position:relative;">
+      <div id="bd-images" onscroll="updateImageCounter()" style="background:#fff;height:300px;padding-top:env(safe-area-inset-top,0px);display:flex;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;border-bottom:1px solid #F0F0F0;"></div>
+      <div id="bd-img-counter" style="display:none;position:absolute;bottom:10px;right:12px;background:rgba(0,0,0,0.55);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">1/1</div>
+    </div>'''
 if old in content:
     content = content.replace(old, new)
     fixes += 1
-    print("Fix 1 done: Follow button moved to Seller Info")
+    print("Fix 1 done: image counter overlay added")
 else:
     print("Fix 1 FAILED")
 
-# 2. Remove old separate seller section with duplicate follow button
-old2 = '''      <!-- SELLER RATING & FOLLOW -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
-        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:12px;">Seller</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div id="bd-seller-photo2" style="width:44px;height:44px;border-radius:50%;background:var(--earth);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
-            <div>
-              <div id="bd-seller-name2" style="font-size:14px;font-weight:700;color:var(--dark);"></div>
-              <div id="bd-seller-avg-rating" style="font-size:12px;color:#F59E0B;margin-top:2px;"></div>
-            </div>
-          </div>
-          <button id="bd-follow-btn" onclick="toggleFollow()" style="padding:8px 16px;background:var(--earth);color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">+ Follow</button>
-        </div>
-        <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
-          <div style="font-size:12px;font-weight:600;color:var(--dark);margin-bottom:8px;">Rate this Seller</div>
-          <div style="display:flex;gap:6px;margin-bottom:0;font-size:26px;">
-            <span onclick="setSellerRating(1)" style="cursor:pointer;" class="seller-star">☆</span>
-            <span onclick="setSellerRating(2)" style="cursor:pointer;" class="seller-star">☆</span>
-            <span onclick="setSellerRating(3)" style="cursor:pointer;" class="seller-star">☆</span>
-            <span onclick="setSellerRating(4)" style="cursor:pointer;" class="seller-star">☆</span>
-            <span onclick="setSellerRating(5)" style="cursor:pointer;" class="seller-star">☆</span>
-          </div>
-          <button onclick="submitSellerRating()" style="width:100%;margin-top:10px;padding:10px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Submit Rating</button>
-        </div>
-      </div>'''
-
-new2 = '''      <!-- SELLER RATING -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;">Rate this Seller</div>
-          <div id="bd-seller-avg-rating" style="font-size:13px;font-weight:700;color:#F59E0B;"></div>
-        </div>
-        <div style="display:flex;gap:6px;margin-bottom:0;font-size:28px;">
-          <span onclick="setSellerRating(1)" style="cursor:pointer;" class="seller-star">☆</span>
-          <span onclick="setSellerRating(2)" style="cursor:pointer;" class="seller-star">☆</span>
-          <span onclick="setSellerRating(3)" style="cursor:pointer;" class="seller-star">☆</span>
-          <span onclick="setSellerRating(4)" style="cursor:pointer;" class="seller-star">☆</span>
-          <span onclick="setSellerRating(5)" style="cursor:pointer;" class="seller-star">☆</span>
-        </div>
-        <button onclick="submitSellerRating()" style="width:100%;margin-top:10px;padding:10px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Submit Rating</button>
-      </div>'''
-
+# 2. Remove casual like/dislike + inline action buttons
+old2 = '''      <!-- LIKES/DISLIKES -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button id="bd-like-btn" onclick="likeItem()" style="flex:1;padding:10px;background:#E8F5EE;color:var(--green);border:1.5px solid var(--green);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">👍 <span id="bd-likes">0</span></button>
+        <button id="bd-dislike-btn" onclick="dislikeItem()" style="flex:1;padding:10px;background:#FDECEA;color:var(--red);border:1.5px solid var(--red);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">👎 <span id="bd-dislikes">0</span></button>
+      </div>
+      <!-- ACTION BUTTONS -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <a id="bd-wa-btn" href="#" target="_blank" style="flex:1.3;padding:13px;background:#25D366;color:#fff;border-radius:11px;font-size:13px;font-weight:700;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;">💬 WhatsApp</a>
+        <a id="bd-call-btn" href="#" style="flex:1;padding:13px;background:var(--dark);color:#fff;border-radius:11px;font-size:13px;font-weight:700;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;">📞 Call</a>
+        <button id="bd-dir-btn" style="width:46px;flex-shrink:0;padding:13px 0;background:#fff;border:1.5px solid var(--border);color:var(--dark);border-radius:11px;font-size:16px;cursor:pointer;">📍</button>
+      </div>
+      <button id="bd-chat-btn" style="display:none;width:100%;padding:14px;background:var(--earth);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;">💬 Chat Now</button>'''
+new2 = '''      <button id="bd-chat-btn" style="display:none;width:100%;padding:14px;background:var(--earth);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:14px;">💬 Chat Now</button>'''
 if old2 in content:
     content = content.replace(old2, new2)
     fixes += 1
-    print("Fix 2 done: duplicate seller section removed")
+    print("Fix 2 done: casual like/dislike removed")
 else:
     print("Fix 2 FAILED")
 
-# 3. Update toggleFollow to use new button ID and update followers count
-old3 = """function toggleFollow() {
-  if (!currentDetailTrader) return;
-  var key = 'following_'+currentDetailTrader;
-  var btn = document.getElementById('bd-follow-btn');
-  if (localStorage.getItem(key)) {
-    localStorage.removeItem(key);
-    btn.textContent = '+ Follow';
-    btn.style.background = 'var(--earth)';
-    showToast('Unfollowed '+currentDetailTrader);
-  } else {
-    localStorage.setItem(key,'1');
-    btn.textContent = '✓ Following';
-    btn.style.background = 'var(--green)';
-    showToast('Following '+currentDetailTrader+'!');
-  }
-}"""
-
-new3 = """async function toggleFollow() {
-  if (!currentDetailTrader) return;
-  var key = 'following_'+currentDetailTrader;
-  var btn = document.getElementById('bd-follow-btn2');
-  var countEl = document.getElementById('bd-followers-count');
-  if (localStorage.getItem(key)) {
-    localStorage.removeItem(key);
-    if(btn){btn.textContent='+ Follow';btn.style.background='var(--earth)';}
-    var r = await db.from('traders').select('followers_count').eq('full_name',currentDetailTrader).single();
-    var cur = (r.data&&r.data.followers_count)||0;
-    await db.from('traders').update({followers_count:Math.max(0,cur-1)}).eq('full_name',currentDetailTrader);
-    if(countEl) countEl.textContent = Math.max(0,cur-1)+' followers';
-    showToast('Unfollowed '+currentDetailTrader);
-  } else {
-    localStorage.setItem(key,'1');
-    if(btn){btn.textContent='\u2713 Following';btn.style.background='var(--green)';}
-    var r = await db.from('traders').select('followers_count').eq('full_name',currentDetailTrader).single();
-    var cur = (r.data&&r.data.followers_count)||0;
-    await db.from('traders').update({followers_count:cur+1}).eq('full_name',currentDetailTrader);
-    if(countEl) countEl.textContent = (cur+1)+' followers';
-    showToast('Following '+currentDetailTrader+'!');
-  }
-}"""
-
+# 3. Add sticky bottom action bar
+old3 = '''      <!-- PRICE HISTORY MINI -->
+      <div id="bd-history-section" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:10px;">Price History</div>
+        <canvas id="bd-price-chart" style="width:100%;height:140px;border-radius:8px;"></canvas>
+        <div id="bd-history-list" style="margin-top:10px;"></div>
+      </div>
+    </div>
+  </div>
+</div>'''
+new3 = '''      <!-- PRICE HISTORY MINI -->
+      <div id="bd-history-section" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:80px;">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:10px;">Price History</div>
+        <canvas id="bd-price-chart" style="width:100%;height:140px;border-radius:8px;"></canvas>
+        <div id="bd-history-list" style="margin-top:10px;"></div>
+      </div>
+      <div style="height:80px;"></div>
+    </div>
+    <!-- STICKY BOTTOM ACTION BAR -->
+    <div style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:20;box-shadow:0 -4px 16px rgba(0,0,0,0.06);">
+      <a id="bd-wa-btn" href="#" target="_blank" style="flex:1.3;padding:13px;background:#25D366;color:#fff;border-radius:11px;font-size:13px;font-weight:700;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;">💬 WhatsApp</a>
+      <a id="bd-call-btn" href="#" style="flex:1;padding:13px;background:var(--dark);color:#fff;border-radius:11px;font-size:13px;font-weight:700;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;">📞 Call</a>
+      <button id="bd-dir-btn" style="width:46px;flex-shrink:0;padding:13px 0;background:#fff;border:1.5px solid var(--border);color:var(--dark);border-radius:11px;font-size:16px;cursor:pointer;">📍</button>
+    </div>
+  </div>
+</div>'''
 if old3 in content:
     content = content.replace(old3, new3)
     fixes += 1
-    print("Fix 3 done: toggleFollow updates DB follower count")
+    print("Fix 3 done: sticky bottom action bar added")
 else:
     print("Fix 3 FAILED")
 
-# 4. Update openBuyerDetail to set follow state on new button and load followers
-old4 = """  var followBtn = document.getElementById('bd-follow-btn');
-  if(followBtn){
-    var isFollowing = localStorage.getItem('following_'+item.trader);
-    followBtn.textContent = isFollowing ? '✓ Following' : '+ Follow';
-    followBtn.style.background = isFollowing ? 'var(--green)' : 'var(--earth)';
+# 4. Fix crash: remove leftover DOM refs to deleted like/dislike buttons in openBuyerDetail
+old4 = """  var liked = localStorage.getItem('liked_'+item.id);
+  var disliked = localStorage.getItem('disliked_'+item.id);
+  if(liked){
+    document.getElementById('bd-like-btn').style.background='#0ECB81';
+    document.getElementById('bd-like-btn').style.color='#fff';
   }
-  var sn2 = document.getElementById('bd-seller-name2');
-  if(sn2) sn2.textContent = item.trader;
-  var sp2 = document.getElementById('bd-seller-photo2');
-  if(sp2) sp2.textContent = item.trader.charAt(0).toUpperCase();"""
-
-new4 = """  var followBtn2 = document.getElementById('bd-follow-btn2');
-  if(followBtn2){
-    var isFollowing = localStorage.getItem('following_'+item.trader);
-    followBtn2.textContent = isFollowing ? '\u2713 Following' : '+ Follow';
-    followBtn2.style.background = isFollowing ? 'var(--green)' : 'var(--earth)';
-  }"""
-
+  if(disliked){
+    document.getElementById('bd-dislike-btn').style.background='#F6465D';
+    document.getElementById('bd-dislike-btn').style.color='#fff';
+  }
+  document.getElementById('bd-likes').textContent = item.likes||0;
+  document.getElementById('bd-dislikes').textContent = item.dislikes||0;
+  document.getElementById('bd-like-btn').style.background = '#E8F5EE';
+  document.getElementById('bd-like-btn').style.color = 'var(--green)';
+  document.getElementById('bd-dislike-btn').style.background = '#FDECEA';
+  document.getElementById('bd-dislike-btn').style.color = 'var(--red)';"""
+new4 = """  updateImageCounter();"""
 if old4 in content:
     content = content.replace(old4, new4)
     fixes += 1
-    print("Fix 4 done: openBuyerDetail uses new follow button")
+    print("Fix 4 done: removed crash-prone refs, hooked image counter")
 else:
     print("Fix 4 FAILED")
 
-# 5. Load follower count when seller data loads
-old5 = """      if(selResult.data.photo_url){
-        sellerPhotoEl.innerHTML='<img src="'+selResult.data.photo_url+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">';
-        var sp2=document.getElementById('bd-seller-photo2');
-        if(sp2) sp2.innerHTML='<img src="'+selResult.data.photo_url+'" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">';
-      }"""
-
-new5 = """      if(selResult.data.photo_url){
-        sellerPhotoEl.innerHTML='<img src="'+selResult.data.photo_url+'" style="width:54px;height:54px;border-radius:50%;object-fit:cover;">';
-      }
-      var fCount = selResult.data.followers_count||0;
-      var countEl = document.getElementById('bd-followers-count');
-      if(countEl) countEl.textContent = fCount+' follower'+(fCount!==1?'s':'');"""
-
+# 5. Track gallery count + set/hide counter when images load
+old5 = '''  if(galleryImgs.length > 0){
+    galleryImgs.forEach(function(url){
+      imgEl.innerHTML += '<div style="min-width:100%;height:100%;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:20px;box-sizing:border-box;">'
+        + '<img src="'+url+'" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;" loading="lazy" onclick="showFullImage(this.src)" onerror="this.style.display=\\'none\\'">'
+        + '</div>';
+    });
+  } else {
+    imgEl.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;">🏪</div>';
+  }'''
+new5 = '''  window.bdGalleryCount = galleryImgs.length;
+  var counterEl = document.getElementById('bd-img-counter');
+  if(galleryImgs.length > 0){
+    galleryImgs.forEach(function(url){
+      imgEl.innerHTML += '<div style="min-width:100%;height:100%;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:20px;box-sizing:border-box;">'
+        + '<img src="'+url+'" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;" loading="lazy" onclick="showFullImage(this.src)" onerror="this.style.display=\\'none\\'">'
+        + '</div>';
+    });
+    if(counterEl){
+      if(galleryImgs.length > 1){ counterEl.style.display='block'; counterEl.textContent='1/'+galleryImgs.length; }
+      else { counterEl.style.display='none'; }
+    }
+  } else {
+    imgEl.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;">🏪</div>';
+    if(counterEl) counterEl.style.display='none';
+  }'''
 if old5 in content:
     content = content.replace(old5, new5)
     fixes += 1
-    print("Fix 5 done: follower count loaded from DB")
+    print("Fix 5 done: gallery counter tracking added")
 else:
     print("Fix 5 FAILED")
+
+# 6. Add updateImageCounter function before closeBuyerDetail
+old6 = "function closeBuyerDetail() {"
+new6 = """function updateImageCounter() {
+  var el = document.getElementById('bd-images');
+  var counterEl = document.getElementById('bd-img-counter');
+  if(!el || !counterEl) return;
+  var total = window.bdGalleryCount||0;
+  if(total <= 1) { counterEl.style.display='none'; return; }
+  var idx = Math.round(el.scrollLeft / (el.offsetWidth||1)) + 1;
+  idx = Math.max(1, Math.min(total, idx));
+  counterEl.style.display = 'block';
+  counterEl.textContent = idx+'/'+total;
+}
+function closeBuyerDetail() {"""
+if old6 in content:
+    content = content.replace(old6, new6, 1)
+    fixes += 1
+    print("Fix 6 done: updateImageCounter function added")
+else:
+    print("Fix 6 FAILED")
 
 with open('/storage/emulated/0/OjaLive/index.html', 'w') as f:
     f.write(content)
 
-print(f"\nTotal: {fixes}/5")
+print(f"\nTotal: {fixes}/6")
