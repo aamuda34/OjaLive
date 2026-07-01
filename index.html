@@ -841,10 +841,13 @@ async function dislikeItem() {
 async function submitReview() {
   if (!currentReviewRating) { showToast('Please select a star rating'); return; }
   if (!currentDetailItemId) return;
+  var reviewedKey = 'reviewed_item_'+currentDetailItemId;
+  if (localStorage.getItem(reviewedKey)) { showToast('You have already reviewed this item'); return; }
   var comment = document.getElementById('bd-review-text').value.trim();
   var reviewer = document.getElementById('bd-reviewer-name').value.trim() || 'Anonymous';
   var result = await db.from('reviews').insert([{listing_id:currentDetailItemId,seller_name:currentDetailTrader,rating:currentReviewRating,comment:comment,reviewer:reviewer}]);
   if (result.error) { showToast('Error submitting review'); return; }
+  localStorage.setItem(reviewedKey, '1');
   showToast('Review submitted! Thank you.');
   document.getElementById('bd-review-text').value='';
   document.getElementById('bd-reviewer-name').value='';
@@ -908,15 +911,6 @@ async function loadItemReviews(id) {
   var avgRating = reviews.length ? (reviews.reduce(function(s,r){return s+r.rating;},0)/reviews.length).toFixed(1) : null;
   var avgEl = document.getElementById('bd-avg-rating');
   if(avgEl) avgEl.textContent = avgRating ? '⭐ '+avgRating+' ('+reviews.length+')' : '';
-  var inlineEl = document.getElementById('bd-inline-rating');
-  if(inlineEl){
-    if(avgRating){
-      inlineEl.style.display='block';
-      inlineEl.innerHTML = '<span style="color:#F59E0B;">★</span> <span style="font-weight:700;color:var(--dark);">'+avgRating+'</span> <span style="color:var(--muted);">('+reviews.length+' review'+(reviews.length!==1?'s':'')+')</span>';
-    } else {
-      inlineEl.style.display='none';
-    }
-  }
   var inlineEl = document.getElementById('bd-inline-rating');
   if(inlineEl){
     if(avgRating){
@@ -1128,16 +1122,6 @@ function showDirections(lat, lng, name, address) {
   var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination='+destination+(buyerLat?'&origin='+buyerLat+','+buyerLng:'');
   if (confirm('Open Google Maps for directions to ' + name + '?')) {
     window.open(mapsUrl, '_blank');
-  }
-}
-function shareItem() {
-  if (!currentDetailItemId || !listingMap[currentDetailItemId]) return;
-  var item = listingMap[currentDetailItemId];
-  var text = item.name + ' - ₦' + Number(item.price).toLocaleString() + ' (' + item.unit + ') from ' + item.trader + ' on OjaLive';
-  if (navigator.share) {
-    navigator.share({ title: item.name, text: text, url: window.location.href }).catch(function(){});
-  } else {
-    navigator.clipboard.writeText(text).then(function(){ showToast('Copied to clipboard!'); }).catch(function(){ showToast('Could not share'); });
   }
 }
 function shareItem() {
