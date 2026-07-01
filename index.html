@@ -58,6 +58,8 @@ input:focus,select:focus{border-color:var(--earth);}
 .lc-loc{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lc-price{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--earth);}
 .lc-unit{font-size:11px;color:var(--muted);}
+.skeleton{background:linear-gradient(90deg,#EFEFEF 25%,#F5F5F5 50%,#EFEFEF 75%);background-size:200% 100%;animation:skeleton-pulse 1.5s ease-in-out infinite;}
+@keyframes skeleton-pulse{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 </style>
 </head>
 <body>
@@ -126,7 +128,7 @@ input:focus,select:focus{border-color:var(--earth);}
   <div style="background:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border-bottom:1px solid var(--border);" onclick="loadListings()">
     <div style="display:flex;align-items:center;gap:8px;">
       <div style="width:7px;height:7px;background:#0ECB81;border-radius:50%;box-shadow:0 0 5px #0ECB81;flex-shrink:0;"></div>
-      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--dark);" id="count">0 Listings</div>
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--dark);" id="count">Finding prices near you...</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;">
       <div style="font-size:10px;color:var(--muted);" id="results-count"></div>
@@ -134,7 +136,7 @@ input:focus,select:focus{border-color:var(--earth);}
     </div>
   </div>
   <!-- BOARD -->
-  <div id="board" style="padding:12px 14px;"><div class="empty">Loading prices...</div></div>
+  <div id="board" style="padding:14px;"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div style="background:#fff;border:1px solid #EEEEEE;border-radius:10px;overflow:hidden;"><div class="skeleton" style="width:100%;height:200px;"></div><div style="padding:11px 12px 13px;"><div class="skeleton" style="height:13px;border-radius:4px;margin-bottom:8px;width:80%;"></div><div class="skeleton" style="height:11px;border-radius:4px;margin-bottom:10px;width:50%;"></div><div class="skeleton" style="height:18px;border-radius:4px;width:60%;"></div></div></div><div style="background:#fff;border:1px solid #EEEEEE;border-radius:10px;overflow:hidden;"><div class="skeleton" style="width:100%;height:200px;"></div><div style="padding:11px 12px 13px;"><div class="skeleton" style="height:13px;border-radius:4px;margin-bottom:8px;width:80%;"></div><div class="skeleton" style="height:11px;border-radius:4px;margin-bottom:10px;width:50%;"></div><div class="skeleton" style="height:18px;border-radius:4px;width:60%;"></div></div></div><div style="background:#fff;border:1px solid #EEEEEE;border-radius:10px;overflow:hidden;"><div class="skeleton" style="width:100%;height:200px;"></div><div style="padding:11px 12px 13px;"><div class="skeleton" style="height:13px;border-radius:4px;margin-bottom:8px;width:80%;"></div><div class="skeleton" style="height:11px;border-radius:4px;margin-bottom:10px;width:50%;"></div><div class="skeleton" style="height:18px;border-radius:4px;width:60%;"></div></div></div><div style="background:#fff;border:1px solid #EEEEEE;border-radius:10px;overflow:hidden;"><div class="skeleton" style="width:100%;height:200px;"></div><div style="padding:11px 12px 13px;"><div class="skeleton" style="height:13px;border-radius:4px;margin-bottom:8px;width:80%;"></div><div class="skeleton" style="height:11px;border-radius:4px;margin-bottom:10px;width:50%;"></div><div class="skeleton" style="height:18px;border-radius:4px;width:60%;"></div></div></div><div style="background:#fff;border:1px solid #EEEEEE;border-radius:10px;overflow:hidden;"><div class="skeleton" style="width:100%;height:200px;"></div><div style="padding:11px 12px 13px;"><div class="skeleton" style="height:13px;border-radius:4px;margin-bottom:8px;width:80%;"></div><div class="skeleton" style="height:11px;border-radius:4px;margin-bottom:10px;width:50%;"></div><div class="skeleton" style="height:18px;border-radius:4px;width:60%;"></div></div></div><div style="background:#fff;border:1px solid #EEEEEE;border-radius:10px;overflow:hidden;"><div class="skeleton" style="width:100%;height:200px;"></div><div style="padding:11px 12px 13px;"><div class="skeleton" style="height:13px;border-radius:4px;margin-bottom:8px;width:80%;"></div><div class="skeleton" style="height:11px;border-radius:4px;margin-bottom:10px;width:50%;"></div><div class="skeleton" style="height:18px;border-radius:4px;width:60%;"></div></div></div></div></div>
   <!-- BUYER ITEM DETAIL MODAL -->
   <div id="buyer-item-detail" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:500;overflow-y:auto;">
     <div style="position:absolute;top:env(safe-area-inset-top,0px);left:0;right:0;padding:16px 16px 0;display:flex;align-items:center;justify-content:space-between;z-index:10;">
