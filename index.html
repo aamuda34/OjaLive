@@ -60,6 +60,7 @@ input:focus,select:focus{border-color:var(--earth);}
 .lc-unit{font-size:11px;color:var(--muted);}
 .skeleton{background:linear-gradient(90deg,#EFEFEF 25%,#F5F5F5 50%,#EFEFEF 75%);background-size:200% 100%;animation:skeleton-pulse 1.5s ease-in-out infinite;}
 @keyframes skeleton-pulse{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -1369,21 +1370,44 @@ function sellerShowScreen(screenName) {
   });
   document.getElementById(screenName).classList.remove('hidden');
 }
+var photoFiles = {add:[], edit:[]};
 function previewImages(mode) {
   var input = document.getElementById(mode+'-item-images');
   var preview = document.getElementById(mode+'-images-preview');
   preview.innerHTML = '';
-  var files = Array.from(input.files).slice(0,5);
-  files.forEach(function(file) {
+  photoFiles[mode] = Array.from(input.files).slice(0,5);
+  renderPhotoThumbnails(mode);
+}
+function renderPhotoThumbnails(mode) {
+  var preview = document.getElementById(mode+'-images-preview');
+  preview.innerHTML = '';
+  photoFiles[mode].forEach(function(file, idx) {
     var reader = new FileReader();
     reader.onload = function(e) {
-      var img = document.createElement('div');
-      img.style.cssText = 'width:70px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);position:relative;';
-      img.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">';
-      preview.appendChild(img);
+      var wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
+      wrap.innerHTML = '<div id="'+mode+'-thumb-'+idx+'" style="width:70px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);position:relative;background:repeating-conic-gradient(#f0f0f0 0% 25%, #fff 0% 50%) 50% / 12px 12px;"><img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;"></div>'
+        + '<button type="button" onclick="enhancePhoto(\''+mode+'\','+idx+')" style="font-size:9px;padding:3px 7px;background:var(--earth);color:#fff;border:none;border-radius:12px;cursor:pointer;white-space:nowrap;">Remove BG</button>';
+      preview.appendChild(wrap);
     };
     reader.readAsDataURL(file);
   });
+}
+async function enhancePhoto(mode, idx) {
+  var thumb = document.getElementById(mode+'-thumb-'+idx);
+  if (!thumb) return;
+  var originalHTML = thumb.innerHTML;
+  thumb.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#F5F5F5;"><div style="width:16px;height:16px;border:2px solid var(--earth);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div></div>';
+  try {
+    var blob = await window.imglyRemoveBackground(photoFiles[mode][idx]);
+    var newFile = new File([blob], photoFiles[mode][idx].name.replace(/\.[^.]+$/, '')+'-nobg.png', {type:'image/png'});
+    photoFiles[mode][idx] = newFile;
+    renderPhotoThumbnails(mode);
+    showToast('Background removed');
+  } catch(e) {
+    thumb.innerHTML = originalHTML;
+    showToast('Could not process photo, try again');
+  }
 }
 async function uploadImages(files, listingId) {
   var urls = [];
@@ -1642,10 +1666,10 @@ async function sellerSaveNewListing() {
   var itemDesc = document.getElementById('add-item-description').value.trim();
   var result = await db.from('Listing').insert([{name:name,price:price,unit:unit,category:category,location:location,trader:currentSeller.full_name,verified:true,change:'stable',latitude:gps.lat,longitude:gps.lng,phone:phone,stock:stock,description:itemDesc}]).select();
   if (!result.error) {
-    var imgFiles = document.getElementById('add-item-images').files;
+    var imgFiles = photoFiles.add;
     if (imgFiles.length > 0 && result.data && result.data[0]) {
       showToast('Uploading photos...');
-      var urls = await uploadImages(Array.from(imgFiles), result.data[0].id);
+      var urls = await uploadImages(imgFiles, result.data[0].id);
       if (urls.length > 0) {
         await db.from('Listing').update({image_url:JSON.stringify(urls)}).eq('id',result.data[0].id);
       }
@@ -1701,10 +1725,10 @@ async function sellerSaveEditListing() {
   if (oldPrice && oldPrice !== price) {
     await db.from('price_history').insert([{listing_id:currentEditingListingId,old_price:oldPrice,new_price:price,trader:currentSeller.full_name,location:currentSeller.location}]);
   }
-  var editImgFiles = document.getElementById('edit-item-images').files;
+  var editImgFiles = photoFiles.edit;
   if (editImgFiles.length > 0) {
     showToast('Uploading photos...');
-    var editUrls = await uploadImages(Array.from(editImgFiles), currentEditingListingId);
+    var editUrls = await uploadImages(editImgFiles, currentEditingListingId);
     if (editUrls.length > 0) {
       await db.from('Listing').update({image_url:JSON.stringify(editUrls)}).eq('id',currentEditingListingId);
     }
