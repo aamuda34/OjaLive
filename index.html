@@ -317,12 +317,35 @@ input:focus,select:focus{border-color:var(--earth);}
           <option>Other</option>
         </select>
         <label>Password</label>
-        <input type="password" id="reg-password" placeholder="Min 6 characters">
+        <div style="position:relative;">
+          <input type="password" id="reg-password" placeholder="Min 6 characters" oninput="checkPasswordStrength()" style="padding-right:44px;">
+          <button type="button" onclick="togglePasswordVisibility('reg-password',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;">👁</button>
+        </div>
+        <div id="reg-password-strength" style="height:4px;border-radius:2px;background:var(--border);margin-top:6px;overflow:hidden;">
+          <div id="reg-password-strength-bar" style="height:100%;width:0%;background:#C0392B;transition:width 0.2s,background 0.2s;"></div>
+        </div>
+        <div id="reg-password-strength-label" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
+        <label style="margin-top:14px;">Confirm Password</label>
+        <div style="position:relative;">
+          <input type="password" id="reg-password-confirm" placeholder="Re-enter your password" style="padding-right:44px;">
+          <button type="button" onclick="togglePasswordVisibility('reg-password-confirm',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;">👁</button>
+        </div>
+        <label style="display:flex;align-items:flex-start;gap:8px;margin-top:16px;text-transform:none;font-size:13px;color:var(--dark);font-weight:500;cursor:pointer;">
+          <input type="checkbox" id="reg-terms-check" style="width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--earth);">
+          <span>I agree to OjaLive's <a href="#" onclick="event.preventDefault();showToast('Terms page coming soon')" style="color:var(--earth);text-decoration:underline;">Terms of Service</a> and <a href="#" onclick="event.preventDefault();showToast('Privacy page coming soon')" style="color:var(--earth);text-decoration:underline;">Privacy Policy</a></span>
+        </label>
+        <div id="reg-step3-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none;"></div>
         <div style="display:flex;gap:8px;margin-top:16px;">
           <button type="button" class="btn btn-o" onclick="regGoToStep(2)" style="margin:0;flex:1;">Back</button>
-          <button class="btn btn-p" id="btn-register-seller" onclick="sellerRegister()" style="margin:0;flex:2;">Create Account</button>
+          <button class="btn btn-p" id="btn-register-seller" onclick="regValidateStep3()" style="margin:0;flex:2;">Create Account</button>
         </div>
         </div>
+      </div>
+      <div class="card hidden" id="auth-panel-success" style="text-align:center;padding:36px 20px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:#E8F5EE;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:32px;color:#2D7A4F;">✓</div>
+        <div style="font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--dark);margin-bottom:8px;">Account Created!</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:22px;">Welcome to OjaLive. Your seller account is ready. Please login to start posting your items.</div>
+        <button type="button" class="btn btn-p" onclick="switchAuthTab('login')" style="margin:0;">Continue to Login</button>
       </div>
       <div class="card" id="auth-panel-login">
         <div class="card-title" style="margin-bottom:18px;">Login to Your Account</div>
@@ -747,7 +770,6 @@ function initDB() {
     document.getElementById('tab-supplier').addEventListener('click', function() { switchTab('supplier'); });
     document.getElementById('tab-ai').addEventListener('click', function() { switchTab('ai'); });
     document.getElementById('tab-admin').addEventListener('click', function() { switchTab('admin'); });
-    document.getElementById('btn-register-seller').addEventListener('click', sellerRegister);
     document.getElementById('btn-login-seller').addEventListener('click', sellerLogin);
     document.getElementById('btn-seller-logout').addEventListener('click', sellerLogout);
     document.getElementById('btn-add-new-listing').addEventListener('click', sellerAddListingScreen);
@@ -1681,7 +1703,9 @@ async function regValidateStep1() {
   var phone = document.getElementById('reg-phone').value.trim();
   if (!name) { errEl.textContent = 'Please enter your shop name'; errEl.style.display = 'block'; return; }
   if (!phone) { errEl.textContent = 'Please enter your phone number'; errEl.style.display = 'block'; return; }
-  if (phone.length < 10) { errEl.textContent = 'Please enter a valid phone number'; errEl.style.display = 'block'; return; }
+  var phoneDigits = phone.replace(/\D/g,'');
+  var validNigerian = /^0[789][01]\d{8}$/.test(phoneDigits);
+  if (!validNigerian) { errEl.textContent = 'Please enter a valid Nigerian phone number (e.g. 08012345678)'; errEl.style.display = 'block'; return; }
   errEl.textContent = 'Checking phone number...';
   errEl.style.color = 'var(--muted)';
   errEl.style.display = 'block';
@@ -1703,6 +1727,43 @@ function regValidateStep2() {
   errEl.style.display = 'none';
   regGoToStep(3);
 }
+function togglePasswordVisibility(fieldId, btn) {
+  var field = document.getElementById(fieldId);
+  if (field.type === 'password') {
+    field.type = 'text';
+    btn.style.color = 'var(--earth)';
+  } else {
+    field.type = 'password';
+    btn.style.color = 'var(--muted)';
+  }
+}
+function checkPasswordStrength() {
+  var pw = document.getElementById('reg-password').value;
+  var bar = document.getElementById('reg-password-strength-bar');
+  var label = document.getElementById('reg-password-strength-label');
+  var score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 9) score++;
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (!pw) { bar.style.width = '0%'; label.textContent = ''; return; }
+  if (score <= 1) { bar.style.width = '33%'; bar.style.background = '#C0392B'; label.textContent = 'Weak password'; label.style.color = '#C0392B'; }
+  else if (score <= 2) { bar.style.width = '66%'; bar.style.background = '#D4A017'; label.textContent = 'Medium strength'; label.style.color = '#D4A017'; }
+  else { bar.style.width = '100%'; bar.style.background = '#2D7A4F'; label.textContent = 'Strong password'; label.style.color = '#2D7A4F'; }
+}
+function regValidateStep3() {
+  var errEl = document.getElementById('reg-step3-error');
+  var pw = document.getElementById('reg-password').value;
+  var pwConfirm = document.getElementById('reg-password-confirm').value;
+  var trade = document.getElementById('reg-trade').value;
+  if (!pw) { errEl.textContent = 'Please enter a password'; errEl.style.display = 'block'; return; }
+  if (pw.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; errEl.style.display = 'block'; return; }
+  if (!pwConfirm) { errEl.textContent = 'Please confirm your password'; errEl.style.display = 'block'; return; }
+  if (pw !== pwConfirm) { errEl.textContent = 'Passwords do not match'; errEl.style.display = 'block'; return; }
+  if (!document.getElementById('reg-terms-check').checked) { errEl.textContent = 'Please agree to the Terms of Service to continue'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  sellerRegister();
+}
 function regGoToStep(step) {
   [1,2,3].forEach(function(s) {
     document.getElementById('reg-step-'+s).classList.toggle('hidden', s !== step);
@@ -1715,6 +1776,8 @@ function switchAuthTab(tab) {
   var registerPanel = document.getElementById('auth-panel-register');
   var loginTab = document.getElementById('auth-tab-login');
   var registerTab = document.getElementById('auth-tab-register');
+  var successPanel = document.getElementById('auth-panel-success');
+  if (successPanel) successPanel.classList.add('hidden');
   if (tab === 'login') {
     loginPanel.classList.remove('hidden');
     registerPanel.classList.add('hidden');
@@ -1767,13 +1830,15 @@ async function sellerRegister() {
     }
   }
   if (result.error) { showToast('Register Error: '+result.error.message); return; }
-  showToast('Account created! Login now.');
+  document.getElementById('login-phone').value = phone;
   document.getElementById('reg-name').value='';
   document.getElementById('reg-phone').value='';
   document.getElementById('reg-location').value='';
   document.getElementById('reg-lat').value='';
   document.getElementById('reg-lng').value='';
   document.getElementById('reg-password').value='';
+  document.getElementById('reg-password-confirm').value='';
+  document.getElementById('reg-terms-check').checked = false;
   document.getElementById('reg-description').value='';
   document.getElementById('reg-whatsapp').value='';
   document.getElementById('reg-photo-preview').innerHTML='';
@@ -1782,6 +1847,9 @@ async function sellerRegister() {
   document.getElementById('btn-capture-location').style.background = 'var(--earth)';
   document.getElementById('btn-capture-location').disabled = false;
   document.getElementById('reg-gps-status').textContent = 'Tap above — your exact location will be auto-filled';
+  regGoToStep(1);
+  document.getElementById('auth-panel-register').classList.add('hidden');
+  document.getElementById('auth-panel-success').classList.remove('hidden');
 }
 async function sellerLogin() {
   var phone = document.getElementById('login-phone').value.trim();
