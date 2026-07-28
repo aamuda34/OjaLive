@@ -45,7 +45,7 @@ input:focus,select:focus{border-color:var(--earth);}
 .spill{background:#E8F5EE;color:var(--green);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
 .bsm{padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:none;}
 .bapp{background:var(--earth);color:#fff;}
-.range-btn{padding:4px 10px;background:#2B2F36;color:#848E9C;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;}
+.range-btn{padding:4px 10px;background:var(--border);color:var(--muted);border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;}
 .range-btn.active-range{background:var(--earth);color:#fff;}
 .cat-pill{padding:8px 14px;background:transparent;color:var(--muted);border:none;border-bottom:2px solid transparent;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:0.2px;}
 .cat-pill.active-pill{color:var(--earth);border-bottom:2px solid var(--earth);}
@@ -240,16 +240,32 @@ input:focus,select:focus{border-color:var(--earth);}
 <div class="screen" id="screen-supplier">
   <div id="seller-login-wall">
     <div style="max-width:400px;margin:0 auto;padding:40px 20px;">
-      <div style="text-align:center;margin-bottom:32px;">
+      <div style="text-align:center;margin-bottom:28px;">
         <div style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;">Oja<span style="color:var(--earth);">Live</span></div>
         <div style="font-size:14px;color:var(--muted);margin-top:6px;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Seller Portal</div>
       </div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title" style="margin-bottom:18px;">New Seller</div>
+      <div style="display:flex;background:#F0EAE0;border-radius:12px;padding:4px;margin-bottom:20px;">
+        <button type="button" id="auth-tab-login" onclick="switchAuthTab('login')" style="flex:1;padding:11px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;background:var(--dark);color:#fff;">Login</button>
+        <button type="button" id="auth-tab-register" onclick="switchAuthTab('register')" style="flex:1;padding:11px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);">New Seller</button>
+      </div>
+      <div class="card hidden" id="auth-panel-register" style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div class="card-title" style="margin-bottom:0;">Create Your Seller Account</div>
+          <div style="font-size:11px;color:var(--earth);font-weight:700;" id="reg-step-label">Step 1 of 3</div>
+        </div>
+        <div style="display:flex;gap:4px;margin-bottom:20px;">
+          <div id="reg-progress-1" style="flex:1;height:3px;border-radius:2px;background:var(--earth);"></div>
+          <div id="reg-progress-2" style="flex:1;height:3px;border-radius:2px;background:var(--border);"></div>
+          <div id="reg-progress-3" style="flex:1;height:3px;border-radius:2px;background:var(--border);"></div>
+        </div>
+        <div id="reg-step-1">
         <label>Shop Name</label>
         <input type="text" id="reg-name" placeholder="Your shop or business name">
         <label>Phone Number</label>
         <input type="tel" id="reg-phone" placeholder="080xxxxxxxx">
+        <button type="button" class="btn btn-p" onclick="regGoToStep(2)" style="margin-top:16px;">Continue</button>
+        </div>
+        <div id="reg-step-2" class="hidden">
         <label>Country</label>
         <select id="reg-country"><option value="Nigeria">Nigeria</option><option value="Ghana">Ghana</option></select>
         <label>State</label>
@@ -260,6 +276,12 @@ input:focus,select:focus{border-color:var(--earth);}
         <div id="reg-gps-status" style="font-size:12px;color:var(--muted);margin-top:6px;text-align:center;">Tap above — your exact location will be auto-filled</div>
         <input type="hidden" id="reg-lat">
         <input type="hidden" id="reg-lng">
+        <div style="display:flex;gap:8px;margin-top:16px;">
+          <button type="button" class="btn btn-o" onclick="regGoToStep(1)" style="margin:0;flex:1;">Back</button>
+          <button type="button" class="btn btn-p" onclick="regGoToStep(3)" style="margin:0;flex:2;">Continue</button>
+        </div>
+        </div>
+        <div id="reg-step-3" class="hidden">
         <label>Profile/Shop Photo (Optional)</label>
         <div id="reg-photo-preview" style="margin-bottom:8px;"></div>
         <input type="file" id="reg-photo" accept="image/*" style="display:none;" onchange="previewRegPhoto()">
@@ -294,11 +316,14 @@ input:focus,select:focus{border-color:var(--earth);}
         </select>
         <label>Password</label>
         <input type="password" id="reg-password" placeholder="Min 6 characters">
-        <button class="btn btn-p" id="btn-register-seller" onclick="sellerRegister()" style="margin-top:16px;">Create Account</button>
+        <div style="display:flex;gap:8px;margin-top:16px;">
+          <button type="button" class="btn btn-o" onclick="regGoToStep(2)" style="margin:0;flex:1;">Back</button>
+          <button class="btn btn-p" id="btn-register-seller" onclick="sellerRegister()" style="margin:0;flex:2;">Create Account</button>
+        </div>
+        </div>
       </div>
-      <div style="text-align:center;color:var(--muted);font-size:12px;margin:20px 0;letter-spacing:1px;text-transform:uppercase;font-weight:600;">or login</div>
-      <div class="card">
-        <div class="card-title" style="margin-bottom:18px;">Existing Seller</div>
+      <div class="card" id="auth-panel-login">
+        <div class="card-title" style="margin-bottom:18px;">Login to Your Account</div>
         <label>Phone Number</label>
         <input type="tel" id="login-phone" placeholder="080xxxxxxxx">
         <label>Password</label>
@@ -320,7 +345,7 @@ input:focus,select:focus{border-color:var(--earth);}
       </div>
       <div class="card" style="text-align:center;padding:14px 8px;">
         <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--green);" id="dashboard-total-value">₦0</div>
-        <div style="font-size:11px;color:var(--muted);font-weight:600;">Total Value</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Inventory Value</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
@@ -377,8 +402,20 @@ input:focus,select:focus{border-color:var(--earth);}
       <input type="number" id="add-item-stock" placeholder="e.g. 50 (how many units available)" min="0">
       <label>Item Photos (Optional)</label>
       <div id="add-images-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+      <div id="add-bg-tools" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <button type="button" onclick="bulkRemoveBackground('add',false)" style="font-size:11px;padding:6px 12px;background:var(--earth);color:#fff;border:none;border-radius:20px;cursor:pointer;font-weight:600;">Remove Background</button>
+        <button type="button" onclick="bulkRemoveBackground('add',true)" style="font-size:11px;padding:6px 12px;background:transparent;color:var(--dark);border:1px solid var(--dark);border-radius:20px;cursor:pointer;font-weight:600;">HD</button>
+        </div>
+      <div id="add-bg-progress" style="display:none;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span id="add-bg-label" style="font-size:11px;color:var(--muted);font-weight:600;">Processing...</span><span id="add-bg-percent" style="font-size:11px;color:var(--earth);font-weight:700;">0%</span></div>
+        <div style="width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;"><div id="add-bg-bar" style="width:0%;height:100%;background:var(--earth);border-radius:3px;transition:width .2s ease;"></div></div>
+      </div>
       <input type="file" id="add-item-images" accept="image/*" multiple style="display:none;" onchange="previewImages('add')">
       <button type="button" onclick="document.getElementById('add-item-images').click()" style="width:100%;padding:10px;background:#F7F2EA;border:1.5px dashed var(--border);border-radius:10px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:10px;">📷 Add Photos (up to 5)</button>
+      <div id="add-upload-progress" style="display:none;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span id="add-upload-label" style="font-size:11px;color:var(--muted);font-weight:600;">Uploading...</span><span id="add-upload-percent" style="font-size:11px;color:var(--earth);font-weight:700;">0%</span></div>
+        <div style="width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;"><div id="add-upload-bar" style="width:0%;height:100%;background:var(--earth);border-radius:3px;transition:width .2s ease;"></div></div>
+      </div>
       <label style="display:flex;align-items:center;gap:10px;margin-top:14px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--dark);"><input type="checkbox" id="add-show-phone" style="width:18px;height:18px;display:inline;" checked> Show my phone number to buyers</label>
       <button class="btn btn-p" id="btn-save-new-listing" style="margin-top:16px;">Post Item</button>
     </div>
@@ -417,13 +454,25 @@ input:focus,select:focus{border-color:var(--earth);}
       <label>Location</label>
       <input type="text" id="edit-item-location" placeholder="Location">
       <label>Item Description (Optional)</label>
-      <textarea id="add-item-description" placeholder="Describe your item... e.g. Fresh from farm, quality guaranteed, wholesale available" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;resize:none;height:80px;font-family:inherit;margin-bottom:0;"></textarea>
+      <textarea id="edit-item-description" placeholder="Describe your item... e.g. Fresh from farm, quality guaranteed, wholesale available" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;resize:none;height:80px;font-family:inherit;margin-bottom:0;"></textarea>
       <label>Stock Quantity (Optional)</label>
-      <input type="number" id="add-item-stock" placeholder="e.g. 50 (how many units available)" min="0">
+      <input type="number" id="edit-item-stock" placeholder="e.g. 50 (how many units available)" min="0">
       <label>Item Photos (Optional)</label>
       <div id="edit-images-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+      <div id="edit-bg-tools" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <button type="button" onclick="bulkRemoveBackground('edit',false)" style="font-size:11px;padding:6px 12px;background:var(--earth);color:#fff;border:none;border-radius:20px;cursor:pointer;font-weight:600;">Remove Background</button>
+        <button type="button" onclick="bulkRemoveBackground('edit',true)" style="font-size:11px;padding:6px 12px;background:transparent;color:var(--dark);border:1px solid var(--dark);border-radius:20px;cursor:pointer;font-weight:600;">HD</button>
+        </div>
+      <div id="edit-bg-progress" style="display:none;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span id="edit-bg-label" style="font-size:11px;color:var(--muted);font-weight:600;">Processing...</span><span id="edit-bg-percent" style="font-size:11px;color:var(--earth);font-weight:700;">0%</span></div>
+        <div style="width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;"><div id="edit-bg-bar" style="width:0%;height:100%;background:var(--earth);border-radius:3px;transition:width .2s ease;"></div></div>
+      </div>
       <input type="file" id="edit-item-images" accept="image/*" multiple style="display:none;" onchange="previewImages('edit')">
       <button type="button" onclick="document.getElementById('edit-item-images').click()" style="width:100%;padding:10px;background:#F7F2EA;border:1.5px dashed var(--border);border-radius:10px;font-size:13px;color:var(--muted);cursor:pointer;">📷 Add/Change Photos</button>
+      <div id="edit-upload-progress" style="display:none;margin-top:10px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span id="edit-upload-label" style="font-size:11px;color:var(--muted);font-weight:600;">Uploading...</span><span id="edit-upload-percent" style="font-size:11px;color:var(--earth);font-weight:700;">0%</span></div>
+        <div style="width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;"><div id="edit-upload-bar" style="width:0%;height:100%;background:var(--earth);border-radius:3px;transition:width .2s ease;"></div></div>
+      </div>
       <button class="btn btn-p" id="btn-save-edit-listing" style="margin-top:16px;">Save Changes</button>
       <button class="btn btn-o" id="btn-delete-listing" style="margin-top:10px;border-color:var(--red);color:var(--red);">Delete Item</button>
     </div>
@@ -446,28 +495,35 @@ input:focus,select:focus{border-color:var(--earth);}
         <div id="detail-location" style="font-size:13px;color:var(--dark);margin-bottom:6px;"></div>
         <div id="detail-trader" style="font-size:13px;color:var(--muted);"></div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:14px;">
-        <button class="btn btn-p" id="btn-detail-edit" style="flex:1;margin:0;">✏️ Edit</button>
-        <button class="btn btn-o" id="btn-detail-pause" style="flex:1;margin:0;border-color:var(--amber);color:var(--amber);">⏸️ Pause</button>
-        <button class="btn btn-o" id="btn-detail-delete" style="flex:1;margin:0;border-color:var(--red);color:var(--red);">🗑️ Delete</button>
+      <div id="detail-stock-row" style="display:none;margin-top:10px;">
+        <span style="font-size:11px;background:#E8F5EE;color:var(--green);border:1px solid var(--green);border-radius:6px;padding:3px 10px;font-weight:600;" id="detail-stock"></span>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button class="btn btn-o" id="btn-detail-duplicate" style="flex:1;margin:0;border-color:var(--green);color:var(--green);">📋 Duplicate</button>
-        <button class="btn btn-o" id="btn-detail-share" style="flex:1;margin:0;border-color:var(--dark);color:var(--dark);">📤 Share</button>
-        <button class="btn btn-o" id="btn-detail-export" style="flex:1;margin:0;">📊 Export</button>
+      <div id="detail-desc-row" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:6px;">Description</div>
+        <div id="detail-description" style="font-size:13px;color:var(--dark);line-height:1.6;"></div>
+      </div>
+      <button class="btn btn-p" id="btn-detail-edit" style="width:100%;margin:14px 0 0;display:flex;align-items:center;justify-content:center;gap:7px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Edit Listing</button>
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <button id="btn-detail-pause" style="flex:1;padding:9px 2px;background:var(--card);border:1px solid var(--border);color:var(--amber);border-radius:9px;font-size:10px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;"></button>
+        <button id="btn-detail-duplicate" style="flex:1;padding:9px 2px;background:var(--card);border:1px solid var(--border);color:var(--dark);border-radius:9px;font-size:10px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Duplicate</button>
+        <button id="btn-detail-share" style="flex:1;padding:9px 2px;background:var(--card);border:1px solid var(--border);color:var(--dark);border-radius:9px;font-size:10px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>Share</button>
+        <button id="btn-detail-export" style="flex:1;padding:9px 2px;background:var(--card);border:1px solid var(--border);color:var(--dark);border-radius:9px;font-size:10px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+      </div>
+      <div style="text-align:center;margin-top:10px;">
+        <button id="btn-detail-delete" style="background:none;border:none;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;padding:6px;display:inline-flex;align-items:center;gap:5px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Delete this listing</button>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">📈 Price History</div>
-      <div id="chart-summary" style="display:none;padding:8px 0 10px;border-bottom:1px solid #2B2F36;margin-bottom:10px;">
+      <div class="card-title" style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Price History</div>
+      <div id="chart-summary" style="display:none;padding:8px 0 10px;border-bottom:1px solid var(--border);margin-bottom:10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div>
-            <div id="chart-current-price" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#0ECB81;"></div>
+            <div id="chart-current-price" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--earth);"></div>
             <div id="chart-change" style="font-size:12px;margin-top:2px;"></div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:11px;color:#848E9C;">High: <span id="chart-high" style="color:#0ECB81;font-weight:600;"></span></div>
-            <div style="font-size:11px;color:#848E9C;margin-top:3px;">Low: <span id="chart-low" style="color:#F6465D;font-weight:600;"></span></div>
+            <div style="font-size:11px;color:var(--muted);">High: <span id="chart-high" style="color:var(--green);font-weight:600;"></span></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;">Low: <span id="chart-low" style="color:var(--red);font-weight:600;"></span></div>
           </div>
         </div>
         <div style="display:flex;gap:6px;" id="chart-range-btns">
@@ -484,7 +540,7 @@ input:focus,select:focus{border-color:var(--earth);}
   <div id="seller-price-history" class="hidden">
     <button class="btn btn-o" id="btn-back-from-history" style="background:transparent;color:var(--muted);border-color:var(--border);margin-bottom:14px;">← Back to Dashboard</button>
     <div class="card" style="margin-bottom:14px;">
-      <div class="card-title">📈 Price History</div>
+      <div class="card-title" style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Price History</div>
       <select id="history-item-select" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff;margin-bottom:14px;" onchange="renderPriceChart()"><option value="">Select an item...</option></select>
       <canvas id="price-chart" style="width:100%;height:200px;display:none;"></canvas>
       <div id="history-empty" style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Select an item to see its price history</div>
@@ -526,7 +582,7 @@ input:focus,select:focus{border-color:var(--earth);}
       </div>
       <div style="padding:16px 0;">
         <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;">Status</div>
-        <div style="margin-top:6px;"><span class="spill">✔ Verified Seller</span></div>
+        <div style="margin-top:6px;" id="profile-status-badge"><span class="spill">✔ Active Seller</span></div>
       </div>
       <button class="btn btn-o" id="btn-edit-profile" style="margin-top:0;">Edit Profile</button>
     </div>
@@ -596,7 +652,7 @@ input:focus,select:focus{border-color:var(--earth);}
       </div>
       <div class="card" style="text-align:center;padding:14px 8px;">
         <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);" id="stats-total-value">₦0</div>
-        <div style="font-size:11px;color:var(--muted);font-weight:600;">Total Value</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Inventory Value</div>
       </div>
       <div class="card" style="text-align:center;padding:14px 8px;">
         <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--dark);" id="stats-paused-items">0</div>
@@ -645,6 +701,8 @@ input:focus,select:focus{border-color:var(--earth);}
 <script>
 const SUPABASE_URL = "https://ivxtmhojrwxfsfblqtcv.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2eHRtaG9qcnd4ZnNmYmxxdGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMDA4NjksImV4cCI6MjA5Nzc3Njg2OX0.hnYsiqkLwnFlo4ZZD9iGbotphOh1lvlr_31sBkds2eM";
+const PHOTOROOM_KEY = "sandbox_sk_pr_default_682134b11d64d9a93db348a4dd0d9e6a1e675385";
+const PHOTOROOM_LIVE_KEY = ""; // add a live PhotoRoom key here to enable HD (no watermark) removal
 let db;
 function pullRefresh() {
   var sub = document.getElementById('hero-sub');
@@ -1384,44 +1442,126 @@ function renderPhotoThumbnails(mode) {
   photoFiles[mode].forEach(function(file, idx) {
     var reader = new FileReader();
     reader.onload = function(e) {
-      var wrap = document.createElement('div');
-      wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
-      wrap.innerHTML = '<div id="'+mode+'-thumb-'+idx+'" style="width:70px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);position:relative;background:repeating-conic-gradient(#f0f0f0 0% 25%, #fff 0% 50%) 50% / 12px 12px;"><img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;"></div>'
-        + '<button type="button" onclick="enhancePhoto(\''+mode+'\','+idx+')" style="font-size:9px;padding:3px 7px;background:var(--earth);color:#fff;border:none;border-radius:12px;cursor:pointer;white-space:nowrap;">Remove BG</button>';
-      preview.appendChild(wrap);
+      var div = document.createElement('div');
+      div.id = mode+'-thumb-'+idx;
+      div.style.cssText = 'width:70px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);position:relative;background:repeating-conic-gradient(#f0f0f0 0% 25%, #fff 0% 50%) 50% / 12px 12px;';
+      div.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;">';
+      preview.appendChild(div);
     };
     reader.readAsDataURL(file);
   });
+  var tools = document.getElementById(mode+'-bg-tools');
+  if (tools) tools.style.display = photoFiles[mode].length ? 'flex' : 'none';
 }
-async function enhancePhoto(mode, idx) {
-  var thumb = document.getElementById(mode+'-thumb-'+idx);
-  if (!thumb) return;
-  var originalHTML = thumb.innerHTML;
-  thumb.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#F5F5F5;"><div style="width:16px;height:16px;border:2px solid var(--earth);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div></div>';
-  try {
-    var blob = await window.imglyRemoveBackground(photoFiles[mode][idx]);
-    var newFile = new File([blob], photoFiles[mode][idx].name.replace(/\.[^.]+$/, '')+'-nobg.png', {type:'image/png'});
-    photoFiles[mode][idx] = newFile;
-    renderPhotoThumbnails(mode);
-    showToast('Background removed');
-  } catch(e) {
-    thumb.innerHTML = originalHTML;
-    showToast('Could not process photo, try again');
+function compositeOnWhite(blob) {
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob(function(outBlob) { resolve(outBlob); }, 'image/png');
+    };
+    img.onerror = function() { resolve(blob); };
+    img.src = URL.createObjectURL(blob);
+  });
+}
+async function bulkRemoveBackground(mode, useLive) {
+  var files = photoFiles[mode];
+  if (!files || !files.length) { showToast('Add photos first'); return; }
+  var apiKey = useLive ? PHOTOROOM_LIVE_KEY : PHOTOROOM_KEY;
+  if (useLive && !apiKey) { showToast('HD removal needs a live PhotoRoom key first'); return; }
+  var total = files.length;
+  var progWrap = document.getElementById(mode+'-bg-progress');
+  var progLabel = document.getElementById(mode+'-bg-label');
+  var progPercent = document.getElementById(mode+'-bg-percent');
+  var progBar = document.getElementById(mode+'-bg-bar');
+  if (progWrap) progWrap.style.display = 'block';
+  function updateProgress(i, done) {
+    var pct = Math.round(((i + (done?1:0)) / total) * 100);
+    if (progLabel) progLabel.textContent = done ? 'Processed photo '+(i+1)+' of '+total : 'Processing photo '+(i+1)+' of '+total;
+    if (progPercent) progPercent.textContent = pct + '%';
+    if (progBar) progBar.style.width = pct + '%';
   }
-}
-async function uploadImages(files, listingId) {
-  var urls = [];
-  for (var i = 0; i < Math.min(files.length, 5); i++) {
-    var file = files[i];
-    var ext = file.name.split('.').pop();
-    var path = 'listing-'+listingId+'-'+i+'-'+Date.now()+'.'+ext;
-    var result = await db.storage.from('listing-images').upload(path, file, {upsert:true});
-    if (!result.error) {
-      var pub = db.storage.from('listing-images').getPublicUrl(path);
-      urls.push(pub.data.publicUrl);
+  for (var idx = 0; idx < files.length; idx++) {
+    updateProgress(idx, false);
+    var thumb = document.getElementById(mode+'-thumb-'+idx);
+    var originalHTML = thumb ? thumb.innerHTML : '';
+    if (thumb) thumb.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#F5F5F5;"><div style="width:16px;height:16px;border:2px solid var(--earth);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div></div>';
+    try {
+      var formData = new FormData();
+      formData.append('image_file', files[idx]);
+      var response = await fetch('https://sdk.photoroom.com/v1/segment', {
+        method: 'POST',
+        headers: { 'x-api-key': apiKey },
+        body: formData
+      });
+      if (!response.ok) throw new Error('API error: '+response.status);
+      var blob = await response.blob();
+      blob = await compositeOnWhite(blob);
+      var newFile = new File([blob], files[idx].name.replace(/\.[^.]+$/, '')+'-edited.png', {type:'image/png'});
+      photoFiles[mode][idx] = newFile;
+      if (thumb) {
+        var objUrl = URL.createObjectURL(blob);
+        thumb.innerHTML = '<img src="'+objUrl+'" style="width:100%;height:100%;object-fit:cover;">';
+      }
+    } catch(e) {
+      if (thumb) thumb.innerHTML = originalHTML;
     }
+    updateProgress(idx, true);
   }
-  return urls;
+  if (progWrap) setTimeout(function(){ progWrap.style.display = 'none'; }, 800);
+  showToast(useLive ? 'HD background applied to all photos' : 'Background removed (test watermark)');
+}
+function uploadImagesWithProgress(files, listingId, mode) {
+  return new Promise(function(resolve) {
+    var total = Math.min(files.length, 5);
+    if (total === 0) { resolve([]); return; }
+    var urls = [];
+    var progWrap = document.getElementById(mode+'-upload-progress');
+    var progLabel = document.getElementById(mode+'-upload-label');
+    var progPercent = document.getElementById(mode+'-upload-percent');
+    var progBar = document.getElementById(mode+'-upload-bar');
+    var saveBtn = document.getElementById('btn-save-'+(mode==='add'?'new':'edit')+'-listing');
+    var originalBtnText = saveBtn ? saveBtn.textContent : '';
+    if (progWrap) progWrap.style.display = 'block';
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.style.opacity = '0.6'; }
+    var completed = 0;
+    function updateOverall(fileFraction) {
+      var overall = ((completed + fileFraction) / total) * 100;
+      if (progBar) progBar.style.width = overall + '%';
+      if (progPercent) progPercent.textContent = Math.round(overall) + '%';
+    }
+    function finish() {
+      if (progWrap) progWrap.style.display = 'none';
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.style.opacity = '1'; saveBtn.textContent = originalBtnText; }
+      resolve(urls);
+    }
+    function uploadOne(i) {
+      if (i >= total) { finish(); return; }
+      var file = files[i];
+      var ext = (file.name.split('.').pop() || 'jpg');
+      var path = 'listing-'+listingId+'-'+i+'-'+Date.now()+'.'+ext;
+      if (progLabel) progLabel.textContent = 'Uploading photo '+(i+1)+' of '+total;
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', SUPABASE_URL+'/storage/v1/object/listing-images/'+path);
+      xhr.setRequestHeader('apikey', SUPABASE_KEY);
+      xhr.setRequestHeader('Authorization', 'Bearer '+SUPABASE_KEY);
+      xhr.setRequestHeader('x-upsert', 'true');
+      xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+      xhr.upload.onprogress = function(e) { if (e.lengthComputable) updateOverall(e.loaded / e.total); };
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) { urls.push(SUPABASE_URL+'/storage/v1/object/public/listing-images/'+path); }
+        completed++; updateOverall(0); uploadOne(i+1);
+      };
+      xhr.onerror = function() { completed++; updateOverall(0); uploadOne(i+1); };
+      xhr.send(file);
+    }
+    uploadOne(0);
+  });
 }
 function previewEditProfilePhoto() {
   var file = document.getElementById('edit-profile-photo-file').files[0];
@@ -1532,6 +1672,34 @@ function captureUpdateLocation() {
     { enableHighAccuracy: true, timeout: 10000 }
   );
 }
+function regGoToStep(step) {
+  [1,2,3].forEach(function(s) {
+    document.getElementById('reg-step-'+s).classList.toggle('hidden', s !== step);
+    document.getElementById('reg-progress-'+s).style.background = (s <= step) ? 'var(--earth)' : 'var(--border)';
+  });
+  document.getElementById('reg-step-label').textContent = 'Step '+step+' of 3';
+}
+function switchAuthTab(tab) {
+  var loginPanel = document.getElementById('auth-panel-login');
+  var registerPanel = document.getElementById('auth-panel-register');
+  var loginTab = document.getElementById('auth-tab-login');
+  var registerTab = document.getElementById('auth-tab-register');
+  if (tab === 'login') {
+    loginPanel.classList.remove('hidden');
+    registerPanel.classList.add('hidden');
+    loginTab.style.background = 'var(--dark)';
+    loginTab.style.color = '#fff';
+    registerTab.style.background = 'transparent';
+    registerTab.style.color = 'var(--muted)';
+  } else {
+    registerPanel.classList.remove('hidden');
+    loginPanel.classList.add('hidden');
+    registerTab.style.background = 'var(--dark)';
+    registerTab.style.color = '#fff';
+    loginTab.style.background = 'transparent';
+    loginTab.style.color = 'var(--muted)';
+  }
+}
 async function sellerRegister() {
   var name = document.getElementById('reg-name').value.trim();
   var phone = document.getElementById('reg-phone').value.trim();
@@ -1543,6 +1711,8 @@ async function sellerRegister() {
   if (!name||!phone||!password) { showToast('Fill all fields'); return; }
   if (!document.getElementById('reg-lat').value) { showToast('Please capture your shop location first'); return; }
   if (password.length < 6) { showToast('Password must be 6+ characters'); return; }
+  var existingCheck = await db.from('traders').select('id').eq('phone',phone);
+  if (existingCheck.data && existingCheck.data.length > 0) { showToast('This phone number is already registered. Please login instead.'); return; }
   var regLat = document.getElementById('reg-lat').value || null;
   var regLng = document.getElementById('reg-lng').value || null;
   var fullLocation = location || state+', '+country;
@@ -1587,9 +1757,9 @@ async function sellerLogin() {
   var password = document.getElementById('login-password').value.trim();
   if (!phone||!password) { showToast('Enter phone and password'); return; }
   if (!db) { showToast('App still loading, please wait'); return; }
-  var result = await db.from('traders').select('*').eq('phone',phone).eq('password',password).single();
-  if (result.error||!result.data) { showToast('Wrong phone or password'); return; }
-  currentSeller = result.data;
+  var result = await db.from('traders').select('*').eq('phone',phone).eq('password',password).order('created_at',{ascending:false}).limit(1);
+  if (result.error || !result.data || result.data.length === 0) { showToast('Wrong phone or password'); return; }
+  currentSeller = result.data[0];
   localStorage.setItem('ojalive_seller', JSON.stringify(result.data));
   document.getElementById('seller-shop-name').textContent = result.data.full_name;
   sellerShowScreen('seller-dashboard');
@@ -1608,7 +1778,7 @@ async function loadSellerDashboard() {
   var listings = result.data || [];
   var activeCount = listings.filter(function(l){return l.verified!==false;}).length;
   document.getElementById('dashboard-listings-count').textContent = activeCount;
-  var total = listings.filter(function(l){return l.verified!==false;}).reduce(function(s,l){return s+Number(l.price);},0);
+  var total = listings.filter(function(l){return l.verified!==false;}).reduce(function(s,l){return s+(Number(l.price)*(l.stock?Number(l.stock):1));},0);
   document.getElementById('dashboard-total-value').textContent = '₦'+total.toLocaleString();
   var html = listings.map(function(item) {
     var pausedBadge = item.verified===false ? '<span style="font-size:10px;background:#FDF6E3;color:var(--amber);border:1px solid var(--amber);border-radius:4px;padding:1px 5px;margin-left:6px;">PAUSED</span>' : '';
@@ -1634,7 +1804,16 @@ function sellerAddListingScreen() {
   document.getElementById('add-item-unit').value='';
   document.getElementById('add-item-location').value=currentSeller.location;
   document.getElementById('add-item-location').style.display='none';
-  document.querySelector('label[for="add-item-location"]') && (document.querySelector('label[for="add-item-location"]').style.display='none');
+  document.getElementById('add-item-description').value='';
+  document.getElementById('add-item-stock').value='';
+  document.getElementById('add-show-phone').checked = true;
+  photoFiles.add = [];
+  document.getElementById('add-item-images').value = '';
+  document.getElementById('add-images-preview').innerHTML = '';
+  var addBgTools = document.getElementById('add-bg-tools');
+  if (addBgTools) addBgTools.style.display = 'none';
+  var addUploadProgress = document.getElementById('add-upload-progress');
+  if (addUploadProgress) addUploadProgress.style.display = 'none';
   sellerShowScreen('seller-add-listing');
 }
 async function getSellerGPS() {
@@ -1668,14 +1847,14 @@ async function sellerSaveNewListing() {
   if (!result.error) {
     var imgFiles = photoFiles.add;
     if (imgFiles.length > 0 && result.data && result.data[0]) {
-      showToast('Uploading photos...');
-      var urls = await uploadImages(imgFiles, result.data[0].id);
+      var urls = await uploadImagesWithProgress(imgFiles, result.data[0].id, 'add');
       if (urls.length > 0) {
         await db.from('Listing').update({image_url:JSON.stringify(urls)}).eq('id',result.data[0].id);
       }
     }
   }
   if (result.error) { showToast('Error: '+result.error.message); return; }
+  photoFiles.add = [];
   showToast('Item posted!');
   loadSellerDashboard();
   loadListings();
@@ -1691,6 +1870,14 @@ async function sellerEditListingScreen(id) {
   document.getElementById('edit-item-unit').value = item.unit;
   document.getElementById('edit-item-location').value = item.location;
   document.getElementById('edit-item-category').value = item.category;
+  document.getElementById('edit-item-description').value = item.description || '';
+  document.getElementById('edit-item-stock').value = item.stock || '';
+  photoFiles.edit = [];
+  document.getElementById('edit-item-images').value = '';
+  var editBgTools = document.getElementById('edit-bg-tools');
+  if (editBgTools) editBgTools.style.display = 'none';
+  var editUploadProgress = document.getElementById('edit-upload-progress');
+  if (editUploadProgress) editUploadProgress.style.display = 'none';
   var editPreview = document.getElementById('edit-images-preview');
   editPreview.innerHTML = '';
   if (item.image_url) {
@@ -1713,6 +1900,8 @@ async function sellerSaveEditListing() {
   var unit = document.getElementById('edit-item-unit').value.trim();
   var category = document.getElementById('edit-item-category').value;
   var location = document.getElementById('edit-item-location').value.trim();
+  var description = document.getElementById('edit-item-description').value.trim();
+  var stock = document.getElementById('edit-item-stock').value ? parseInt(document.getElementById('edit-item-stock').value) : null;
   if (!name||!price||!unit) { showToast('Fill all fields'); return; }
   if (!location) location = currentSeller.location || '';
   var oldItem = await db.from('Listing').select('price').eq('id',currentEditingListingId).single();
@@ -1720,19 +1909,19 @@ async function sellerSaveEditListing() {
   var changeDir = 'stable';
   if (oldPrice && price > oldPrice) changeDir = 'up';
   if (oldPrice && price < oldPrice) changeDir = 'down';
-  var result = await db.from('Listing').update({name:name,price:price,unit:unit,category:category,location:location,change:changeDir}).eq('id',currentEditingListingId);
+  var result = await db.from('Listing').update({name:name,price:price,unit:unit,category:category,location:location,change:changeDir,description:description,stock:stock}).eq('id',currentEditingListingId);
   if (result.error) { showToast('Error: '+result.error.message); return; }
   if (oldPrice && oldPrice !== price) {
     await db.from('price_history').insert([{listing_id:currentEditingListingId,old_price:oldPrice,new_price:price,trader:currentSeller.full_name,location:currentSeller.location}]);
   }
   var editImgFiles = photoFiles.edit;
   if (editImgFiles.length > 0) {
-    showToast('Uploading photos...');
-    var editUrls = await uploadImages(editImgFiles, currentEditingListingId);
+    var editUrls = await uploadImagesWithProgress(editImgFiles, currentEditingListingId, 'edit');
     if (editUrls.length > 0) {
       await db.from('Listing').update({image_url:JSON.stringify(editUrls)}).eq('id',currentEditingListingId);
     }
   }
+  photoFiles.edit = [];
   showToast('Item updated!');
   loadSellerDashboard();
   loadListings();
@@ -1775,13 +1964,29 @@ async function sellerItemDetail(id) {
   document.getElementById('detail-unit').textContent = 'per '+item.unit;
   document.getElementById('detail-location').textContent = '📍 '+item.location;
   document.getElementById('detail-trader').textContent = '🏪 '+item.trader;
+  var stockRow = document.getElementById('detail-stock-row');
+  if (item.stock) {
+    stockRow.style.display = 'block';
+    document.getElementById('detail-stock').textContent = item.stock+' in stock';
+  } else {
+    stockRow.style.display = 'none';
+  }
+  var descRow = document.getElementById('detail-desc-row');
+  if (item.description) {
+    descRow.style.display = 'block';
+    document.getElementById('detail-description').textContent = item.description;
+  } else {
+    descRow.style.display = 'none';
+  }
   document.getElementById('btn-detail-edit').onclick = function() { sellerEditListingScreen(id); };
   document.getElementById('btn-detail-delete').onclick = function() { sellerDeleteListing(); };
   var isPaused = item.verified === false;
   var pauseBtn = document.getElementById('btn-detail-pause');
-  pauseBtn.textContent = isPaused ? '▶️ Activate' : '⏸️ Pause';
+  var pauseIcon = isPaused
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+  pauseBtn.innerHTML = pauseIcon + (isPaused ? 'Activate' : 'Pause');
   pauseBtn.style.color = isPaused ? 'var(--green)' : 'var(--amber)';
-  pauseBtn.style.borderColor = isPaused ? 'var(--green)' : 'var(--amber)';
   pauseBtn.onclick = async function() {
     var newState = isPaused ? true : false;
     var r = await db.from('Listing').update({verified:newState}).eq('id',id);
@@ -1807,7 +2012,9 @@ async function sellerItemDetail(id) {
       latitude: gps.lat,
       longitude: gps.lng,
       phone: item.phone,
-      image_url: item.image_url
+      image_url: item.image_url,
+      stock: item.stock,
+      description: item.description
     }]);
     if (dupResult.error) { showToast('Error: '+dupResult.error.message); return; }
     showToast('Item duplicated! Edit to update details.');
@@ -1862,7 +2069,7 @@ async function sellerItemDetail(id) {
   listEl.innerHTML = reversedChanges.map(function(h) {
     var up = h.new_price > h.old_price;
     var arrow = up ? '▲' : '▼';
-    var color = up ? '#0ECB81' : '#F6465D';
+    var color = up ? '#2D7A4F' : '#C0392B';
     var ago = timeAgo(h.created_at);
     var dateStr = h.created_at ? new Date(h.created_at).toLocaleString('en-NG',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
     var pct = (up?'+':'')+((h.new_price-h.old_price)/h.old_price*100).toFixed(1)+'%';
@@ -1875,11 +2082,11 @@ async function sellerItemDetail(id) {
   var lowEver = Math.min.apply(null,allPrices);
   var summaryExtra = document.getElementById('chart-summary');
   if(summaryExtra){
-    var extraHtml = '<div style="display:flex;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid #2B2F36;">';
-    extraHtml += '<div style="flex:1;text-align:center;"><div style="font-size:10px;color:#848E9C;">AVG</div><div style="font-size:12px;font-weight:700;color:#fff;">₦'+Number(avg).toLocaleString()+'</div></div>';
-    extraHtml += '<div style="flex:1;text-align:center;"><div style="font-size:10px;color:#848E9C;">ALL TIME HIGH</div><div style="font-size:13px;font-weight:700;color:#0ECB81;">₦'+highEver.toLocaleString()+'</div></div>';
-    extraHtml += '<div style="flex:1;text-align:center;"><div style="font-size:10px;color:#848E9C;">ALL TIME LOW</div><div style="font-size:13px;font-weight:700;color:#F6465D;">₦'+lowEver.toLocaleString()+'</div></div>';
-    extraHtml += '<div style="flex:1;text-align:center;"><div style="font-size:10px;color:#848E9C;">CHANGES</div><div style="font-size:13px;font-weight:700;color:#fff;">'+changes.length+'x</div></div>';
+    var extraHtml = '<div style="display:flex;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">';
+    extraHtml += '<div style="flex:1;text-align:center;"><div style="font-size:10px;color:var(--muted);">AVG</div><div style="font-size:12px;font-weight:700;color:var(--dark);">₦'+Number(avg).toLocaleString()+'</div></div>';
+    extraHtml += '<div style="flex:1;text-align:center;"><div style="font-size:10px;color:var(--muted);">ALL TIME HIGH</div><div style="font-size:13px;font-weight:700;color:var(--green);">₦'+highEver.toLocaleString()+'</div></div>';
+    extraHtml += '<div style="flex:1;text-align:center;"><div style="font-size:10px;color:var(--muted);">ALL TIME LOW</div><div style="font-size:13px;font-weight:700;color:var(--red);">₦'+lowEver.toLocaleString()+'</div></div>';
+    extraHtml += '<div style="flex:1;text-align:center;"><div style="font-size:10px;color:var(--muted);">CHANGES</div><div style="font-size:13px;font-weight:700;color:var(--dark);">'+changes.length+'x</div></div>';
     extraHtml += '</div>';
     var existingExtra = document.getElementById('chart-stats-extra');
     if(existingExtra) existingExtra.remove();
@@ -1904,158 +2111,170 @@ function filterChartRange(range) {
   if (!filtered.length) filtered = all;
   drawDetailChart(filtered);
 }
-function drawDetailChart(changes) {
-  if (!changes || !changes.length) return;
-  var canvas = document.getElementById('detail-price-chart');
+var _EARTH_PALETTE = ['#C4612A','#2D7A4F','#B8894A','#8B5CF6','#C0392B','#3B82F6','#D4A017','#7A6A55'];
+function renderEarthLineChart(canvasId, prices, dates, opts){
+  opts = opts || {};
+  var canvas = document.getElementById(canvasId);
+  if(!canvas || !prices || prices.length < 2){ if(canvas) canvas.style.display='none'; return null; }
   canvas.style.display = 'block';
-  canvas.style.borderRadius = '12px';
+  var H = opts.height || 160;
   var W = canvas.offsetWidth || 320;
-  var H = 200;
   canvas.width = W; canvas.height = H;
-  var ctx = canvas.getContext('2d');
-  var prices = [Number(changes[0].old_price)].concat(changes.map(function(h){return Number(h.new_price);}));
-  var times = changes.map(function(h){return timeAgo2(h.created_at);});
-  function timeAgo2(ts){
-    if(!ts)return '';
-    var diff=Math.floor((Date.now()-new Date(ts).getTime())/1000);
-    if(diff<60)return diff+'s';
-    if(diff<3600)return Math.floor(diff/60)+'m';
-    if(diff<86400)return Math.floor(diff/3600)+'h';
-    if(diff<604800)return Math.floor(diff/86400)+'d';
-    return Math.floor(diff/604800)+'w';
+  canvas._chartPrices = prices;
+  canvas._chartDates = dates || [];
+  canvas._chartIsUp = prices[prices.length-1] >= prices[0];
+  canvas._chartCrosshairIdx = null;
+  _drawEarthLineChart(canvas);
+  _bindEarthChartDrag(canvas);
+  var last=prices[prices.length-1], first=prices[0];
+  if(opts.summaryEl){
+    var lc = canvas._chartIsUp ? '#2D7A4F' : '#C0392B';
+    var pct = ((last-first)/first*100).toFixed(1);
+    document.getElementById(opts.summaryEl).innerHTML = '<span style="font-weight:800;color:'+lc+';">₦'+last.toLocaleString()+'</span><span style="color:'+lc+';">'+(last>=first?'+':'')+pct+'% overall</span>';
   }
-  var isUp = prices[prices.length-1] >= prices[0];
-  var lineColor = isUp ? '#0ECB81' : '#F6465D';
-  var gradTop = isUp ? 'rgba(14,203,129,0.3)' : 'rgba(246,70,93,0.3)';
-  var isSellerView = true;
-  ctx.fillStyle = '#1E2026';
-  ctx.fillRect(0,0,W,H);
-  var min = Math.min.apply(null,prices)*0.999;
-  var max = Math.max.apply(null,prices)*1.001;
-  var padL=58,padR=12,padT=20,padB=28;
-  var range = max-min||1;
-  function px(i){ return padL+(i/(prices.length-1||1))*(W-padL-padR); }
-  function py(v){ return H-padB-((v-min)/range)*(H-padT-padB); }
-  ctx.setLineDash([2,4]);
-  ctx.lineWidth=1;
-  [0,0.25,0.5,0.75,1].forEach(function(t){
-    var yy=H-padB-t*(H-padT-padB);
-    ctx.strokeStyle='#2B2F36';
-    ctx.beginPath();ctx.moveTo(padL,yy);ctx.lineTo(W-padR,yy);ctx.stroke();
-    ctx.fillStyle='#848E9C';ctx.font='9px sans-serif';ctx.textAlign='right';
-    ctx.fillText('₦'+(min+t*range).toLocaleString('en',{maximumFractionDigits:0}),padL-4,yy+3);
+  return { last:last, first:first, high:Math.max.apply(null,prices), low:Math.min.apply(null,prices), pctChange:((last-first)/first*100) };
+}
+function _drawEarthLineChart(canvas){
+  var prices=canvas._chartPrices, isUp=canvas._chartIsUp;
+  var W=canvas.width,H=canvas.height;
+  var ctx=canvas.getContext('2d');
+  var lc=isUp?'#2D7A4F':'#C0392B';
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#FEFCF8';ctx.fillRect(0,0,W,H);
+  var mn=Math.min.apply(null,prices)*0.999,mx=Math.max.apply(null,prices)*1.001;
+  var pL=52,pR=10,pT=16,pB=22,rng=mx-mn||1;
+  function bpx(i){return pL+(i/(prices.length-1||1))*(W-pL-pR);}
+  function bpy(v){return H-pB-((v-mn)/rng)*(H-pT-pB);}
+  ctx.setLineDash([2,4]);ctx.lineWidth=1;
+  [0,0.5,1].forEach(function(t){
+    var yy=H-pB-t*(H-pT-pB);
+    ctx.strokeStyle='#E8DFD0';ctx.beginPath();ctx.moveTo(pL,yy);ctx.lineTo(W-pR,yy);ctx.stroke();
+    ctx.fillStyle='#7A6A55';ctx.font='9px sans-serif';ctx.textAlign='right';
+    ctx.fillText('₦'+(mn+t*rng).toLocaleString('en',{maximumFractionDigits:0}),pL-3,yy+3);
   });
   ctx.setLineDash([]);
-  ctx.beginPath();
-  ctx.moveTo(px(0),py(prices[0]));
-  for(var i=1;i<prices.length;i++){
-    var cpx=(px(i-1)+px(i))/2;
-    ctx.bezierCurveTo(cpx,py(prices[i-1]),cpx,py(prices[i]),px(i),py(prices[i]));
+  ctx.beginPath();ctx.moveTo(bpx(0),bpy(prices[0]));
+  for(var i=1;i<prices.length;i++){var cpx=(bpx(i-1)+bpx(i))/2;ctx.bezierCurveTo(cpx,bpy(prices[i-1]),cpx,bpy(prices[i]),bpx(i),bpy(prices[i]));}
+  var gr=ctx.createLinearGradient(0,pT,0,H-pB);
+  gr.addColorStop(0,isUp?'rgba(45,122,79,0.16)':'rgba(192,57,43,0.16)');gr.addColorStop(1,'rgba(254,252,248,0)');
+  ctx.lineTo(bpx(prices.length-1),H-pB);ctx.lineTo(bpx(0),H-pB);ctx.closePath();ctx.fillStyle=gr;ctx.fill();
+  ctx.beginPath();ctx.moveTo(bpx(0),bpy(prices[0]));
+  for(var i=1;i<prices.length;i++){var cpx=(bpx(i-1)+bpx(i))/2;ctx.bezierCurveTo(cpx,bpy(prices[i-1]),cpx,bpy(prices[i]),bpx(i),bpy(prices[i]));}
+  ctx.strokeStyle=lc;ctx.lineWidth=2;ctx.stroke();
+  prices.forEach(function(p,i){ctx.beginPath();ctx.arc(bpx(i),bpy(p),i===prices.length-1?4:2.5,0,Math.PI*2);ctx.fillStyle=lc;ctx.fill();});
+  ctx.save();
+  ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();
+  ctx.globalAlpha=0.09;ctx.fillStyle='#C4612A';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+  var stepX=80, stepY=44;
+  for(var yy2=-stepY; yy2<H+stepY; yy2+=stepY){
+    for(var xx2=-stepX; xx2<W+stepX; xx2+=stepX){
+      ctx.save();ctx.translate(xx2,yy2);ctx.rotate(-20*Math.PI/180);ctx.fillText('OjaLive',0,0);ctx.restore();
+    }
   }
-  var grad=ctx.createLinearGradient(0,padT,0,H-padB);
-  grad.addColorStop(0,gradTop);
-  grad.addColorStop(1,'rgba(30,32,38,0)');
-  ctx.lineTo(px(prices.length-1),H-padB);
-  ctx.lineTo(px(0),H-padB);
-  ctx.closePath();
-  ctx.fillStyle=grad;ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(px(0),py(prices[0]));
-  for(var i=1;i<prices.length;i++){
-    var cpx=(px(i-1)+px(i))/2;
-    ctx.bezierCurveTo(cpx,py(prices[i-1]),cpx,py(prices[i]),px(i),py(prices[i]));
-  }
-  ctx.strokeStyle=lineColor;ctx.lineWidth=2;ctx.stroke();
-  prices.forEach(function(p,i){
-    ctx.beginPath();ctx.arc(px(i),py(p),i===prices.length-1?5:3,0,Math.PI*2);
-    ctx.fillStyle=lineColor;ctx.fill();
-  });
-  var last=prices[prices.length-1];
-  var first=prices[0];
-  var pctChange=((last-first)/first*100).toFixed(2);
-  var pctSign=last>=first?'+':'';
-  var high=Math.max.apply(null,prices);
-  var low2=Math.min.apply(null,prices);
-  var summary=document.getElementById('chart-summary');
-  if(summary){
-    summary.style.display='block';
-    document.getElementById('chart-current-price').textContent='₦'+last.toLocaleString();
-    document.getElementById('chart-current-price').style.color=lineColor;
-    var chEl=document.getElementById('chart-change');
-    chEl.textContent=pctSign+pctChange+'% overall';
-    chEl.style.color=lineColor;
-    document.getElementById('chart-high').textContent='₦'+high.toLocaleString();
-    document.getElementById('chart-low').textContent='₦'+low2.toLocaleString();
-  }
-  times.forEach(function(t,i){
-    if(i===0)return;
-    ctx.fillStyle='#848E9C';ctx.font='9px sans-serif';ctx.textAlign='center';
-    ctx.fillText(t,px(i),H-padB+12);
-  });
-  canvas.ontouchstart=function(e){
-    e.preventDefault();
-    var rect=canvas.getBoundingClientRect();
-    var touchX=e.touches[0].clientX-rect.left;
-    var scaleX=W/rect.width;
-    var tx=touchX*scaleX;
-    var idx=Math.round((tx-padL)/(W-padL-padR)*(prices.length-1));
-    idx=Math.max(0,Math.min(prices.length-1,idx));
-    var tp=prices[idx];
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#1E2026';ctx.fillRect(0,0,W,H);
-    ctx.setLineDash([2,4]);ctx.lineWidth=1;
-    [0,0.25,0.5,0.75,1].forEach(function(t){
-      var yy=H-padB-t*(H-padT-padB);
-      ctx.strokeStyle='#2B2F36';
-      ctx.beginPath();ctx.moveTo(padL,yy);ctx.lineTo(W-padR,yy);ctx.stroke();
-      ctx.fillStyle='#848E9C';ctx.font='9px sans-serif';ctx.textAlign='right';
-      ctx.fillText('₦'+(min+t*range).toLocaleString('en',{maximumFractionDigits:0}),padL-4,yy+3);
-    });
+  ctx.restore();ctx.globalAlpha=1;
+  if(canvas._chartCrosshairIdx !== null){
+    var idx=Math.max(0,Math.min(prices.length-1,canvas._chartCrosshairIdx));
+    var cx=bpx(idx), cy=bpy(prices[idx]);
+    ctx.save();
+    ctx.strokeStyle='#C4612A';ctx.setLineDash([3,3]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(cx,pT);ctx.lineTo(cx,H-pB);ctx.stroke();
     ctx.setLineDash([]);
-    ctx.beginPath();ctx.moveTo(px(0),py(prices[0]));
-    for(var i=1;i<prices.length;i++){var cpx=(px(i-1)+px(i))/2;ctx.bezierCurveTo(cpx,py(prices[i-1]),cpx,py(prices[i]),px(i),py(prices[i]));}
-    ctx.strokeStyle=lineColor;ctx.lineWidth=2;ctx.stroke();
-    ctx.setLineDash([3,3]);
-    ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.globalAlpha=0.5;
-    ctx.beginPath();ctx.moveTo(px(idx),padT);ctx.lineTo(px(idx),H-padB);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(padL,py(tp));ctx.lineTo(W-padR,py(tp));ctx.stroke();
-    ctx.setLineDash([]);ctx.globalAlpha=1;
-    ctx.beginPath();ctx.arc(px(idx),py(tp),5,0,Math.PI*2);
-    ctx.fillStyle=lineColor;ctx.fill();
-    var tooltipTime = idx===0 ? 'now' : (times[idx-1]?times[idx-1]+' ago':'now');
-    var tooltipText = '₦'+tp.toLocaleString();
-    var tooltipW = 120;
-    var tooltipH = 38;
-    var tooltipX = Math.min(Math.max(px(idx)-tooltipW/2, padL), W-padR-tooltipW);
-    var tooltipY = py(tp) < padT+50 ? py(tp)+12 : py(tp)-tooltipH-8;
-    ctx.fillStyle='rgba(15,15,20,0.97)';
-    ctx.strokeStyle=lineColor;ctx.lineWidth=1.5;
-    ctx.beginPath();
-    if(ctx.roundRect){ctx.roundRect(tooltipX,tooltipY,tooltipW,tooltipH,6);}
-    else{ctx.rect(tooltipX,tooltipY,tooltipW,tooltipH);}
-    ctx.fill();ctx.stroke();
-    ctx.fillStyle='#FFFFFF';ctx.font='bold 13px sans-serif';ctx.textAlign='center';
-    ctx.fillText(tooltipText,tooltipX+tooltipW/2,tooltipY+16);
-    ctx.fillStyle='#E0E0E0';ctx.font='bold 11px sans-serif';
-    ctx.fillText(tooltipTime,tooltipX+tooltipW/2,tooltipY+30);
-    ctx.globalAlpha=0.1;ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';
-    wRows.forEach(function(wy){wCols.forEach(function(wx){ctx.save();ctx.translate(wx,wy);ctx.rotate(-20*Math.PI/180);ctx.fillText('OjaLive',0,0);ctx.restore();});});
-    ctx.globalAlpha=1;
-  };
-  ctx.globalAlpha=0.1;
-  ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';ctx.textAlign='center';
-  var wRows=[H*0.25,H*0.5,H*0.75];
-  var wCols=[W*0.25,W*0.5,W*0.75];
-  wRows.forEach(function(wy){
-    wCols.forEach(function(wx){
-      ctx.save();
-      ctx.translate(wx,wy);
-      ctx.rotate(-20*Math.PI/180);
-      ctx.fillText('OjaLive',0,0);
-      ctx.restore();
-    });
+    ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fillStyle=lc;ctx.fill();ctx.strokeStyle='#FEFCF8';ctx.lineWidth=2;ctx.stroke();
+    var dates=canvas._chartDates||[];
+    var dLabel=dates[idx]||'';
+    var pLabel='₦'+Math.round(prices[idx]).toLocaleString();
+    ctx.font='bold 10px sans-serif';
+    var tw=Math.max(ctx.measureText(pLabel).width, dLabel?ctx.measureText(dLabel).width:0)+14;
+    var th=dLabel?30:18;
+    var tx=Math.min(Math.max(cx-tw/2,pL),W-pR-tw);
+    var ty=cy>pT+th+6?cy-th-8:cy+10;
+    ctx.fillStyle='#1A1208';ctx.fillRect(tx,ty,tw,th);
+    ctx.fillStyle='#fff';ctx.textAlign='center';
+    ctx.fillText(pLabel,tx+tw/2,ty+13);
+    if(dLabel){ctx.font='9px sans-serif';ctx.fillStyle='#C4B8A3';ctx.fillText(dLabel,tx+tw/2,ty+25);}
+    ctx.restore();
+  }
+}
+function _bindEarthChartDrag(canvas){
+  if(canvas._chartDragBound) return;
+  canvas._chartDragBound = true;
+  var dragging=false;
+  function pos(e){var t=e.touches?e.touches[0]:e;var r=canvas.getBoundingClientRect();return {x:t.clientX-r.left};}
+  function idxFromX(x){
+    var W=canvas.width,pL=52,pR=10;
+    var ratio=(x-pL)/(W-pL-pR);
+    return Math.round(ratio*((canvas._chartPrices?canvas._chartPrices.length:1)-1));
+  }
+  function down(e){dragging=true;canvas._chartCrosshairIdx=idxFromX(pos(e).x);_drawEarthLineChart(canvas);}
+  function move(e){if(!dragging)return;if(e.cancelable)e.preventDefault();canvas._chartCrosshairIdx=idxFromX(pos(e).x);_drawEarthLineChart(canvas);}
+  function up(){dragging=false;canvas._chartCrosshairIdx=null;_drawEarthLineChart(canvas);}
+  canvas.style.cursor='crosshair';
+  canvas.addEventListener('mousedown',down);canvas.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
+  canvas.addEventListener('touchstart',down,{passive:true});canvas.addEventListener('touchmove',move,{passive:false});canvas.addEventListener('touchend',up);
+}
+function renderEarthPieChart(canvasId, dataMap, opts){
+  opts=opts||{};
+  var canvas=document.getElementById(canvasId);
+  var keys=Object.keys(dataMap);
+  if(!canvas||!keys.length){if(canvas)canvas.style.display='none';return;}
+  canvas.style.display='block';
+  var H=opts.height||200;
+  var W=canvas.offsetWidth||320;
+  canvas.width=W;canvas.height=H;
+  var ctx=canvas.getContext('2d');
+  ctx.fillStyle='#FEFCF8';ctx.fillRect(0,0,W,H);
+  var total=keys.reduce(function(s,k){return s+dataMap[k];},0);
+  var cx=W*0.36, cy=H/2, r=Math.min(cx,cy)*0.8;
+  var start=-Math.PI/2;
+  keys.forEach(function(k,i){
+    var slice=(dataMap[k]/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,start,start+slice);ctx.closePath();
+    ctx.fillStyle=_EARTH_PALETTE[i%_EARTH_PALETTE.length];ctx.fill();
+    ctx.strokeStyle='#FEFCF8';ctx.lineWidth=2;ctx.stroke();
+    start+=slice;
   });
-  ctx.globalAlpha=1;
+  ctx.beginPath();ctx.arc(cx,cy,r*0.55,0,Math.PI*2);ctx.fillStyle='#FEFCF8';ctx.fill();
+  var lx=W*0.66, ly=H*0.14;
+  keys.forEach(function(k,i){
+    if(i>5)return;
+    ctx.fillStyle=_EARTH_PALETTE[i%_EARTH_PALETTE.length];
+    ctx.fillRect(lx,ly+i*24,10,10);
+    ctx.fillStyle='#1A1208';ctx.font='10px sans-serif';ctx.textAlign='left';
+    var short=k.length>13?k.substring(0,13)+'…':k;
+    ctx.fillText(short+' '+Math.round(dataMap[k]/total*100)+'%',lx+14,ly+i*24+9);
+  });
+  ctx.save();
+  ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();
+  ctx.globalAlpha=0.08;ctx.fillStyle='#C4612A';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+  [[W*0.2,H*0.25],[W*0.45,H*0.75],[W*0.15,H*0.7]].forEach(function(p){ctx.save();ctx.translate(p[0],p[1]);ctx.rotate(-20*Math.PI/180);ctx.fillText('OjaLive',0,0);ctx.restore();});
+  ctx.restore();ctx.globalAlpha=1;
+}
+function drawDetailChart(changes) {
+  if (!changes || !changes.length) return;
+  var prices = [Number(changes[0].old_price)].concat(changes.map(function(h){return Number(h.new_price);}));
+  var dates = [null].concat(changes.map(function(h){
+    if(!h.created_at) return null;
+    var diff=Math.floor((Date.now()-new Date(h.created_at).getTime())/1000);
+    if(diff<60)return diff+'s ago';
+    if(diff<3600)return Math.floor(diff/60)+'m ago';
+    if(diff<86400)return Math.floor(diff/3600)+'h ago';
+    if(diff<604800)return Math.floor(diff/86400)+'d ago';
+    return Math.floor(diff/604800)+'w ago';
+  }));
+  var stats = renderEarthLineChart('detail-price-chart', prices, dates, {height:200});
+  if(!stats) return;
+  var lc = stats.last >= stats.first ? '#2D7A4F' : '#C0392B';
+  var summary = document.getElementById('chart-summary');
+  if(summary){
+    summary.style.display = 'block';
+    document.getElementById('chart-current-price').textContent = '₦'+stats.last.toLocaleString();
+    document.getElementById('chart-current-price').style.color = lc;
+    var chEl = document.getElementById('chart-change');
+    chEl.textContent = (stats.pctChange>=0?'+':'')+stats.pctChange.toFixed(2)+'% overall';
+    chEl.style.color = lc;
+    document.getElementById('chart-high').textContent = '₦'+stats.high.toLocaleString();
+    document.getElementById('chart-low').textContent = '₦'+stats.low.toLocaleString();
+  }
 }
 async function sellerPriceHistoryScreen() {
   sellerShowScreen('seller-price-history');
@@ -2081,7 +2300,7 @@ async function sellerPriceHistoryScreen() {
   listEl.innerHTML = changes.map(function(h) {
     var up = h.new_price > h.old_price;
     var arrow = up ? '▲' : '▼';
-    var color = up ? '#0ECB81' : '#F6465D';
+    var color = up ? '#2D7A4F' : '#C0392B';
     var pct = (up?'+':'')+((h.new_price-h.old_price)/h.old_price*100).toFixed(1)+'%';
     var itemName = namesMap[h.listing_id] || 'Item #'+h.listing_id;
     var ago = '';
@@ -2103,86 +2322,13 @@ async function renderPriceChart() {
   }
   if(empty2) empty2.style.display='none';
   if(canvas2) {
-    canvas2.style.display='block';
-    canvas2.style.borderRadius='12px';
     var prices2=[Number(changes[0].old_price)].concat(changes.map(function(h){return Number(h.new_price);}));
-    var times2=changes.map(function(h){if(!h.created_at)return'';var d=Math.floor((Date.now()-new Date(h.created_at).getTime())/1000);return d<60?d+'s':d<3600?Math.floor(d/60)+'m':d<86400?Math.floor(d/3600)+'h':Math.floor(d/86400)+'d';});
-    var W2=canvas2.offsetWidth||320,H2=200;
-    canvas2.width=W2;canvas2.height=H2;
-    var ctx2=canvas2.getContext('2d');
-    var isUp2=prices2[prices2.length-1]>=prices2[0];
-    var lc2=isUp2?'#0ECB81':'#F6465D';
-    ctx2.fillStyle='#1E2026';ctx2.fillRect(0,0,W2,H2);
-    var mn2=Math.min.apply(null,prices2)*0.999,mx2=Math.max.apply(null,prices2)*1.001;
-    var pL2=55,pR2=10,pT2=20,pB2=28,rng2=mx2-mn2||1;
-    function px2(i){return pL2+(i/(prices2.length-1||1))*(W2-pL2-pR2);}
-    function py2(v){return H2-pB2-((v-mn2)/rng2)*(H2-pT2-pB2);}
-    ctx2.setLineDash([2,4]);ctx2.lineWidth=1;
-    [0,0.25,0.5,0.75,1].forEach(function(t){
-      var yy=H2-pB2-t*(H2-pT2-pB2);
-      ctx2.strokeStyle='#2B2F36';ctx2.beginPath();ctx2.moveTo(pL2,yy);ctx2.lineTo(W2-pR2,yy);ctx2.stroke();
-      ctx2.fillStyle='#848E9C';ctx2.font='9px sans-serif';ctx2.textAlign='right';
-      ctx2.fillText('₦'+(mn2+t*rng2).toLocaleString('en',{maximumFractionDigits:0}),pL2-3,yy+3);
-    });
-    ctx2.setLineDash([]);
-    ctx2.beginPath();ctx2.moveTo(px2(0),py2(prices2[0]));
-    for(var i=1;i<prices2.length;i++){var cpx2=(px2(i-1)+px2(i))/2;ctx2.bezierCurveTo(cpx2,py2(prices2[i-1]),cpx2,py2(prices2[i]),px2(i),py2(prices2[i]));}
-    var gr2=ctx2.createLinearGradient(0,pT2,0,H2-pB2);
-    gr2.addColorStop(0,isUp2?'rgba(14,203,129,0.3)':'rgba(246,70,93,0.3)');gr2.addColorStop(1,'rgba(30,32,38,0)');
-    ctx2.lineTo(px2(prices2.length-1),H2-pB2);ctx2.lineTo(px2(0),H2-pB2);ctx2.closePath();ctx2.fillStyle=gr2;ctx2.fill();
-    ctx2.beginPath();ctx2.moveTo(px2(0),py2(prices2[0]));
-    for(var i=1;i<prices2.length;i++){var cpx2=(px2(i-1)+px2(i))/2;ctx2.bezierCurveTo(cpx2,py2(prices2[i-1]),cpx2,py2(prices2[i]),px2(i),py2(prices2[i]));}
-    ctx2.strokeStyle=lc2;ctx2.lineWidth=2;ctx2.stroke();
-    prices2.forEach(function(p,i){ctx2.beginPath();ctx2.arc(px2(i),py2(p),i===prices2.length-1?5:3,0,Math.PI*2);ctx2.fillStyle=lc2;ctx2.fill();});
-    var last2=prices2[prices2.length-1];
-    ctx2.fillStyle=lc2;ctx2.font='bold 12px sans-serif';ctx2.textAlign='left';
-    ctx2.fillText('₦'+last2.toLocaleString(),pL2,pT2-4);
-    var pct2=((last2-prices2[0])/prices2[0]*100).toFixed(1);
-    ctx2.fillStyle=lc2;ctx2.font='11px sans-serif';
-    ctx2.fillText((last2>=prices2[0]?'+':'')+pct2+'%',pL2+80,pT2-4);
-    var wRows2=[H2*0.25,H2*0.5,H2*0.75];
-    var wCols2=[W2*0.2,W2*0.5,W2*0.8];
-    ctx2.globalAlpha=0.08;ctx2.fillStyle='#fff';ctx2.font='bold 13px sans-serif';ctx2.textAlign='center';
-    wRows2.forEach(function(wy){wCols2.forEach(function(wx){ctx2.save();ctx2.translate(wx,wy);ctx2.rotate(-20*Math.PI/180);ctx2.fillText('OjaLive',0,0);ctx2.restore();});});
-    ctx2.globalAlpha=1;
-    canvas2.ontouchstart=function(e){
-      e.preventDefault();
-      var rect=canvas2.getBoundingClientRect();
-      var tx=(e.touches[0].clientX-rect.left)*(W2/rect.width);
-      var idx=Math.round((tx-pL2)/(W2-pL2-pR2)*(prices2.length-1));
-      idx=Math.max(0,Math.min(prices2.length-1,idx));
-      var tp=prices2[idx];
-      ctx2.clearRect(0,0,W2,H2);
-      ctx2.fillStyle='#1E2026';ctx2.fillRect(0,0,W2,H2);
-      ctx2.setLineDash([2,4]);ctx2.lineWidth=1;
-      [0,0.25,0.5,0.75,1].forEach(function(t){
-        var yy=H2-pB2-t*(H2-pT2-pB2);
-        ctx2.strokeStyle='#2B2F36';ctx2.beginPath();ctx2.moveTo(pL2,yy);ctx2.lineTo(W2-pR2,yy);ctx2.stroke();
-        ctx2.fillStyle='#848E9C';ctx2.font='9px sans-serif';ctx2.textAlign='right';
-        ctx2.fillText('₦'+(mn2+t*rng2).toLocaleString('en',{maximumFractionDigits:0}),pL2-3,yy+3);
-      });
-      ctx2.setLineDash([]);
-      ctx2.beginPath();ctx2.moveTo(px2(0),py2(prices2[0]));
-      for(var i=1;i<prices2.length;i++){var cpx2=(px2(i-1)+px2(i))/2;ctx2.bezierCurveTo(cpx2,py2(prices2[i-1]),cpx2,py2(prices2[i]),px2(i),py2(prices2[i]));}
-      ctx2.strokeStyle=lc2;ctx2.lineWidth=2;ctx2.stroke();
-      ctx2.setLineDash([3,3]);ctx2.strokeStyle='rgba(255,255,255,0.5)';ctx2.lineWidth=1;
-      ctx2.beginPath();ctx2.moveTo(px2(idx),pT2);ctx2.lineTo(px2(idx),H2-pB2);ctx2.stroke();
-      ctx2.beginPath();ctx2.moveTo(pL2,py2(tp));ctx2.lineTo(W2-pR2,py2(tp));ctx2.stroke();
-      ctx2.setLineDash([]);
-      ctx2.beginPath();ctx2.arc(px2(idx),py2(tp),5,0,Math.PI*2);ctx2.fillStyle=lc2;ctx2.fill();
-      var tLabel=idx===0?'start':(times2[idx-1]||'');
-      var ttW=115,ttH=36;
-      var ttX=Math.min(Math.max(px2(idx)-ttW/2,pL2),W2-pR2-ttW);
-      var ttY=py2(tp)<pT2+50?py2(tp)+10:py2(tp)-ttH-8;
-      ctx2.fillStyle='rgba(15,15,20,0.97)';ctx2.strokeStyle=lc2;ctx2.lineWidth=1.5;
-      ctx2.beginPath();if(ctx2.roundRect)ctx2.roundRect(ttX,ttY,ttW,ttH,6);else ctx2.rect(ttX,ttY,ttW,ttH);
-      ctx2.fill();ctx2.stroke();
-      ctx2.fillStyle='#fff';ctx2.font='bold 12px sans-serif';ctx2.textAlign='center';
-      ctx2.fillText('₦'+tp.toLocaleString(),ttX+ttW/2,ttY+14);
-      ctx2.fillStyle='#E0E0E0';ctx2.font='bold 10px sans-serif';
-      ctx2.fillText(tLabel?tLabel+' ago':'now',ttX+ttW/2,ttY+28);
-      wRows2.forEach(function(wy){wCols2.forEach(function(wx){ctx2.save();ctx2.globalAlpha=0.08;ctx2.fillStyle='#fff';ctx2.font='bold 13px sans-serif';ctx2.translate(wx,wy);ctx2.rotate(-20*Math.PI/180);ctx2.fillText('OjaLive',0,0);ctx2.restore();});});
-    };
+    var dates2=[null].concat(changes.map(function(h){
+      if(!h.created_at)return null;
+      var d=Math.floor((Date.now()-new Date(h.created_at).getTime())/1000);
+      return d<60?d+'s ago':d<3600?Math.floor(d/60)+'m ago':d<86400?Math.floor(d/3600)+'h ago':Math.floor(d/86400)+'d ago';
+    }));
+    renderEarthLineChart('price-chart', prices2, dates2, {height:200});
   }
   return;
   var canvas = document.getElementById('price-chart');
@@ -2258,6 +2404,16 @@ function sellerProfileScreen() {
   }
   var hoursEl = document.getElementById('profile-opening-hours');
   if (hoursEl) hoursEl.textContent = currentSeller.opening_hours || 'Not set';
+  var statusBadge = document.getElementById('profile-status-badge');
+  if (statusBadge) {
+    if (currentSeller.status === 'approved') {
+      statusBadge.innerHTML = '<span class="spill">✔ Active Seller</span>';
+    } else if (currentSeller.status === 'rejected') {
+      statusBadge.innerHTML = '<span class="spill" style="background:#FDECEA;color:var(--red);">✕ Not Approved</span>';
+    } else {
+      statusBadge.innerHTML = '<span class="spill" style="background:#FDF6E3;color:var(--amber);">⏳ Pending Review</span>';
+    }
+  }
   var photoEl = document.getElementById('profile-photo');
   if (photoEl) {
     if (currentSeller.photo_url) {
@@ -2343,7 +2499,7 @@ async function sellerStatisticsScreen() {
   var listings = result.data || [];
   var active = listings.filter(function(l){return l.verified!==false;});
   var paused = listings.filter(function(l){return l.verified===false;});
-  var total = active.reduce(function(s,l){return s+Number(l.price);},0);
+  var total = active.reduce(function(s,l){return s+(Number(l.price)*(l.stock?Number(l.stock):1));},0);
   var highest = listings.reduce(function(a,b){return Number(a.price)>Number(b.price)?a:b},{price:0});
   var lowest = active.length?active.reduce(function(a,b){return Number(a.price)<Number(b.price)?a:b},active[0]):{name:'-',price:0};
   document.getElementById('stats-active-items').textContent = active.length;
@@ -2356,124 +2512,27 @@ async function sellerStatisticsScreen() {
   listings.forEach(function(l){catMap[l.category]=(catMap[l.category]||0)+1;});
   var cats = Object.keys(catMap).sort(function(a,b){return catMap[b]-catMap[a];});
   var pieCanvas = document.getElementById('stats-pie-chart');
-  var pieColors = ['#C55A11','#0ECB81','#F6465D','#3B82F6','#F59E0B','#8B5CF6','#EC4899','#14B8A6'];
   if (cats.length > 0 && pieCanvas) {
-    pieCanvas.style.display = 'block';
-    var PW = pieCanvas.offsetWidth||320, PH = 200;
-    pieCanvas.width = PW; pieCanvas.height = PH;
-    var pctx = pieCanvas.getContext('2d');
-    pctx.fillStyle = '#1E2026'; pctx.fillRect(0,0,PW,PH);
-    var cx = PW*0.38, cy = PH/2, pr = Math.min(cx,cy)*0.85;
-    var total2 = listings.length;
-    var startAngle = -Math.PI/2;
-    cats.forEach(function(c,i){
-      var slice = (catMap[c]/total2)*Math.PI*2;
-      pctx.beginPath();
-      pctx.moveTo(cx,cy);
-      pctx.arc(cx,cy,pr,startAngle,startAngle+slice);
-      pctx.closePath();
-      pctx.fillStyle = pieColors[i%pieColors.length];
-      pctx.fill();
-      pctx.strokeStyle = '#1E2026'; pctx.lineWidth = 2; pctx.stroke();
-      startAngle += slice;
-    });
-    pctx.beginPath(); pctx.arc(cx,cy,pr*0.5,0,Math.PI*2);
-    pctx.fillStyle='#1E2026'; pctx.fill();
-    var lx = PW*0.68, ly = PH*0.15;
-    cats.forEach(function(c,i){
-      if(i>5)return;
-      pctx.fillStyle=pieColors[i%pieColors.length];
-      pctx.fillRect(lx,ly+i*26,12,12);
-      pctx.fillStyle='#fff'; pctx.font='10px sans-serif'; pctx.textAlign='left';
-      var short = c.length>12?c.substring(0,12)+'..':c;
-      pctx.fillText(short+' '+Math.round(catMap[c]/total2*100)+'%',lx+16,ly+i*26+10);
-    });
-    pctx.globalAlpha=0.08; pctx.fillStyle='#fff'; pctx.font='bold 13px sans-serif'; pctx.textAlign='center';
-    [[PW*0.3,PH*0.3],[PW*0.6,PH*0.6],[PW*0.15,PH*0.65]].forEach(function(pos){
-      pctx.save();pctx.translate(pos[0],pos[1]);pctx.rotate(-20*Math.PI/180);pctx.fillText('OjaLive',0,0);pctx.restore();
-    });
-    pctx.globalAlpha=1;
+    renderEarthPieChart('stats-pie-chart', catMap, {height:200});
+  } else if (pieCanvas) {
+    pieCanvas.style.display = 'none';
   }
   document.getElementById('stats-categories').innerHTML = cats.length ? cats.map(function(c,i){
     var pct = Math.round(catMap[c]/listings.length*100);
-    return '<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:'+pieColors[i%pieColors.length]+';display:inline-block;"></span><b>'+c+'</b></span><span>'+catMap[c]+' items ('+pct+'%)</span></div><div style="background:#f0f0f0;border-radius:6px;height:8px;"><div style="background:'+pieColors[i%pieColors.length]+';border-radius:6px;height:8px;width:'+pct+'%;"></div></div></div>';
+    var col = _EARTH_PALETTE[i%_EARTH_PALETTE.length];
+    return '<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:'+col+';display:inline-block;"></span><b>'+c+'</b></span><span>'+catMap[c]+' items ('+pct+'%)</span></div><div style="background:var(--border);border-radius:6px;height:8px;"><div style="background:'+col+';border-radius:6px;height:8px;width:'+pct+'%;"></div></div></div>';
   }).join('') : '<div class="empty">No categories yet</div>';
   var sortedByPrice = listings.slice().sort(function(a,b){return Number(b.price)-Number(a.price);});
-  document.getElementById('stats-items-list').innerHTML = sortedByPrice.length ? '<div style="margin-bottom:10px;padding:10px;background:#FDF6E3;border-radius:10px;"><div style="font-size:11px;color:var(--amber);font-weight:700;">HIGHEST PRICE</div><div style="font-size:15px;font-weight:800;color:var(--dark);">'+highest.name+'</div><div style="font-size:13px;color:var(--earth);">₦'+Number(highest.price).toLocaleString()+' per '+highest.unit+'</div></div><div style="margin-bottom:10px;padding:10px;background:#E8F5EE;border-radius:10px;"><div style="font-size:11px;color:var(--green);font-weight:700;">LOWEST PRICE</div><div style="font-size:15px;font-weight:800;color:var(--dark);">'+lowest.name+'</div><div style="font-size:13px;color:var(--green);">₦'+Number(lowest.price).toLocaleString()+' per '+lowest.unit+'</div></div>'+sortedByPrice.map(function(item){var chg=item.change||'stable';var chgColor=chg==='up'?'#0ECB81':chg==='down'?'#F6465D':'var(--muted)';var chgArrow=chg==='up'?'▲':chg==='down'?'▼':'•';return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+' · '+item.category+'</div></div><div class="pright"><div class="pval">₦'+Number(item.price).toLocaleString()+'</div><div style="font-size:11px;color:'+chgColor+';font-weight:700;">'+chgArrow+' '+chg+'</div></div></div>';}).join('') : '<div class="empty">No items yet</div>';
+  document.getElementById('stats-items-list').innerHTML = sortedByPrice.length ? '<div style="margin-bottom:10px;padding:10px;background:#FDF6E3;border-radius:10px;"><div style="font-size:11px;color:var(--amber);font-weight:700;">HIGHEST PRICE</div><div style="font-size:15px;font-weight:800;color:var(--dark);">'+highest.name+'</div><div style="font-size:13px;color:var(--earth);">₦'+Number(highest.price).toLocaleString()+' per '+highest.unit+'</div></div><div style="margin-bottom:10px;padding:10px;background:#E8F5EE;border-radius:10px;"><div style="font-size:11px;color:var(--green);font-weight:700;">LOWEST PRICE</div><div style="font-size:15px;font-weight:800;color:var(--dark);">'+lowest.name+'</div><div style="font-size:13px;color:var(--green);">₦'+Number(lowest.price).toLocaleString()+' per '+lowest.unit+'</div></div>'+sortedByPrice.map(function(item){var chg=item.change||'stable';var chgColor=chg==='up'?'#2D7A4F':chg==='down'?'#C0392B':'var(--muted)';var chgArrow=chg==='up'?'▲':chg==='down'?'▼':'•';return '<div class="price-item"><div><div class="mname">'+item.name+'</div><div class="munit">'+item.unit+' · '+item.category+'</div></div><div class="pright"><div class="pval">₦'+Number(item.price).toLocaleString()+'</div><div style="font-size:11px;color:'+chgColor+';font-weight:700;">'+chgArrow+' '+chg+'</div></div></div>';}).join('') : '<div class="empty">No items yet</div>';
   if (history.length > 1) {
-    var canvas = document.getElementById('stats-chart');
     var prices = history.map(function(h){return Number(h.new_price);}).reverse();
-    var W = canvas.offsetWidth||320; var H = 180;
-    canvas.width=W; canvas.height=H;
-    var ctx = canvas.getContext('2d');
-    var isUp = prices[prices.length-1]>=prices[0];
-    var lc = isUp?'#0ECB81':'#F6465D';
-    ctx.fillStyle='#1E2026'; ctx.fillRect(0,0,W,H);
-    var mn=Math.min.apply(null,prices)*0.998,mx=Math.max.apply(null,prices)*1.002;
-    var pL=50,pR=10,pT=20,pB=25,rng=mx-mn||1;
-    function px(i){return pL+(i/(prices.length-1||1))*(W-pL-pR);}
-    function py(v){return H-pB-((v-mn)/rng)*(H-pT-pB);}
-    ctx.setLineDash([2,4]); ctx.lineWidth=1;
-    [0,0.5,1].forEach(function(t){
-      var yy=H-pB-t*(H-pT-pB);
-      ctx.strokeStyle='#2B2F36'; ctx.beginPath(); ctx.moveTo(pL,yy); ctx.lineTo(W-pR,yy); ctx.stroke();
-      ctx.fillStyle='#848E9C'; ctx.font='9px sans-serif'; ctx.textAlign='right';
-      ctx.fillText('₦'+(mn+t*rng).toLocaleString('en',{maximumFractionDigits:0}),pL-3,yy+3);
+    var dates = history.slice().reverse().map(function(h){
+      if(!h.created_at) return null;
+      var d=Math.floor((Date.now()-new Date(h.created_at).getTime())/1000);
+      return d<60?d+'s ago':d<3600?Math.floor(d/60)+'m ago':d<86400?Math.floor(d/3600)+'h ago':Math.floor(d/86400)+'d ago';
     });
-    ctx.setLineDash([]);
-    ctx.beginPath(); ctx.moveTo(px(0),py(prices[0]));
-    for(var i=1;i<prices.length;i++){var cpx=(px(i-1)+px(i))/2;ctx.bezierCurveTo(cpx,py(prices[i-1]),cpx,py(prices[i]),px(i),py(prices[i]));}
-    var gr=ctx.createLinearGradient(0,pT,0,H-pB);
-    gr.addColorStop(0,isUp?'rgba(14,203,129,0.25)':'rgba(246,70,93,0.25)'); gr.addColorStop(1,'rgba(30,32,38,0)');
-    ctx.lineTo(px(prices.length-1),H-pB); ctx.lineTo(px(0),H-pB); ctx.closePath(); ctx.fillStyle=gr; ctx.fill();
-    ctx.beginPath(); ctx.moveTo(px(0),py(prices[0]));
-    for(var i=1;i<prices.length;i++){var cpx=(px(i-1)+px(i))/2;ctx.bezierCurveTo(cpx,py(prices[i-1]),cpx,py(prices[i]),px(i),py(prices[i]));}
-    ctx.strokeStyle=lc; ctx.lineWidth=2; ctx.stroke();
-    var last=prices[prices.length-1],first=prices[0];
-    var pct=((last-first)/first*100).toFixed(1);
-    document.getElementById('stats-chart-summary').innerHTML='<span style="font-weight:800;color:'+lc+';">₦'+last.toLocaleString()+'</span><span style="color:'+lc+';">'+(last>=first?'+':'')+pct+'% overall</span>';
-    var wR=[H*0.25,H*0.5,H*0.75],wC=[W*0.2,W*0.5,W*0.8];
-    ctx.globalAlpha=0.08;ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign='center';
-    wR.forEach(function(wy){wC.forEach(function(wx){ctx.save();ctx.translate(wx,wy);ctx.rotate(-20*Math.PI/180);ctx.fillText('OjaLive',0,0);ctx.restore();});});
-    ctx.globalAlpha=1;
-    var sCanvas=document.getElementById('stats-chart');
-    sCanvas.ontouchstart=function(e){
-      e.preventDefault();
-      var rect=sCanvas.getBoundingClientRect();
-      var tx=(e.touches[0].clientX-rect.left)*(W/rect.width);
-      var idx=Math.round((tx-pL)/(W-pL-pR)*(prices.length-1));
-      idx=Math.max(0,Math.min(prices.length-1,idx));
-      var tp=prices[idx];
-      ctx.clearRect(0,0,W,H);
-      ctx.fillStyle='#1E2026';ctx.fillRect(0,0,W,H);
-      ctx.setLineDash([2,4]);ctx.lineWidth=1;
-      [0,0.5,1].forEach(function(t){
-        var yy=H-pB-t*(H-pT-pB);
-        ctx.strokeStyle='#2B2F36';ctx.beginPath();ctx.moveTo(pL,yy);ctx.lineTo(W-pR,yy);ctx.stroke();
-        ctx.fillStyle='#848E9C';ctx.font='9px sans-serif';ctx.textAlign='right';
-        ctx.fillText('₦'+(mn+t*rng).toLocaleString('en',{maximumFractionDigits:0}),pL-3,yy+3);
-      });
-      ctx.setLineDash([]);
-      ctx.beginPath();ctx.moveTo(px(0),py(prices[0]));
-      for(var i=1;i<prices.length;i++){var cpx=(px(i-1)+px(i))/2;ctx.bezierCurveTo(cpx,py(prices[i-1]),cpx,py(prices[i]),px(i),py(prices[i]));}
-      ctx.strokeStyle=lc;ctx.lineWidth=2;ctx.stroke();
-      ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;
-      ctx.beginPath();ctx.moveTo(px(idx),pT);ctx.lineTo(px(idx),H-pB);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(pL,py(tp));ctx.lineTo(W-pR,py(tp));ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.beginPath();ctx.arc(px(idx),py(tp),5,0,Math.PI*2);ctx.fillStyle=lc;ctx.fill();
-      var ttW=110,ttH=34;
-      var ttX=Math.min(Math.max(px(idx)-ttW/2,pL),W-pR-ttW);
-      var ttY=py(tp)<pT+50?py(tp)+10:py(tp)-ttH-8;
-      ctx.fillStyle='rgba(15,15,20,0.97)';ctx.strokeStyle=lc;ctx.lineWidth=1.5;
-      ctx.beginPath();if(ctx.roundRect)ctx.roundRect(ttX,ttY,ttW,ttH,6);else ctx.rect(ttX,ttY,ttW,ttH);
-      ctx.fill();ctx.stroke();
-      ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
-      ctx.fillText('₦'+tp.toLocaleString(),ttX+ttW/2,ttY+14);
-      ctx.fillStyle='#E0E0E0';ctx.font='10px sans-serif';
-      ctx.fillText('change #'+(idx+1),ttX+ttW/2,ttY+27);
-      wR.forEach(function(wy){wC.forEach(function(wx){ctx.save();ctx.globalAlpha=0.08;ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.translate(wx,wy);ctx.rotate(-20*Math.PI/180);ctx.fillText('OjaLive',0,0);ctx.restore();});});
-    };
+    document.getElementById('stats-chart').style.display='block';
+    renderEarthLineChart('stats-chart', prices, dates, {height:180, summaryEl:'stats-chart-summary'});
   } else {
     var canvas2 = document.getElementById('stats-chart');
     canvas2.style.display = history.length<=1?'none':'block';
