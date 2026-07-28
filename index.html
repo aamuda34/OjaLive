@@ -263,7 +263,8 @@ input:focus,select:focus{border-color:var(--earth);}
         <input type="text" id="reg-name" placeholder="Your shop or business name">
         <label>Phone Number</label>
         <input type="tel" id="reg-phone" placeholder="080xxxxxxxx">
-        <button type="button" class="btn btn-p" onclick="regGoToStep(2)" style="margin-top:16px;">Continue</button>
+        <div id="reg-step1-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none;"></div>
+        <button type="button" class="btn btn-p" onclick="regValidateStep1()" style="margin-top:16px;">Continue</button>
         </div>
         <div id="reg-step-2" class="hidden">
         <label>Country</label>
@@ -276,9 +277,10 @@ input:focus,select:focus{border-color:var(--earth);}
         <div id="reg-gps-status" style="font-size:12px;color:var(--muted);margin-top:6px;text-align:center;">Tap above — your exact location will be auto-filled</div>
         <input type="hidden" id="reg-lat">
         <input type="hidden" id="reg-lng">
+        <div id="reg-step2-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none;"></div>
         <div style="display:flex;gap:8px;margin-top:16px;">
           <button type="button" class="btn btn-o" onclick="regGoToStep(1)" style="margin:0;flex:1;">Back</button>
-          <button type="button" class="btn btn-p" onclick="regGoToStep(3)" style="margin:0;flex:2;">Continue</button>
+          <button type="button" class="btn btn-p" onclick="regValidateStep2()" style="margin:0;flex:2;">Continue</button>
         </div>
         </div>
         <div id="reg-step-3" class="hidden">
@@ -1671,6 +1673,35 @@ function captureUpdateLocation() {
     },
     { enableHighAccuracy: true, timeout: 10000 }
   );
+}
+async function regValidateStep1() {
+  var errEl = document.getElementById('reg-step1-error');
+  errEl.style.display = 'none';
+  var name = document.getElementById('reg-name').value.trim();
+  var phone = document.getElementById('reg-phone').value.trim();
+  if (!name) { errEl.textContent = 'Please enter your shop name'; errEl.style.display = 'block'; return; }
+  if (!phone) { errEl.textContent = 'Please enter your phone number'; errEl.style.display = 'block'; return; }
+  if (phone.length < 10) { errEl.textContent = 'Please enter a valid phone number'; errEl.style.display = 'block'; return; }
+  errEl.textContent = 'Checking phone number...';
+  errEl.style.color = 'var(--muted)';
+  errEl.style.display = 'block';
+  var check = await db.from('traders').select('id').eq('phone', phone);
+  if (check.data && check.data.length > 0) {
+    errEl.textContent = 'This phone number is already registered. Please login instead.';
+    errEl.style.color = '#C0392B';
+    return;
+  }
+  errEl.style.display = 'none';
+  regGoToStep(2);
+}
+function regValidateStep2() {
+  var errEl = document.getElementById('reg-step2-error');
+  var state = document.getElementById('reg-state').value;
+  var lat = document.getElementById('reg-lat').value;
+  if (!state) { errEl.textContent = 'Please select your state'; errEl.style.display = 'block'; return; }
+  if (!lat) { errEl.textContent = 'Please capture your shop location first'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  regGoToStep(3);
 }
 function regGoToStep(step) {
   [1,2,3].forEach(function(s) {
