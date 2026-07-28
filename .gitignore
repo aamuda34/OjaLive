@@ -1,3 +1,10 @@
 .geminikey
 .photoroomkey
 test-output.png
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
